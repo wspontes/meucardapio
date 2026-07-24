@@ -29,6 +29,64 @@
   </div>
 </div>
 
+<!-- ============ LANDING / CADASTRO ============= -->
+<div class="view" id="viewLanding">
+  <div class="landing-hero">
+    <div class="landing-container">
+      <div class="landing-logo">&#127828; Meu<span>Cardapio</span></div>
+      <h1>Cardápio digital grátis<br>para sua lanchonete!</h1>
+      <p>Crie seu cardápio online em segundos. Compartilhe o link com seus clientes e receba pedidos pelo WhatsApp.</p>
+      <a href="#cadastro" class="landing-cta">&#10003; Criar meu cardápio grátis</a>
+      <div class="landing-stores" id="landingStores"></div>
+    </div>
+  </div>
+
+  <div class="landing-section" id="cadastro">
+    <div class="landing-container">
+      <h2>&#128221; Cadastre sua lanchonete</h2>
+      <p style="color:var(--muted);margin-bottom:32px;">Preencha os dados abaixo e ganhe um link exclusivo para compartilhar.</p>
+      <div class="landing-form">
+        <div class="form-group">
+          <label>Nome da Lanchonete *</label>
+          <input type="text" id="regName" placeholder="Ex: Fabiano Lanches" oninput="slugifyName()">
+        </div>
+        <div class="form-group">
+          <label>Seu link será:</label>
+          <div class="slug-preview"><span class="slug-base">meucardapio.app/</span><span class="slug-value" id="slugPreview">sua-lanchonete</span></div>
+        </div>
+        <div class="form-group">
+          <label>WhatsApp *</label>
+          <input type="tel" id="regWhatsapp" placeholder="(11) 99999-8888">
+        </div>
+        <div class="form-group">
+          <label>Instagram</label>
+          <input type="text" id="regInstagram" placeholder="@seudelivery">
+        </div>
+        <button class="landing-cta" onclick="registerStore()">&#128190; Cadastrar grátis</button>
+        <p id="regError" class="reg-error"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="landing-section landing-features">
+    <div class="landing-container">
+      <h2>Por que usar o MeuCardapio?</h2>
+      <div class="features-grid">
+        <div class="feature-card"><span class="fi">&#128247;</span><h3>Cardápio Digital</h3><p>Produtos com fotos, preços e descrições.</p></div>
+        <div class="feature-card"><span class="fi">&#128722;</span><h3>Carrinho</h3><p>Clientes montam o pedido com poucos cliques.</p></div>
+        <div class="feature-card"><span class="fi">&#128172;</span><h3>Pedido via WhatsApp</h3><p>Receba os pedidos diretamente no seu WhatsApp.</p></div>
+        <div class="feature-card"><span class="fi">&#128202;</span><h3>Painel Admin</h3><p>Gerencie produtos, pedidos e finanças.</p></div>
+        <div class="feature-card"><span class="fi">&#127991;</span><h3>Cupons</h3><p>Crie promoções e descontos especiais.</p></div>
+        <div class="feature-card"><span class="fi">&#128666;</span><h3>Taxa por Bairro</h3><p>Configure entregas e taxas dinâmicas.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-bottom"><p>&copy; 2026 MeuCardapio. Feito para lanchonetes.</p></div>
+  </footer>
+</div>
+
 <!-- =================== LOGIN =================== -->
 <div class="login-overlay hidden" id="loginOverlay">
   <div class="login-box">
@@ -347,7 +405,7 @@
     <div class="admin-topbar">
       <h2 id="adminTitle">Dashboard</h2>
       <div class="top-actions">
-        <button class="action-btn" onclick="adminLogout()">&#128241; Ver Site</button>
+        <button class="action-btn" onclick="goToStoreView()">&#128241; Ver Site</button>
       </div>
     </div>
     <div class="admin-content">

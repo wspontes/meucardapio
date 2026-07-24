@@ -20,19 +20,163 @@ let currentUser = null;
 let couponApplied = false, discount = 0;
 const deliveryFeeValue = 4.99;
 
-function saveProducts() { localStorage.setItem('meucardapioProducts', JSON.stringify(products)); }
+// ===== MULTI-TENANT =====
+let currentSlug = null;
+let storesData = {};
+
+function loadStoresData() {
+  const saved = localStorage.getItem('meucardapioStores');
+  storesData = saved ? JSON.parse(saved) : {};
+}
+
+function saveStoresData() {
+  localStorage.setItem('meucardapioStores', JSON.stringify(storesData));
+}
+
+function slugify(text) {
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'lanchonete';
+}
+
+function navigateTo(url) {
+  history.pushState(null, '', url);
+  router();
+}
+
+function getPathFromURL() {
+  let path = window.location.pathname.replace(/\/+$/, '') || '';
+  if (path.startsWith('/')) path = path.slice(1);
+  return path;
+}
+
+function router() {
+  let path = getPathFromURL();
+
+  if (!path) {
+    showLanding();
+    return;
+  }
+
+  const store = storesData[path];
+  if (store) {
+    currentSlug = path;
+    loadStore(path, store);
+  } else {
+    showLanding();
+  }
+}
+
+function showLanding() {
+  currentSlug = null;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('viewLanding').classList.add('active');
+  renderStoreList();
+}
+
+function renderStoreList() {
+  const el = document.getElementById('landingStores');
+  const slugs = Object.keys(storesData);
+  if (!slugs.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<h3>&#127760; Lanchonetes cadastradas</h3><div class="landing-stores-list">' +
+    slugs.map(s => '<a class="landing-store-badge" href="/' + s + '" onclick="event.preventDefault();navigateTo(\'/' + s + '\')">' + storesData[s].config.storeName + '</a>').join('') +
+    '</div>';
+}
+
+function loadStore(slug, store) {
+  products.length = 0;
+  (store.products || []).forEach(p => products.push(p));
+  banners.length = 0;
+  (store.banners || []).forEach(b => banners.push(b));
+  banners = store.banners || [];
+  localStorage.setItem('meucardapioProducts', JSON.stringify(products));
+  localStorage.setItem('meucardapioBanners', JSON.stringify(banners));
+  localStorage.setItem('meucardapioConfig', JSON.stringify(store.config));
+  currentConfig = store.config;
+  document.title = store.config.storeName + ' - Cardápio Digital';
+  applyConfig(store.config);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('viewCliente').classList.add('active');
+  renderBannerCarousel();
+  checkUser();
+}
+
+function saveCurrentStore() {
+  if (!currentSlug) return;
+  if (!storesData[currentSlug]) {
+    storesData[currentSlug] = { config: {}, products: [], banners: [] };
+  }
+  storesData[currentSlug].products = JSON.parse(JSON.stringify(products));
+  storesData[currentSlug].banners = JSON.parse(JSON.stringify(banners));
+  storesData[currentSlug].config = JSON.parse(JSON.stringify(currentConfig));
+  saveStoresData();
+}
+
+function registerStore() {
+  const name = document.getElementById('regName').value.trim();
+  const whatsapp = document.getElementById('regWhatsapp').value.trim();
+  const instagram = document.getElementById('regInstagram').value.trim();
+  const slug = slugify(name);
+  const errEl = document.getElementById('regError');
+
+  if (!name || !whatsapp) { errEl.textContent = 'Preencha nome e WhatsApp!'; return; }
+  if (storesData[slug]) { errEl.textContent = 'Já existe uma lanchonete com esse nome. Tente outro.'; return; }
+  if (!slug || slug === 'lanchonete') { errEl.textContent = 'Nome inválido para gerar o link.'; return; }
+
+  storesData[slug] = {
+    config: {
+      storeName: name,
+      slug: slug,
+      colorPrimary: '#10b981',
+      colorSecondary: '#1c1917',
+      colorButtons: '#10b981',
+      whatsapp: whatsapp,
+      instagram: instagram || '@' + slug,
+      deliveryFee: 4.99,
+      minOrder: 25
+    },
+    products: [],
+    banners: []
+  };
+  saveStoresData();
+  navigateTo('/' + slug);
+}
+
+function slugifyName() {
+  const name = document.getElementById('regName').value.trim();
+  document.getElementById('slugPreview').textContent = slugify(name);
+}
+
+let currentConfig = {
+  storeName: 'MeuCardapio',
+  slug: '',
+  colorPrimary: '#10b981',
+  colorSecondary: '#1c1917',
+  colorButtons: '#10b981',
+  whatsapp: '(11) 99999-8888',
+  instagram: '@meucardapio',
+  deliveryFee: 4.99,
+  minOrder: 25
+};
+
+function saveProducts() {
+  localStorage.setItem('meucardapioProducts', JSON.stringify(products));
+  saveCurrentStore();
+}
 function toggleDestaque(id, el) {
   var p = products.find(function(x){ return x.id === id; });
   if (p) { p.destaque = !p.destaque; saveProducts(); el.classList.toggle('active'); }
 }
 
 // ===== LOGIN =====
+function storePrefix() {
+  return currentSlug ? 'store_' + currentSlug + '_' : '';
+}
+
 function doLogin(fromCheckout) {
   const name = document.getElementById('loginName').value.trim();
   const phone = document.getElementById('loginPhone').value.trim();
   if (!name || !phone) { alert('Preencha nome e telefone!'); return; }
   currentUser = { name, phone, id: phone.replace(/\D/g,'') };
-  localStorage.setItem('burgerUser', JSON.stringify(currentUser));
+  localStorage.setItem(storePrefix() + 'burgerUser', JSON.stringify(currentUser));
   document.getElementById('loginOverlay').classList.add('hidden');
   document.getElementById('userNameDisplay').textContent = name.split(' ')[0];
   document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
@@ -47,8 +191,8 @@ function doLogin(fromCheckout) {
 function logout() {
   if (currentUser) {
     if (confirm('Trocar de usuário?')) {
-      localStorage.removeItem('burgerUser');
-      localStorage.removeItem('burgerOrders_' + currentUser.id);
+      localStorage.removeItem(storePrefix() + 'burgerUser');
+      localStorage.removeItem(storePrefix() + 'burgerOrders_' + currentUser.id);
       currentUser = null;
       location.reload();
     }
@@ -59,16 +203,16 @@ function logout() {
 
 function loadUserData() {
   if (!currentUser) return;
-  const key = 'burgerOrders_' + currentUser.id;
+  const key = storePrefix() + 'burgerOrders_' + currentUser.id;
   orderHistory = JSON.parse(localStorage.getItem(key) || '[]');
-  favoritos = JSON.parse(localStorage.getItem('burgerFavs_' + currentUser.id) || '[]');
+  favoritos = JSON.parse(localStorage.getItem(storePrefix() + 'burgerFavs_' + currentUser.id) || '[]');
   document.getElementById('umFavCount').textContent = favoritos.length;
   document.getElementById('umOrderCount').textContent = orderHistory.length;
   renderProducts('all');
 }
 
 function checkUser() {
-  const saved = JSON.parse(localStorage.getItem('burgerUser'));
+  const saved = JSON.parse(localStorage.getItem(storePrefix() + 'burgerUser'));
   if (saved && saved.name && saved.phone) {
     currentUser = saved;
     document.getElementById('userNameDisplay').textContent = saved.name.split(' ')[0];
@@ -99,6 +243,7 @@ function doAdminLogin() {
     closeAdminLogin();
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('viewAdmin').classList.add('active');
+    loadAdminStoreData();
     drawAdminCharts();
     renderSortableProducts();
     if (window.location.hash === '#admin') history.replaceState(null, '', window.location.pathname);
@@ -106,12 +251,40 @@ function doAdminLogin() {
     alert('Credenciais inválidas!');
   }
 }
+
+function loadAdminStoreData() {
+  if (!currentSlug) return;
+  const store = storesData[currentSlug];
+  if (!store) return;
+  const cfg = store.config;
+  document.getElementById('cfgStoreName').value = cfg.storeName;
+  document.getElementById('cfgSlug').value = cfg.slug;
+  document.getElementById('cfgColorPrimary').value = cfg.colorPrimary;
+  document.getElementById('cfgColorSecondary').value = cfg.colorSecondary;
+  document.getElementById('cfgColorButtons').value = cfg.colorButtons;
+  document.getElementById('cfgWhatsapp').value = cfg.whatsapp;
+  document.getElementById('cfgInstagram').value = cfg.instagram;
+  document.getElementById('cfgDeliveryFee').value = (cfg.deliveryFee || 4.99).toFixed(2).replace('.',',');
+  document.getElementById('cfgMinOrder').value = (cfg.minOrder || 25).toFixed(2).replace('.',',');
+  applyConfig(cfg);
+}
+function goToStoreView() {
+  adminLoggedIn = false;
+  sessionStorage.removeItem('meucardapioAdmin');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('viewCliente').classList.add('active');
+}
+
 function adminLogout() {
   if (confirm('Sair do painel administrativo?')) {
     adminLoggedIn = false;
     sessionStorage.removeItem('meucardapioAdmin');
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('viewCliente').classList.add('active');
+    if (currentSlug) {
+      navigateTo('/' + currentSlug);
+    } else {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('viewCliente').classList.add('active');
+    }
   }
 }
 function restoreAdminSession() {
@@ -119,6 +292,7 @@ function restoreAdminSession() {
     adminLoggedIn = true;
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('viewAdmin').classList.add('active');
+    loadAdminStoreData();
     drawAdminCharts();
     renderSortableProducts();
   }
@@ -231,7 +405,7 @@ function toggleFavorito(id, btn) {
   const idx = favoritos.indexOf(id);
   if (idx > -1) { favoritos.splice(idx,1); if(btn) btn.classList.remove('favorited'); }
   else { favoritos.push(id); if(btn) btn.classList.add('favorited'); }
-  localStorage.setItem('burgerFavs_' + currentUser.id, JSON.stringify(favoritos));
+  localStorage.setItem(storePrefix() + 'burgerFavs_' + currentUser.id, JSON.stringify(favoritos));
   document.getElementById('umFavCount').textContent = favoritos.length;
 }
 function addFavorito(id) {
@@ -456,7 +630,7 @@ function confirmOrder() {
     telefone: chkPhone || currentUser.phone
   };
   orderHistory.unshift(order);
-  const key = 'burgerOrders_' + currentUser.id;
+  const key = storePrefix() + 'burgerOrders_' + currentUser.id;
   localStorage.setItem(key, JSON.stringify(orderHistory));
   closeCheckout(); closeCart();
   cart = []; couponApplied = false; discount = 0; updateCart();
@@ -506,7 +680,7 @@ function submitRating() {
   const orderNum = document.getElementById('orderNum').textContent;
   const order = orderHistory.find(o => '#'+o.id === orderNum);
   if (order) { order.avaliado=true; order.rating=ratingValue; order.ratingComment=document.getElementById('ratingComment').value.trim();
-    const key = 'burgerOrders_'+currentUser.id; localStorage.setItem(key, JSON.stringify(orderHistory)); }
+    const key = storePrefix() + 'burgerOrders_'+currentUser.id; localStorage.setItem(key, JSON.stringify(orderHistory)); }
   document.getElementById('ratingOverlay').classList.remove('open');
   alert('Obrigado!');
   ratingValue=0; document.querySelectorAll('#starsInput span').forEach(el => el.classList.remove('active'));
@@ -796,6 +970,7 @@ function loadBanners() {
 
 function saveBanners() {
   localStorage.setItem('meucardapioBanners', JSON.stringify(banners));
+  saveCurrentStore();
   renderBanners();
   renderBannerCarousel();
 }
@@ -992,7 +1167,7 @@ document.addEventListener('touchend', function(e) {
 
 // ===== CONFIG =====
 function saveConfig() {
-  const cfg = {
+  currentConfig = {
     storeName: document.getElementById('cfgStoreName').value.trim() || 'MeuCardapio',
     slug: document.getElementById('cfgSlug').value.trim() || 'meu-cardapio',
     colorPrimary: document.getElementById('cfgColorPrimary').value,
@@ -1003,14 +1178,16 @@ function saveConfig() {
     deliveryFee: parseFloat(document.getElementById('cfgDeliveryFee').value.replace(',','.')) || 4.99,
     minOrder: parseFloat(document.getElementById('cfgMinOrder').value.replace(',','.')) || 25
   };
-  localStorage.setItem('meucardapioConfig', JSON.stringify(cfg));
-  applyConfig(cfg);
+  localStorage.setItem('meucardapioConfig', JSON.stringify(currentConfig));
+  saveCurrentStore();
+  applyConfig(currentConfig);
   alert('Configurações salvas!');
 }
 
 function loadConfig() {
   const saved = JSON.parse(localStorage.getItem('meucardapioConfig'));
   if (saved) {
+    currentConfig = saved;
     document.getElementById('cfgStoreName').value = saved.storeName;
     document.getElementById('cfgSlug').value = saved.slug;
     document.getElementById('cfgColorPrimary').value = saved.colorPrimary;
@@ -1074,14 +1251,20 @@ window.addEventListener('resize', function() {
   }, 250);
 });
 
-loadConfig();
-loadBanners();
-var savedProducts = JSON.parse(localStorage.getItem('meucardapioProducts'));
-if (savedProducts && savedProducts.length) products = savedProducts;
-checkUser();
-restoreAdminSession();
+loadStoresData();
+router();
 
-if (window.location.hash === '#admin' && !adminLoggedIn) showAdminLogin();
+window.addEventListener('popstate', function() { router(); });
 window.addEventListener('hashchange', function() {
-  if (window.location.hash === '#admin' && !adminLoggedIn) showAdminLogin();
+  if (currentSlug && window.location.hash === '#admin' && !adminLoggedIn) showAdminLogin();
 });
+
+if (currentSlug) {
+  loadConfig();
+  loadBanners();
+  var savedProducts = JSON.parse(localStorage.getItem('meucardapioProducts'));
+  if (savedProducts && savedProducts.length) { products.length = 0; savedProducts.forEach(function(p) { products.push(p); }); }
+  checkUser();
+  restoreAdminSession();
+  if (window.location.hash === '#admin') showAdminLogin();
+}
