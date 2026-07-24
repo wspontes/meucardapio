@@ -101,6 +101,14 @@ function loadStore(slug, store) {
 }
 
 function clearAdminMockData() {
+  // Nav badge (sidebar)
+  document.querySelectorAll('.sidebar-nav .nav-badge').forEach(function(el) {
+    el.textContent = '0';
+  });
+  // Tab bar counts (Pedidos page)
+  document.querySelectorAll('#apage-pedidos .tab-bar button').forEach(function(btn) {
+    btn.textContent = btn.textContent.replace(/\((\d+)\)/, '(0)');
+  });
   // Dashboard metrics
   document.querySelectorAll('.metrics-grid .m-value').forEach(function(el) {
     if (el.style.color) el.textContent = '0';
@@ -118,8 +126,6 @@ function clearAdminMockData() {
   // Cupons
   var cuponsBody = document.getElementById('cuponsTableBody');
   if (cuponsBody) cuponsBody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;font-size:13px;">Nenhum cupom cadastrado</td></tr>';
-  // Produtos sem venda
-  var semVenda = document.querySelector('#apage-dash .card:first-of-type + .card table tbody');
   // Dashboard products without sales
   document.querySelectorAll('#apage-dash .card .card-header h3').forEach(function(h3) {
     if (h3.textContent.indexOf('Produtos sem Venda') > -1) {
