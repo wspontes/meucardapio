@@ -77,13 +77,37 @@ function checkUser() {
   }
 }
 
-// ===== MODE SWITCHER =====
-function switchMode(mode, btn) {
-  document.querySelectorAll('.mode-switcher button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('view' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
-  if (mode === 'admin') { drawAdminCharts(); renderSortableProducts(); }
+// ===== ADMIN LOGIN =====
+let adminLoggedIn = false;
+
+function showAdminLogin() {
+  document.getElementById('adminLoginOverlay').classList.remove('hidden');
+}
+function closeAdminLogin() {
+  document.getElementById('adminLoginOverlay').classList.add('hidden');
+  document.getElementById('adminLoginUser').value = '';
+  document.getElementById('adminLoginPass').value = '';
+}
+function doAdminLogin() {
+  const user = document.getElementById('adminLoginUser').value.trim();
+  const pass = document.getElementById('adminLoginPass').value.trim();
+  if (user === 'admin' && pass === 'admin123') {
+    adminLoggedIn = true;
+    closeAdminLogin();
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('viewAdmin').classList.add('active');
+    drawAdminCharts();
+    renderSortableProducts();
+  } else {
+    alert('Credenciais inválidas!');
+  }
+}
+function adminLogout() {
+  if (confirm('Sair do painel administrativo?')) {
+    adminLoggedIn = false;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('viewCliente').classList.add('active');
+  }
 }
 
 // ===== PRODUCTS =====
@@ -622,4 +646,3 @@ document.querySelector('.sidebar-nav').addEventListener('click', function(e) {
 });
 
 checkUser();
-drawAdminCharts();

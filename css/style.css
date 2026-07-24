@@ -3,10 +3,6 @@
 :root{--primary:#10b981;--primary-dark:#059669;--primary-alpha:rgba(16,185,129,.15);--secondary:#1c1917;--bg:#f5f5f4;--surface:#fff;--text:#1c1917;--muted:#78716c;--border:#e7e5e4;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;--yellow:#f59e0b;--font:'Inter',-apple-system,sans-serif}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5}
 .container{max-width:1120px;margin:0 auto;padding:0 20px}
-.mode-switcher{background:var(--secondary);display:flex;justify-content:center;gap:4px;padding:10px;position:sticky;top:0;z-index:500}
-.mode-switcher button{padding:10px 32px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;background:rgba(255,255,255,.08);color:#a8a29e}
-.mode-switcher button.active{background:var(--primary);color:#fff}
-.mode-switcher button:hover:not(.active){background:rgba(255,255,255,.15);color:#fff}
 .view{display:none}.view.active{display:block}
 
 /* ===== LOGIN ===== */
@@ -25,7 +21,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 @keyframes modalIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
 
 /* ===== CLIENTE HEADER ===== */
-.cliente-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:100}
+.cliente-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
 .cliente-header .inner{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;max-width:1120px;margin:0 auto}
 .cliente-header .logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800}
 .cliente-header .logo span{color:var(--primary)}

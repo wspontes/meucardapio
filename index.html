@@ -10,11 +10,23 @@
 </head>
 <body>
 
-<!-- MODE SWITCHER -->
-<div class="mode-switcher">
-  <span style="position:absolute;left:20px;top:50%;transform:translateY(-50%);color:var(--primary);font-weight:800;font-size:15px;">&#127828; MeuCardapio</span>
-  <button class="active" onclick="switchMode('cliente',this)">&#128241; Visão do Cliente</button>
-  <button onclick="switchMode('admin',this)">&#128187; Visão do Admin</button>
+<!-- ADMIN LOGIN MODAL -->
+<div class="login-overlay hidden" id="adminLoginOverlay">
+  <div class="login-box">
+    <div class="login-icon">&#128274;</div>
+    <h2>Acesso Administrativo</h2>
+    <p>Entre com suas credenciais</p>
+    <div class="form-group">
+      <label>Usuário</label>
+      <input type="text" placeholder="admin" id="adminLoginUser" onkeydown="if(event.key==='Enter') doAdminLogin()">
+    </div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" placeholder="********" id="adminLoginPass" onkeydown="if(event.key==='Enter') doAdminLogin()">
+    </div>
+    <button onclick="doAdminLogin()">&#128274; Entrar no Painel</button>
+    <p style="margin-top:16px;font-size:12px;color:var(--muted);cursor:pointer;" onclick="closeAdminLogin()">&#8592; Voltar ao cardápio</p>
+  </div>
 </div>
 
 <!-- =================== LOGIN =================== -->
@@ -52,7 +64,7 @@
     </div>
   </header>
 
-  <div class="delivery-bar">&#128666; Pedido mínimo: <strong>R$ 25,00</strong> &middot; <a href="#" onclick="switchMode('admin',document.querySelector('.mode-switcher button:last-child'));return false">Painel Admin</a></div>
+  <div class="delivery-bar">&#128666; Pedido mínimo: <strong>R$ 25,00</strong> &middot; <a href="#" onclick="showAdminLogin();return false">&#128274; Admin</a></div>
 
   <div class="banner">
     <div class="decor"></div>
@@ -110,7 +122,7 @@
           <div class="social"><a href="#">&#10070;</a><a href="#">&#120143;</a><a href="#">&#128222;</a></div>
         </div>
         <div><h4>Serviços</h4><a href="#">Cardápio Digital</a><a href="#">Delivery</a><a href="#">Gestão de Pedidos</a><a href="#">Suporte</a></div>
-        <div><h4>Contato</h4><p>(11) 99999-8888</p><p>@meucardapio</p><p>Seg-Sáb: 18h-23h</p></div>
+        <div><h4>Contato</h4><p>(11) 99999-8888</p><p>@meucardapio</p><p>Seg-Sáb: 18h-23h</p><p style="margin-top:12px;"><a href="#" onclick="showAdminLogin();return false" style="font-size:12px;color:#57534e;">&#128274; Admin</a></p></div>
       </div>
       <div class="container footer-bottom"><p>&copy; 2026 MeuCardapio.</p></div>
     </footer>
@@ -315,19 +327,20 @@
       <button data-apage="financeiro"><span class="nav-icon">&#128176;</span><span class="nav-label">Financeiro</span></button>
       <button data-apage="config"><span class="nav-icon">&#128295;</span><span class="nav-label">Configurações</span></button>
     </nav>
-    <div style="padding:16px 20px;border-top:1px solid rgba(255,255,255,.06);font-size:13px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;">M</div>
-        <div><h5 style="font-size:13px;color:#fff;font-weight:600;">Admin</h5><p style="font-size:11px;color:#a8a29e;">Administrador</p></div>
+      <div style="padding:16px 20px;border-top:1px solid rgba(255,255,255,.06);font-size:13px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;">M</div>
+          <div><h5 style="font-size:13px;color:#fff;font-weight:600;">Admin</h5><p style="font-size:11px;color:#a8a29e;">Administrador</p></div>
+          <button onclick="adminLogout()" style="margin-left:auto;background:none;border:1px solid rgba(255,255,255,.15);color:#a8a29e;border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;">Sair</button>
+        </div>
       </div>
-    </div>
   </aside>
 
   <div class="admin-main">
     <div class="admin-topbar">
       <h2 id="adminTitle">Dashboard</h2>
       <div class="top-actions">
-        <button class="action-btn" onclick="switchMode('cliente',document.querySelector('.mode-switcher button:first-child'))">&#128241; Ver Site</button>
+        <button class="action-btn" onclick="adminLogout()">&#128241; Ver Site</button>
       </div>
     </div>
     <div class="admin-content">
