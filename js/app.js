@@ -517,6 +517,7 @@ function switchAdminPage(page, el) {
   const titles = {dash:'Dashboard',pedidos:'Pedidos',produtos:'Produtos',banners:'Banners',clientes:'Clientes',bairros:'Bairros Atendidos',cupons:'Cupons',pagamentos:'Formas de Pagamento',financeiro:'Financeiro',config:'Configurações'};
   document.getElementById('adminTitle').textContent = titles[page]||'Dashboard';
   if (page === 'produtos') renderSortableProducts();
+  if (page === 'banners') renderBanners();
   if (page === 'dash') drawAdminCharts();
 }
 function drawAdminCharts() {
@@ -656,6 +657,38 @@ function addPayment() {
   const tr = document.createElement('tr');
   tr.innerHTML = `<td><strong>${nome}</strong></td><td>&#128179;</td><td>${taxa}</td><td><span class="toggle-switch active" onclick="this.classList.toggle('active')"><span class="knob"></span></span></td><td><button class="action-btn">&#9998;</button></td>`;
   tbody.appendChild(tr);
+}
+function deleteRow(btn) { if (confirm('Remover?')) btn.closest('tr').remove(); }
+function editBairro(btn) {
+  var tr = btn.closest('tr');
+  var cells = tr.querySelectorAll('td');
+  var nome = prompt('Nome do bairro:', cells[0].textContent.trim());
+  if (!nome) return;
+  var taxa = prompt('Taxa de entrega (R$):', cells[1].textContent.replace('R$ ',''));
+  var tempo = prompt('Tempo médio:', cells[2].textContent);
+  cells[0].innerHTML = '<strong>' + nome + '</strong>';
+  cells[1].textContent = 'R$ ' + parseFloat(taxa||0).toFixed(2);
+  cells[2].textContent = tempo;
+}
+function editCupom(btn) {
+  var tr = btn.closest('tr');
+  var cells = tr.querySelectorAll('td');
+  var codigo = prompt('Código:', cells[0].textContent.trim());
+  if (!codigo) return;
+  var tipo = prompt('Tipo:', cells[1].textContent);
+  var valor = prompt('Valor:', cells[2].textContent);
+  cells[0].innerHTML = '<strong style="font-family:monospace;">' + codigo.toUpperCase() + '</strong>';
+  cells[1].textContent = tipo;
+  cells[2].textContent = valor;
+}
+function editPagamento(btn) {
+  var tr = btn.closest('tr');
+  var cells = tr.querySelectorAll('td');
+  var nome = prompt('Nome:', cells[0].textContent.trim());
+  if (!nome) return;
+  var taxa = prompt('Taxa (%):', cells[2].textContent.replace('%',''));
+  cells[0].innerHTML = '<strong>' + nome + '</strong>';
+  cells[2].textContent = taxa + '%';
 }
 function addBairro() {
   const nome = prompt('Nome do bairro:');
