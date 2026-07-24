@@ -658,37 +658,70 @@ function addPayment() {
   tr.innerHTML = `<td><strong>${nome}</strong></td><td>&#128179;</td><td>${taxa}</td><td><span class="toggle-switch active" onclick="this.classList.toggle('active')"><span class="knob"></span></span></td><td><button class="action-btn">&#9998;</button></td>`;
   tbody.appendChild(tr);
 }
+var simpleEditTarget = null;
 function deleteRow(btn) { if (confirm('Remover?')) btn.closest('tr').remove(); }
+function openSimpleEdit(title, fields, target, onsave) {
+  document.getElementById('simpleEditTitle').textContent = title;
+  document.getElementById('simpleEditBody').innerHTML = fields.map(function(f) {
+    return '<div class="form-group"><label>' + f.label + '</label><input type="text" id="sef-' + f.id + '" value="' + (f.value || '') + '" placeholder="' + (f.placeholder || '') + '"></div>';
+  }).join('');
+  simpleEditTarget = { target: target, fields: fields, onsave: onsave };
+  document.getElementById('simpleEditOverlay').dataset.saveFields = JSON.stringify(fields.map(function(f){return f.id;}));
+  document.getElementById('simpleEditOverlay').classList.add('open');
+}
+function closeSimpleEdit() {
+  document.getElementById('simpleEditOverlay').classList.remove('open');
+  simpleEditTarget = null;
+}
+function saveSimpleEdit() {
+  if (!simpleEditTarget) return;
+  var values = {};
+  var valid = true;
+  simpleEditTarget.fields.forEach(function(f) {
+    var v = document.getElementById('sef-' + f.id).value.trim();
+    if (f.required && !v) { valid = false; }
+    values[f.id] = v;
+  });
+  if (!valid) { alert('Preencha todos os campos obrigatórios!'); return; }
+  simpleEditTarget.onsave(simpleEditTarget.target, values);
+  closeSimpleEdit();
+}
 function editBairro(btn) {
   var tr = btn.closest('tr');
   var cells = tr.querySelectorAll('td');
-  var nome = prompt('Nome do bairro:', cells[0].textContent.trim());
-  if (!nome) return;
-  var taxa = prompt('Taxa de entrega (R$):', cells[1].textContent.replace('R$ ',''));
-  var tempo = prompt('Tempo médio:', cells[2].textContent);
-  cells[0].innerHTML = '<strong>' + nome + '</strong>';
-  cells[1].textContent = 'R$ ' + parseFloat(taxa||0).toFixed(2);
-  cells[2].textContent = tempo;
+  openSimpleEdit('&#127963; Editar Bairro', [
+    { id:'nome', label:'Nome', value: cells[0].textContent.trim(), required: true },
+    { id:'taxa', label:'Taxa de Entrega (R$)', value: cells[1].textContent.replace('R$ ',''), placeholder: '4,99' },
+    { id:'tempo', label:'Tempo Médio', value: cells[2].textContent, placeholder: '20-30 min' }
+  ], tr, function(tr, vals) {
+    tr.querySelectorAll('td')[0].innerHTML = '<strong>' + vals.nome + '</strong>';
+    tr.querySelectorAll('td')[1].textContent = 'R$ ' + parseFloat(vals.taxa||0).toFixed(2);
+    tr.querySelectorAll('td')[2].textContent = vals.tempo;
+  });
 }
 function editCupom(btn) {
   var tr = btn.closest('tr');
   var cells = tr.querySelectorAll('td');
-  var codigo = prompt('Código:', cells[0].textContent.trim());
-  if (!codigo) return;
-  var tipo = prompt('Tipo:', cells[1].textContent);
-  var valor = prompt('Valor:', cells[2].textContent);
-  cells[0].innerHTML = '<strong style="font-family:monospace;">' + codigo.toUpperCase() + '</strong>';
-  cells[1].textContent = tipo;
-  cells[2].textContent = valor;
+  openSimpleEdit('&#127991; Editar Cupom', [
+    { id:'codigo', label:'Código', value: cells[0].textContent.trim(), required: true },
+    { id:'tipo', label:'Tipo', value: cells[1].textContent, placeholder: 'Percentual' },
+    { id:'valor', label:'Valor', value: cells[2].textContent, placeholder: '10%' }
+  ], tr, function(tr, vals) {
+    tr.querySelectorAll('td')[0].innerHTML = '<strong style="font-family:monospace;">' + vals.codigo.toUpperCase() + '</strong>';
+    tr.querySelectorAll('td')[1].textContent = vals.tipo;
+    tr.querySelectorAll('td')[2].textContent = vals.valor;
+  });
 }
 function editPagamento(btn) {
   var tr = btn.closest('tr');
   var cells = tr.querySelectorAll('td');
-  var nome = prompt('Nome:', cells[0].textContent.trim());
-  if (!nome) return;
-  var taxa = prompt('Taxa (%):', cells[2].textContent.replace('%',''));
-  cells[0].innerHTML = '<strong>' + nome + '</strong>';
-  cells[2].textContent = taxa + '%';
+  openSimpleEdit('&#128179; Editar Pagamento', [
+    { id:'nome', label:'Nome', value: cells[0].textContent.trim(), required: true },
+    { id:'taxa', label:'Taxa (%)', value: cells[2].textContent.replace('%',''), placeholder: '2,99' }
+  ], tr, function(tr, vals) {
+    tr.querySelectorAll('td')[0].innerHTML = '<strong>' + vals.nome + '</strong>';
+    tr.querySelectorAll('td')[2].textContent = vals.taxa + '%';
+  });
 }
 function addBairro() {
   const nome = prompt('Nome do bairro:');

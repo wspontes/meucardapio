@@ -252,54 +252,68 @@
     </div>
   </div>
 
-  <!-- PRODUCT EDIT (ADMIN) -->
-  <div class="overlay" id="editProdOverlay">
-    <div class="modal" style="max-width:640px;">
-      <div class="modal-header"><h3 id="editProdTitle">&#9998; Editar Produto</h3><button class="modal-close" onclick="closeEditProd()">&times;</button></div>
-      <div class="modal-body" style="padding:24px;">
-        <div class="form-row-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-          <div class="form-group"><label>Nome</label><input type="text" id="epName" placeholder="Produto"></div>
-          <div class="form-group"><label>Preço (R$)</label><input type="text" id="epPrice" placeholder="29,90"></div>
-          <div class="form-group"><label>Preço Promocional (R$)</label><input type="text" id="epOldPrice" placeholder="24,90" oninput="epAutoTag()"></div>
-        </div>
-        <div class="form-group"><label>Descrição</label><textarea rows="2" id="epDesc" placeholder="Descrição curta..."></textarea></div>
-        <div class="form-group">
-          <label>&#128247; Imagem do Produto</label>
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <button class="btn-sm primary" onclick="document.getElementById('epImageInput').click()">&#128206; Carregar Foto</button>
-            <button class="btn-sm" onclick="clearProdImage()" style="display:none;" id="clearProdImgBtn">&#128465; Remover</button>
-          </div>
-          <input type="file" id="epImageInput" accept="image/*" style="display:none;" onchange="previewProdImage(event)">
-          <div id="epImagePreview" style="margin-top:8px;max-width:160px;display:none;">
-            <img id="epImagePreviewImg" src="" style="width:100%;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">
-          </div>
-        </div>
-        <div class="form-row-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-          <div class="form-group"><label>Categoria</label><select id="epCat"><option value="burguer">Burguer</option><option value="batata">Batatas</option><option value="bebida">Bebidas</option><option value="sobremesa">Sobremesas</option></select></div>
-          <div class="form-group"><label>Ícone</label><select id="epEmoji"><option value="&#127828;">&#127828; Burguer</option><option value="&#127839;">&#127839; Batata</option><option value="&#129346;">&#129346; Bebida</option><option value="&#127852;">&#127852; Sobremesa</option><option value="&#127849;">&#127849; Petit</option></select></div>
-          <div class="form-group"><label>Vendas</label><input type="text" id="epVendas" placeholder="0"></div>
-        </div>
-        <div class="form-group"><label>Ingredientes (separados por vírgula)</label><input type="text" id="epIngredients" placeholder="Hamburguer, Cheddar, Alface"></div>
-        <div class="tag-select" style="margin:12px 0;">
-          <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--muted);">Tag / Selo</label>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <label class="tag-option"><input type="radio" name="epTag" value="" checked> Nenhum</label>
-            <label class="tag-option"><input type="radio" name="epTag" value="destaque|Mais pedido"> &#127775; Mais pedido</label>
-            <label class="tag-option"><input type="radio" name="epTag" value="destaque|Destaque"> &#11088; Destaque</label>
-            <label class="tag-option"><input type="radio" name="epTag" value="destaque|Novidade"> &#128293; Novidade</label>
-            <label class="tag-option" id="epTagPromo" style="opacity:.5;"><input type="radio" name="epTag" value="promo|Promoção" disabled> &#127881; Promoção</label>
-          </div>
-        </div>
-        <div style="display:flex;gap:16px;flex-wrap:wrap;margin:12px 0;">
-          <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;"><input type="checkbox" id="epDestaque"> &#11088; Em destaque</label>
-          <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;"><input type="checkbox" id="epDisponivel" checked> &#9989; Disponível</label>
-        </div>
-        <div class="form-group"><label>Adicionais (nome,preço | um por linha)</label><textarea rows="3" id="epAddons" placeholder="Bacon extra,3&#10;Cheddar extra,2.5"></textarea></div>
+</div>
+
+<!-- ============== ADMIN OVERLAYS =============== -->
+<!-- SIMPLE EDIT -->
+<div class="overlay" id="simpleEditOverlay" onclick="if(event.target===this)closeSimpleEdit()">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header"><h3 id="simpleEditTitle">&#9998; Editar</h3><button class="modal-close" onclick="closeSimpleEdit()">&times;</button></div>
+    <div class="modal-body" style="padding:20px;" id="simpleEditBody"></div>
+    <div class="modal-footer" style="padding:12px 20px;display:flex;gap:12px;justify-content:flex-end;">
+      <button class="btn-cancel" onclick="closeSimpleEdit()">Cancelar</button>
+      <button class="btn-add" id="simpleEditSaveBtn" onclick="saveSimpleEdit()">&#128190; Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT EDIT -->
+<div class="overlay" id="editProdOverlay">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header"><h3 id="editProdTitle">&#9998; Editar Produto</h3><button class="modal-close" onclick="closeEditProd()">&times;</button></div>
+    <div class="modal-body" style="padding:24px;">
+      <div class="form-row-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div class="form-group"><label>Nome</label><input type="text" id="epName" placeholder="Produto"></div>
+        <div class="form-group"><label>Preço (R$)</label><input type="text" id="epPrice" placeholder="29,90"></div>
+        <div class="form-group"><label>Preço Promocional (R$)</label><input type="text" id="epOldPrice" placeholder="24,90" oninput="epAutoTag()"></div>
       </div>
-      <div class="modal-footer" style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end;">
-        <button class="btn-cancel" onclick="closeEditProd()">Cancelar</button>
-        <button class="btn-add" onclick="saveEditProduto()">&#128190; Salvar</button>
+      <div class="form-group"><label>Descrição</label><textarea rows="2" id="epDesc" placeholder="Descrição curta..."></textarea></div>
+      <div class="form-group">
+        <label>&#128247; Imagem do Produto</label>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <button class="btn-sm primary" onclick="document.getElementById('epImageInput').click()">&#128206; Carregar Foto</button>
+          <button class="btn-sm" onclick="clearProdImage()" style="display:none;" id="clearProdImgBtn">&#128465; Remover</button>
+        </div>
+        <input type="file" id="epImageInput" accept="image/*" style="display:none;" onchange="previewProdImage(event)">
+        <div id="epImagePreview" style="margin-top:8px;max-width:160px;display:none;">
+          <img id="epImagePreviewImg" src="" style="width:100%;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">
+        </div>
       </div>
+      <div class="form-row-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div class="form-group"><label>Categoria</label><select id="epCat"><option value="burguer">Burguer</option><option value="batata">Batatas</option><option value="bebida">Bebidas</option><option value="sobremesa">Sobremesas</option></select></div>
+        <div class="form-group"><label>Ícone</label><select id="epEmoji"><option value="&#127828;">&#127828; Burguer</option><option value="&#127839;">&#127839; Batata</option><option value="&#129346;">&#129346; Bebida</option><option value="&#127852;">&#127852; Sobremesa</option><option value="&#127849;">&#127849; Petit</option></select></div>
+        <div class="form-group"><label>Vendas</label><input type="text" id="epVendas" placeholder="0"></div>
+      </div>
+      <div class="form-group"><label>Ingredientes (separados por vírgula)</label><input type="text" id="epIngredients" placeholder="Hamburguer, Cheddar, Alface"></div>
+      <div class="tag-select" style="margin:12px 0;">
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--muted);">Tag / Selo</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <label class="tag-option"><input type="radio" name="epTag" value="" checked> Nenhum</label>
+          <label class="tag-option"><input type="radio" name="epTag" value="destaque|Mais pedido"> &#127775; Mais pedido</label>
+          <label class="tag-option"><input type="radio" name="epTag" value="destaque|Destaque"> &#11088; Destaque</label>
+          <label class="tag-option"><input type="radio" name="epTag" value="destaque|Novidade"> &#128293; Novidade</label>
+          <label class="tag-option" id="epTagPromo" style="opacity:.5;"><input type="radio" name="epTag" value="promo|Promoção" disabled> &#127881; Promoção</label>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin:12px 0;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;"><input type="checkbox" id="epDestaque"> &#11088; Em destaque</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;"><input type="checkbox" id="epDisponivel" checked> &#9989; Disponível</label>
+      </div>
+      <div class="form-group"><label>Adicionais (nome,preço | um por linha)</label><textarea rows="3" id="epAddons" placeholder="Bacon extra,3&#10;Cheddar extra,2.5"></textarea></div>
+    </div>
+    <div class="modal-footer" style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end;">
+      <button class="btn-cancel" onclick="closeEditProd()">Cancelar</button>
+      <button class="btn-add" onclick="saveEditProduto()">&#128190; Salvar</button>
     </div>
   </div>
 </div>
