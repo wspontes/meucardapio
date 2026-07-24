@@ -96,7 +96,45 @@ function loadStore(slug, store) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('viewCliente').classList.add('active');
   renderBannerCarousel();
+  clearAdminMockData();
   checkUser();
+}
+
+function clearAdminMockData() {
+  // Dashboard metrics
+  document.querySelectorAll('.metrics-grid .m-value').forEach(function(el) {
+    if (el.style.color) el.textContent = '0';
+  });
+  document.querySelectorAll('.metrics-grid .m-change').forEach(function(el) {
+    el.textContent = '--';
+  });
+  // Dashboard tables
+  document.querySelectorAll('#apage-dash table tbody, #apage-pedidos table tbody, #apage-clientes table tbody, #apage-financeiro table tbody').forEach(function(tbody) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:24px;font-size:13px;">Nenhum registro ainda</td></tr>';
+  });
+  // Bairros
+  var bairrosBody = document.getElementById('bairrosTableBody');
+  if (bairrosBody) bairrosBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;font-size:13px;">Nenhum bairro cadastrado</td></tr>';
+  // Cupons
+  var cuponsBody = document.getElementById('cuponsTableBody');
+  if (cuponsBody) cuponsBody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;font-size:13px;">Nenhum cupom cadastrado</td></tr>';
+  // Produtos sem venda
+  var semVenda = document.querySelector('#apage-dash .card:first-of-type + .card table tbody');
+  // Dashboard products without sales
+  document.querySelectorAll('#apage-dash .card .card-header h3').forEach(function(h3) {
+    if (h3.textContent.indexOf('Produtos sem Venda') > -1) {
+      var tbody = h3.closest('.card').querySelector('table tbody');
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;font-size:13px;">Nenhum</td></tr>';
+    }
+  });
+  // Pedidos em andamento na dashboard
+  var andamentoCards = document.querySelectorAll('#apage-dash .chart-card');
+  andamentoCards.forEach(function(card) {
+    var title = card.querySelector('.chart-title');
+    if (title && title.textContent.indexOf('Andamento') > -1) {
+      card.innerHTML = '<div class="chart-title">Pedidos em Andamento</div><p style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">Nenhum pedido no momento</p>';
+    }
+  });
 }
 
 function saveCurrentStore() {
