@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MeuCardapio - Cardápio Digital</title>
+<title id="pageTitle">MeuCardapio - Cardápio Digital</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -44,7 +44,7 @@
       <input type="tel" placeholder="(11) 99999-8888" id="loginPhone" onkeydown="if(event.key==='Enter') doLogin()">
     </div>
     <button onclick="doLogin(true)">&#128075; Confirmar e Finalizar</button>
-    <p style="margin-top:16px;font-size:12px;color:var(--muted);">Seus dados ficam salvos para próximos pedidos.</p>
+    <p style="margin-top:12px;font-size:12px;color:var(--muted);cursor:pointer;" onclick="closeLoginModal()">&#8592; Voltar</p>
   </div>
 </div>
 
@@ -53,49 +53,36 @@
 
   <header class="cliente-header">
     <div class="inner">
-      <div class="logo"><span>&#127828;</span> Meu<span>Cardapio</span></div>
+      <div class="logo"><span>&#127828;</span> <span id="storeNameHeader">Meu<span>Cardapio</span></span></div>
       <div class="header-info">
-        <div class="user-badge" id="userBadge" onclick="logout()" title="Clique para entrar ou trocar de usuário">
+        <div class="user-badge" id="userBadge" onclick="toggleUserMenu()" title="Meu perfil">
           <span class="avatar" id="userAvatar">?</span>
           <span id="userNameDisplay">Entrar</span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="um-header">
+            <span class="um-avatar" id="umAvatar">?</span>
+            <div><strong id="umName">Visitante</strong><p id="umPhone">Faça login para pedir</p></div>
+          </div>
+          <div class="um-body">
+            <div class="um-item" onclick="umAction('favoritos')"><span class="um-icon" style="color:var(--red);">&#10084;</span><span class="um-label">Favoritos</span><span class="um-badge" id="umFavCount">0</span></div>
+            <div class="um-item" onclick="umAction('pedidos')"><span class="um-icon">&#128196;</span><span class="um-label">Meus Pedidos</span><span class="um-badge" id="umOrderCount">0</span></div>
+            
+          </div>
+          <div class="um-footer">
+            <button class="um-logout" id="umLoginBtn" onclick="umAction('login')">&#128275; Entrar</button>
+          </div>
         </div>
         <button class="cart-btn" onclick="openCart()">&#128722; <span id="cartCount">0</span><span class="cart-badge" id="cartBadge">0</span></button>
       </div>
     </div>
   </header>
 
-  <div class="delivery-bar">&#128666; Pedido mínimo: <strong>R$ 25,00</strong> &middot; <a href="#" onclick="showAdminLogin();return false">&#128274; Admin</a></div>
+  <div class="delivery-bar">&#128666; Pedido mínimo: <strong id="deliveryMinOrder">R$ 25,00</strong></div>
 
-  <div class="banner">
-    <div class="decor"></div>
-    <div class="banner-inner">
-      <div>
-        <span class="promo-tag">&#127881; Promoção</span>
-        <h2>Promoção do Dia</h2>
-        <p>Aproveite nossas ofertas especiais de hoje! <strong style="color:#fff;">Válido hoje!</strong></p>
-        <div style="display:flex;gap:10px;align-items:center;">
-          <span style="font-size:32px;font-weight:900;color:var(--primary);">R$ 39,90</span>
-          <span style="font-size:16px;color:#a8a29e;text-decoration:line-through;">R$ 54,90</span>
-        </div>
-      </div>
-      <div class="banner-image">&#127828;</div>
-    </div>
-  </div>
+  <div class="banners-grid" id="bannersGrid"></div>
 
-  <div style="display:flex;gap:8px;max-width:1120px;margin:0 auto 24px;padding:0 20px;flex-wrap:wrap;">
-    <div style="flex:1;min-width:160px;padding:12px 20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:12px;">
-      <span style="font-size:22px;color:var(--red);">&#10084;</span>
-      <div><span style="font-size:13px;font-weight:600;">Favoritos</span><br><span style="font-size:12px;color:var(--muted);" id="favCount">0</span></div>
-    </div>
-    <div style="flex:1;min-width:160px;padding:12px 20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="document.getElementById('historySection').scrollIntoView({behavior:'smooth'})">
-      <span style="font-size:22px;">&#128196;</span>
-      <div><span style="font-size:13px;font-weight:600;">Meus Pedidos</span><br><span style="font-size:12px;color:var(--muted);" id="orderCount">0</span></div>
-    </div>
-    <div style="flex:1;min-width:160px;padding:12px 20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:12px;">
-      <span style="font-size:22px;">&#127881;</span>
-      <div><span style="font-size:13px;font-weight:600;">Fidelidade</span><br><span style="font-size:12px;color:var(--muted);" id="loyaltyCount">0/10</span></div>
-    </div>
-  </div>
+  
 
   <div class="container">
     <div class="section-title"><span>Categorias</span></div>
@@ -111,29 +98,26 @@
     <div class="section-title"><span>Cardápio</span><span style="font-size:13px;font-weight:400;color:var(--muted);"><span id="prodCount">12</span> produtos</span></div>
     <div class="products-grid" id="productsGrid"></div>
 
-    <div class="section-title" id="historySection"><span>&#128196; Histórico de Pedidos</span></div>
-    <div class="order-history" id="orderHistory"></div>
-
     <footer class="footer" style="margin-left:-20px;margin-right:-20px;margin-bottom:-40px;border-radius:0;">
       <div class="container footer-grid">
         <div>
-          <h4>&#127828; MeuCardapio</h4>
+          <h4>&#127828; <span id="footerStoreName">MeuCardapio</span></h4>
           <p>Sua plataforma de cardápio digital e delivery. Personalize para sua loja.</p>
           <div class="social"><a href="#">&#10070;</a><a href="#">&#120143;</a><a href="#">&#128222;</a></div>
         </div>
         <div><h4>Serviços</h4><a href="#">Cardápio Digital</a><a href="#">Delivery</a><a href="#">Gestão de Pedidos</a><a href="#">Suporte</a></div>
-        <div><h4>Contato</h4><p>(11) 99999-8888</p><p>@meucardapio</p><p>Seg-Sáb: 18h-23h</p><p style="margin-top:12px;"><a href="#" onclick="showAdminLogin();return false" style="font-size:12px;color:#57534e;">&#128274; Admin</a></p></div>
+        <div><h4>Contato</h4><p id="footerPhone">(11) 99999-8888</p><p id="footerInsta">@meucardapio</p><p>Seg-Sáb: 18h-23h</p></div>
       </div>
-      <div class="container footer-bottom"><p>&copy; 2026 MeuCardapio.</p></div>
+      <div class="container footer-bottom"><p>&copy; 2026 <span id="footerCopyright">MeuCardapio</span>.</p></div>
     </footer>
   </div>
 
-  <a href="#" class="whatsapp-float">&#128172;</a>
+  <a href="#" class="whatsapp-float" id="whatsappFloat">&#128172;</a>
 
   <!-- CART -->
   <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
   <div class="cart-sidebar" id="cartSidebar">
-    <div class="cart-header"><h3>&#128722; Carrinho</h3><button class="cart-close" onclick="closeCart()">&times;</button></div>
+    <div class="cart-header"><h3>&#128722; Carrinho</h3><button onclick="clearCart()" style="background:none;border:none;color:var(--red);font-size:13px;cursor:pointer;margin-right:auto;margin-left:12px;">Esvaziar</button><button class="cart-close" onclick="closeCart()">&times;</button></div>
     <div class="cart-items" id="cartItems"><p style="text-align:center;color:var(--muted);padding-top:40px;">Vazio</p></div>
     <div class="cart-footer">
       <div class="coupon-input"><input type="text" placeholder="Cupom" id="couponInput"><button onclick="applyCoupon()">OK</button></div>
@@ -171,6 +155,7 @@
         <h4>&#10133; Adicionais</h4>
         <div id="modalAddons"></div>
       </div>
+      <div class="modal-addon-total" id="modalAddonTotal" style="text-align:right;font-size:15px;font-weight:700;color:var(--primary);padding:0 4px;">R$ 0,00</div>
       <div class="modal-obs"><textarea rows="2" placeholder="Observações..." id="modalObs"></textarea></div>
       <div class="related-section">
         <h4>&#128260; Quem viu também viu</h4>
@@ -243,6 +228,14 @@
         <div class="track-step"><div class="dot"></div><div class="info"><h5>Entregue</h5><p>Bom apetite!</p></div></div>
       </div>
       <button class="checkout-btn" onclick="closeTracking()" style="max-width:200px;margin:0 auto;">OK</button>
+    </div>
+  </div>
+
+  <!-- CART ITEM DETAILS -->
+  <div class="overlay" id="cartItemOverlay" onclick="if(event.target===this)closeCartItemModal()">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header"><h3 id="cartItemModalTitle">&#128230; Item</h3><button class="modal-close" onclick="closeCartItemModal()">&times;</button></div>
+      <div class="modal-body" style="padding:24px;" id="cartItemModalBody"></div>
     </div>
   </div>
 
@@ -320,6 +313,7 @@
       <button class="active" data-apage="dash"><span class="nav-icon">&#128202;</span><span class="nav-label">Dashboard</span></button>
       <button data-apage="pedidos"><span class="nav-icon">&#128203;</span><span class="nav-label">Pedidos</span><span class="nav-badge">3</span></button>
       <button data-apage="produtos"><span class="nav-icon">&#127828;</span><span class="nav-label">Produtos</span></button>
+      <button data-apage="banners"><span class="nav-icon">&#128250;</span><span class="nav-label">Banners</span></button>
       <button data-apage="clientes"><span class="nav-icon">&#128101;</span><span class="nav-label">Clientes</span></button>
       <button data-apage="bairros"><span class="nav-icon">&#127963;</span><span class="nav-label">Bairros</span></button>
       <button data-apage="cupons"><span class="nav-icon">&#127991;</span><span class="nav-label">Cupons</span></button>
@@ -458,6 +452,50 @@
         </div>
       </div>
 
+      <!-- BANNERS -->
+      <div class="admin-page" id="apage-banners">
+        <div class="card">
+          <div class="card-header"><h3>&#128250; Banners</h3><button class="btn-sm primary" onclick="openEditBanner(null)">+ Novo Banner</button></div>
+          <div id="bannersList"></div>
+        </div>
+        <!-- Banner Editor Modal -->
+        <div class="overlay" id="editBannerOverlay">
+          <div class="modal" style="max-width:560px;">
+            <div class="modal-header"><h3 id="editBannerTitle">&#9998; Banner</h3><button class="modal-close" onclick="closeEditBanner()">&times;</button></div>
+            <div class="modal-body" style="padding:24px;">
+              <div class="form-group"><label>Título</label><input type="text" id="ebTitle" placeholder="Promoção do Dia"></div>
+              <div class="form-group"><label>Subtítulo</label><textarea rows="2" id="ebSubtitle" placeholder="Aproveite nossas ofertas..."></textarea></div>
+              <div class="form-row-3">
+                <div class="form-group"><label>Tag/Selo</label><input type="text" id="ebTag" placeholder="Promoção"></div>
+                <div class="form-group"><label>Ícone (emoji)</label><input type="text" id="ebEmoji" placeholder="&#127828;"></div>
+                <div class="form-group"><label>Cor do Tag</label><select id="ebTagColor"><option value="promo">Verde (Promo)</option><option value="destaque">Azul (Destaque)</option><option value="novidade">Roxo (Novidade)</option></select></div>
+              </div>
+              <div class="form-row-3">
+                <div class="form-group"><label>Preço (R$)</label><input type="text" id="ebPrice" placeholder="39,90"></div>
+                <div class="form-group"><label>Preço Original (R$)</label><input type="text" id="ebOldPrice" placeholder="54,90"></div>
+                <div class="form-group"><label>Vincular Produto</label><select id="ebProduct"><option value="">Nenhum</option></select></div>
+              </div>
+              <div class="form-group">
+                <label>&#128247; Imagem de Fundo</label>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                  <button class="btn-sm primary" onclick="document.getElementById('ebImageInput').click()">&#128206; Carregar Imagem</button>
+                  <button class="btn-sm" onclick="clearBannerImage()" style="display:none;" id="clearBannerImgBtn">&#128465; Remover</button>
+                </div>
+                <input type="file" id="ebImageInput" accept="image/*" style="display:none;" onchange="previewBannerImage(event)">
+                <div id="ebImagePreview" style="margin-top:8px;max-width:240px;display:none;">
+                  <img id="ebImagePreviewImg" src="" style="width:100%;height:140px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">
+                </div>
+              </div>
+              <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;margin-top:8px;"><input type="checkbox" id="ebActive" checked> &#9989; Banner ativo</label>
+            </div>
+            <div class="modal-footer" style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end;">
+              <button class="btn-cancel" onclick="closeEditBanner()">Cancelar</button>
+              <button class="btn-add" onclick="saveEditBanner()">&#128190; Salvar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- CLIENTES -->
       <div class="admin-page" id="apage-clientes">
         <div class="card">
@@ -589,26 +627,26 @@
           <div style="margin-bottom:24px;">
             <h4 style="font-size:15px;font-weight:700;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">&#127912; Identidade</h4>
             <div class="form-grid">
-              <div class="form-group"><label>Nome da Loja</label><input type="text" value="Minha Loja"></div>
-              <div class="form-group"><label>Slug</label><input type="text" value="minha-loja"></div>
+              <div class="form-group"><label>Nome da Loja</label><input type="text" id="cfgStoreName" value="Minha Loja"></div>
+              <div class="form-group"><label>Slug</label><input type="text" id="cfgSlug" value="minha-loja"></div>
             </div>
             <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><label style="font-size:12px;color:var(--muted);">Primária</label><input type="color" value="#10b981" style="width:48px;height:48px;border:2px solid var(--border);border-radius:10px;cursor:pointer;padding:2px;"></div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><label style="font-size:12px;color:var(--muted);">Secundária</label><input type="color" value="#1c1917" style="width:48px;height:48px;border:2px solid var(--border);border-radius:10px;cursor:pointer;padding:2px;"></div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><label style="font-size:12px;color:var(--muted);">Botões</label><input type="color" value="#10b981" style="width:48px;height:48px;border:2px solid var(--border);border-radius:10px;cursor:pointer;padding:2px;"></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><label style="font-size:12px;color:var(--muted);">Primária</label><input type="color" id="cfgColorPrimary" value="#10b981" oninput="previewColor('primary',this.value)" style="width:48px;height:48px;border:2px solid var(--border);border-radius:10px;cursor:pointer;padding:2px;"></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><label style="font-size:12px;color:var(--muted);">Secundária</label><input type="color" id="cfgColorSecondary" value="#1c1917" oninput="previewColor('secondary',this.value)" style="width:48px;height:48px;border:2px solid var(--border);border-radius:10px;cursor:pointer;padding:2px;"></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><label style="font-size:12px;color:var(--muted);">Botões</label><input type="color" id="cfgColorButtons" value="#10b981" oninput="previewColor('buttons',this.value)" style="width:48px;height:48px;border:2px solid var(--border);border-radius:10px;cursor:pointer;padding:2px;"></div>
             </div>
           </div>
           <div>
             <h4 style="font-size:15px;font-weight:700;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">&#128222; Contato</h4>
             <div class="form-grid">
-              <div class="form-group"><label>WhatsApp</label><input type="text" value="(11) 99999-8888"></div>
-              <div class="form-group"><label>Instagram</label><input type="text" value="@meucardapio"></div>
-              <div class="form-group"><label>Taxa Entrega (R$)</label><input type="text" value="4,99"></div>
-              <div class="form-group"><label>Pedido Mínimo (R$)</label><input type="text" value="25,00"></div>
+              <div class="form-group"><label>WhatsApp</label><input type="text" id="cfgWhatsapp" value="(11) 99999-8888"></div>
+              <div class="form-group"><label>Instagram</label><input type="text" id="cfgInstagram" value="@meucardapio"></div>
+              <div class="form-group"><label>Taxa Entrega (R$)</label><input type="text" id="cfgDeliveryFee" value="4,99"></div>
+              <div class="form-group"><label>Pedido Mínimo (R$)</label><input type="text" id="cfgMinOrder" value="25,00"></div>
             </div>
           </div>
           <div style="text-align:right;padding-top:20px;border-top:1px solid var(--border);margin-top:20px;">
-            <button class="btn-sm primary" style="padding:10px 28px;font-size:14px;" onclick="alert('Configurações salvas!')">&#128190; Salvar</button>
+            <button class="btn-sm primary" style="padding:10px 28px;font-size:14px;" onclick="saveConfig()">&#128190; Salvar</button>
           </div>
         </div>
       </div>
