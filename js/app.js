@@ -1,17 +1,17 @@
 // ===== DATA =====
 const products = [
-  { id:1, cat:'burguer', name:'Smash Burguer', desc:'Hamburguer 150g, cheddar, alface, tomate e molho especial', price:32.90, oldPrice:null, emoji:'&#127828;', image:null, tag:'Mais pedido', tagType:'destaque', ingredients:['Hamburguer 150g','Cheddar','Alface','Tomate','Molho especial','Pão brioche'], addons:[{name:'Bacon extra',price:3},{name:'Cheddar extra',price:2.5},{name:'Ovo',price:4},{name:'Molho barbecue',price:3.5},{name:'Batata palha',price:5},{name:'Pão australiano',price:2}], disponivel:true, destaque:true, vendas:342 },
-  { id:2, cat:'burguer', name:'Smash Duplo', desc:'Dois burguers 150g, cheddar duplo, bacon crocante', price:39.90, oldPrice:45.90, emoji:'&#127828;', image:null, tag:'Promoção', tagType:'promo', ingredients:['2x Hamburguer 150g','Cheddar duplo','Bacon','Alface','Molho'], addons:[{name:'Bacon extra',price:3},{name:'Cheddar extra',price:2.5},{name:'Ovo',price:4}], disponivel:true, destaque:true, vendas:134 },
-  { id:3, cat:'burguer', name:'Burguer Salada', desc:'Hamburguer 150g, salada fresca, maionese da casa', price:28.90, oldPrice:null, emoji:'&#127828;', image:null, tag:'', tagType:'', ingredients:['Hamburguer 150g','Alface','Tomate','Maionese','Pão'], addons:[{name:'Bacon extra',price:3},{name:'Ovo',price:4}], disponivel:true, destaque:false, vendas:89 },
-  { id:4, cat:'batata', name:'Batata Cheddar', desc:'Batata crocante com cheddar cremoso e bacon', price:18.90, oldPrice:null, emoji:'&#127839;', image:null, tag:'', tagType:'', ingredients:['Batata','Cheddar cremoso','Bacon','Cebolinha'], addons:[{name:'Cheddar extra',price:2.5},{name:'Bacon extra',price:3},{name:'Catupiry',price:3}], disponivel:true, destaque:true, vendas:287 },
-  { id:5, cat:'batata', name:'Batata Bacon', desc:'Batata com bacon crocante e barbecue', price:20.90, oldPrice:24.90, emoji:'&#127839;', image:null, tag:'Indisponível', tagType:'soldout', ingredients:['Batata','Bacon','Molho barbecue'], addons:[{name:'Cheddar extra',price:2.5},{name:'Bacon extra',price:3}], disponivel:false, destaque:false, vendas:0 },
-  { id:6, cat:'batata', name:'Batata Palito', desc:'Batata palito crocante sal grosso', price:12.90, oldPrice:null, emoji:'&#127839;', image:null, tag:'', tagType:'', ingredients:['Batata','Sal grosso'], addons:[], disponivel:true, destaque:false, vendas:56 },
-  { id:7, cat:'bebida', name:'Coca-Cola Lata', desc:'Coca-Cola lata 350ml', price:6.90, oldPrice:null, emoji:'&#129346;', image:null, tag:'', tagType:'', ingredients:['Refrigerante'], addons:[], disponivel:true, destaque:false, vendas:198 },
-  { id:8, cat:'bebida', name:'Guaraná Lata', desc:'Guaraná Antarctica lata 350ml', price:5.90, oldPrice:null, emoji:'&#129346;', image:null, tag:'', tagType:'', ingredients:['Refrigerante'], addons:[], disponivel:true, destaque:false, vendas:156 },
-  { id:9, cat:'bebida', name:'Suco Natural', desc:'Suco de laranja ou limão 500ml', price:9.90, oldPrice:null, emoji:'&#129346;', image:null, tag:'', tagType:'', ingredients:['Fruta natural'], addons:[{name:'Com açúcar',price:0},{name:'Sem açúcar',price:0}], disponivel:true, destaque:false, vendas:87 },
-  { id:10, cat:'sobremesa', name:'Milk Shake Ovomaltine', desc:'Milkshake de ovomaltine com chantilly', price:16.90, oldPrice:null, emoji:'&#127852;', image:null, tag:'', tagType:'', ingredients:['Sorvete','Ovomaltine','Chantilly','Leite'], addons:[{name:'Chantilly extra',price:2},{name:'Calda chocolate',price:2.5}], disponivel:true, destaque:true, vendas:156 },
-  { id:11, cat:'sobremesa', name:'Milk Shake Chocolate', desc:'Chocolate belga com calda', price:16.90, oldPrice:null, emoji:'&#127852;', image:null, tag:'', tagType:'', ingredients:['Sorvete','Chocolate belga','Calda','Chantilly'], addons:[{name:'Chantilly extra',price:2},{name:'Calda extra',price:2.5}], disponivel:true, destaque:false, vendas:98 },
-  { id:12, cat:'sobremesa', name:'Petit Gateau', desc:'Bolo chocolate com sorvete', price:19.90, oldPrice:null, emoji:'&#127849;', image:null, tag:'', tagType:'', ingredients:['Bolo chocolate','Sorvete creme','Calda'], addons:[{name:'Sorvete extra',price:3},{name:'Chantilly',price:2}], disponivel:true, destaque:true, vendas:134 },
+  { id:1, cat:'burguer', name:'Smash Burguer', desc:'Hamburguer 150g, cheddar, alface, tomate e molho especial', price:32.90, oldPrice:null, emoji:'&#127828;', image:null, tag:'Mais pedido', tagType:'destaque', ingredients:['Hamburguer 150g','Cheddar','Alface','Tomate','Molho especial','Pão brioche'], addons:[{name:'Bacon extra',price:3},{name:'Cheddar extra',price:2.5},{name:'Ovo',price:4},{name:'Molho barbecue',price:3.5},{name:'Batata palha',price:5},{name:'Pão australiano',price:2}], disponivel:true, destaque:true },
+  { id:2, cat:'burguer', name:'Smash Duplo', desc:'Dois burguers 150g, cheddar duplo, bacon crocante', price:39.90, oldPrice:45.90, emoji:'&#127828;', image:null, tag:'Promoção', tagType:'promo', ingredients:['2x Hamburguer 150g','Cheddar duplo','Bacon','Alface','Molho'], addons:[{name:'Bacon extra',price:3},{name:'Cheddar extra',price:2.5},{name:'Ovo',price:4}], disponivel:true, destaque:true },
+  { id:3, cat:'burguer', name:'Burguer Salada', desc:'Hamburguer 150g, salada fresca, maionese da casa', price:28.90, oldPrice:null, emoji:'&#127828;', image:null, tag:'', tagType:'', ingredients:['Hamburguer 150g','Alface','Tomate','Maionese','Pão'], addons:[{name:'Bacon extra',price:3},{name:'Ovo',price:4}], disponivel:true, destaque:false },
+  { id:4, cat:'batata', name:'Batata Cheddar', desc:'Batata crocante com cheddar cremoso e bacon', price:18.90, oldPrice:null, emoji:'&#127839;', image:null, tag:'', tagType:'', ingredients:['Batata','Cheddar cremoso','Bacon','Cebolinha'], addons:[{name:'Cheddar extra',price:2.5},{name:'Bacon extra',price:3},{name:'Catupiry',price:3}], disponivel:true, destaque:true },
+  { id:5, cat:'batata', name:'Batata Bacon', desc:'Batata com bacon crocante e barbecue', price:20.90, oldPrice:24.90, emoji:'&#127839;', image:null, tag:'Indisponível', tagType:'soldout', ingredients:['Batata','Bacon','Molho barbecue'], addons:[{name:'Cheddar extra',price:2.5},{name:'Bacon extra',price:3}], disponivel:false, destaque:false },
+  { id:6, cat:'batata', name:'Batata Palito', desc:'Batata palito crocante sal grosso', price:12.90, oldPrice:null, emoji:'&#127839;', image:null, tag:'', tagType:'', ingredients:['Batata','Sal grosso'], addons:[], disponivel:true, destaque:false },
+  { id:7, cat:'bebida', name:'Coca-Cola Lata', desc:'Coca-Cola lata 350ml', price:6.90, oldPrice:null, emoji:'&#129346;', image:null, tag:'', tagType:'', ingredients:['Refrigerante'], addons:[], disponivel:true, destaque:false },
+  { id:8, cat:'bebida', name:'Guaraná Lata', desc:'Guaraná Antarctica lata 350ml', price:5.90, oldPrice:null, emoji:'&#129346;', image:null, tag:'', tagType:'', ingredients:['Refrigerante'], addons:[], disponivel:true, destaque:false },
+  { id:9, cat:'bebida', name:'Suco Natural', desc:'Suco de laranja ou limão 500ml', price:9.90, oldPrice:null, emoji:'&#129346;', image:null, tag:'', tagType:'', ingredients:['Fruta natural'], addons:[{name:'Com açúcar',price:0},{name:'Sem açúcar',price:0}], disponivel:true, destaque:false },
+  { id:10, cat:'sobremesa', name:'Milk Shake Ovomaltine', desc:'Milkshake de ovomaltine com chantilly', price:16.90, oldPrice:null, emoji:'&#127852;', image:null, tag:'', tagType:'', ingredients:['Sorvete','Ovomaltine','Chantilly','Leite'], addons:[{name:'Chantilly extra',price:2},{name:'Calda chocolate',price:2.5}], disponivel:true, destaque:true },
+  { id:11, cat:'sobremesa', name:'Milk Shake Chocolate', desc:'Chocolate belga com calda', price:16.90, oldPrice:null, emoji:'&#127852;', image:null, tag:'', tagType:'', ingredients:['Sorvete','Chocolate belga','Calda','Chantilly'], addons:[{name:'Chantilly extra',price:2},{name:'Calda extra',price:2.5}], disponivel:true, destaque:false },
+  { id:12, cat:'sobremesa', name:'Petit Gateau', desc:'Bolo chocolate com sorvete', price:19.90, oldPrice:null, emoji:'&#127849;', image:null, tag:'', tagType:'', ingredients:['Bolo chocolate','Sorvete creme','Calda'], addons:[{name:'Sorvete extra',price:3},{name:'Chantilly',price:2}], disponivel:true, destaque:true },
 ];
 let cart = [];
 let favoritos = [];
@@ -19,6 +19,12 @@ let orderHistory = [];
 let currentUser = null;
 let couponApplied = false, discount = 0;
 const deliveryFeeValue = 4.99;
+
+function saveProducts() { localStorage.setItem('meucardapioProducts', JSON.stringify(products)); }
+function toggleDestaque(id, el) {
+  var p = products.find(function(x){ return x.id === id; });
+  if (p) { p.destaque = !p.destaque; saveProducts(); el.classList.toggle('active'); }
+}
 
 // ===== LOGIN =====
 function doLogin(fromCheckout) {
@@ -539,10 +545,10 @@ function renderSortableProducts() {
   el.innerHTML = list.map((p,i) => `
     <div class="sortable-item" draggable="true" data-id="${p.id}">
       <span class="drag-handle">&#9776;</span><span class="s-icon">${p.emoji}</span>
-      <div class="s-info"><h5>${p.name}</h5><p>R$ ${p.price.toFixed(2)} &middot; ${p.vendas} vendas</p></div>
+      <div class="s-info"><h5>${p.name}</h5><p>R$ ${p.price.toFixed(2)}</p></div>
       <span style="font-size:12px;color:var(--muted);">#${i+1}</span>
       <button class="action-btn" onclick="openEditProduto(${p.id})" title="Editar">&#9998;</button>
-      <div class="s-toggle ${p.destaque?'active':''}" onclick="event.stopPropagation();this.classList.toggle('active')"><span class="s-knob"></span></div>
+      <div class="s-toggle ${p.destaque?'active':''}" onclick="event.stopPropagation();toggleDestaque(${p.id},this)"><span class="s-knob"></span></div>
     </div>`).join('');
   el.querySelectorAll('.sortable-item').forEach(item => {
     item.addEventListener('dragstart', function(e) { e.dataTransfer.setData('text/plain',this.dataset.id); this.style.opacity='.5'; });
@@ -573,7 +579,6 @@ function openEditProduto(id) {
   document.getElementById('epDesc').value = p ? p.desc : '';
   document.getElementById('epCat').value = p ? p.cat : 'burguer';
   document.getElementById('epEmoji').value = p ? p.emoji : '&#127828;';
-  document.getElementById('epVendas').value = p ? p.vendas : '0';
   document.getElementById('epIngredients').value = p ? p.ingredients.join(', ') : '';
   document.getElementById('epDestaque').checked = p ? p.destaque : false;
   document.getElementById('epDisponivel').checked = p ? p.disponivel : true;
@@ -617,7 +622,6 @@ function saveEditProduto() {
   const desc = document.getElementById('epDesc').value.trim();
   const cat = document.getElementById('epCat').value;
   const emoji = document.getElementById('epEmoji').value;
-  const vendas = parseInt(document.getElementById('epVendas').value.replace(/\D/g,'')) || 0;
   const ingredients = document.getElementById('epIngredients').value.trim().split(',').map(s => s.trim()).filter(Boolean);
   const destaque = document.getElementById('epDestaque').checked;
   const disponivel = document.getElementById('epDisponivel').checked;
@@ -638,12 +642,13 @@ function saveEditProduto() {
   if (id) {
     const idx = products.findIndex(x => x.id == id);
     if (idx > -1) {
-      products[idx] = { ...products[idx], name, desc, price, oldPrice, cat, emoji, image, vendas, ingredients, addons, disponivel, destaque, tag, tagType };
+      products[idx] = { ...products[idx], name, desc, price, oldPrice, cat, emoji, image, ingredients, addons, disponivel, destaque, tag, tagType };
     }
   } else {
     const newId = Math.max(...products.map(p => p.id)) + 1;
-    products.push({ id: newId, name, desc, price, oldPrice, cat, emoji, image, vendas, ingredients, addons, disponivel, destaque, tag, tagType });
+    products.push({ id: newId, name, desc, price, oldPrice, cat, emoji, image, ingredients, addons, disponivel, destaque, tag, tagType });
   }
+  saveProducts();
   closeEditProd();
   const activeCat = document.querySelector('.cat-item.active');
   renderProducts(activeCat ? activeCat.dataset.cat : 'all');
@@ -1071,6 +1076,8 @@ window.addEventListener('resize', function() {
 
 loadConfig();
 loadBanners();
+var savedProducts = JSON.parse(localStorage.getItem('meucardapioProducts'));
+if (savedProducts && savedProducts.length) products = savedProducts;
 checkUser();
 restoreAdminSession();
 
