@@ -56,7 +56,31 @@ function router() {
     return;
   }
 
-  const store = storesData[path];
+  // /admin/{slug} → admin panel
+  if (path.startsWith('admin/')) {
+    var slug = path.slice(6);
+    var store = storesData[slug];
+    if (store) {
+      currentSlug = slug;
+      sessionStorage.setItem('meucardapioAdminTarget', slug);
+      if (sessionStorage.getItem('meucardapioAdmin') === '1') {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('viewAdmin').classList.add('active');
+        loadAdminStoreData();
+        drawAdminCharts();
+        renderSortableProducts();
+      } else {
+        showAdminLogin();
+      }
+      return;
+    }
+    showLanding();
+    return;
+  }
+
+  // /{slug} → client view
+  closeAdminLogin();
+  var store = storesData[path];
   if (store) {
     currentSlug = path;
     loadStore(path, store);
@@ -285,12 +309,15 @@ function doAdminLogin() {
     adminLoggedIn = true;
     sessionStorage.setItem('meucardapioAdmin', '1');
     closeAdminLogin();
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('viewAdmin').classList.add('active');
-    loadAdminStoreData();
-    drawAdminCharts();
-    renderSortableProducts();
-    if (window.location.hash === '#admin') history.replaceState(null, '', window.location.pathname);
+    if (currentSlug) {
+      navigateTo('/admin/' + currentSlug);
+    } else {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('viewAdmin').classList.add('active');
+      loadAdminStoreData();
+      drawAdminCharts();
+      renderSortableProducts();
+    }
   } else {
     alert('Credenciais inválidas!');
   }
@@ -315,8 +342,12 @@ function loadAdminStoreData() {
 function goToStoreView() {
   adminLoggedIn = false;
   sessionStorage.removeItem('meucardapioAdmin');
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('viewCliente').classList.add('active');
+  if (currentSlug) {
+    navigateTo('/' + currentSlug);
+  } else {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('viewCliente').classList.add('active');
+  }
 }
 
 function adminLogout() {
@@ -333,6 +364,15 @@ function adminLogout() {
 }
 function restoreAdminSession() {
   if (sessionStorage.getItem('meucardapioAdmin') === '1') {
+    var path = getPathFromURL();
+    // Only restore admin if we are on /admin/{slug} path
+    if (!path.startsWith('admin/')) return;
+    var target = sessionStorage.getItem('meucardapioAdminTarget');
+    if (target && target !== currentSlug) {
+      adminLoggedIn = false;
+      sessionStorage.removeItem('meucardapioAdmin');
+      return;
+    }
     adminLoggedIn = true;
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('viewAdmin').classList.add('active');
@@ -1299,16 +1339,15 @@ loadStoresData();
 router();
 
 window.addEventListener('popstate', function() { router(); });
-window.addEventListener('hashchange', function() {
-  if (currentSlug && window.location.hash === '#admin' && !adminLoggedIn) showAdminLogin();
-});
 
 if (currentSlug) {
-  loadConfig();
-  loadBanners();
-  var savedProducts = JSON.parse(localStorage.getItem('meucardapioProducts'));
-  if (savedProducts && savedProducts.length) { products.length = 0; savedProducts.forEach(function(p) { products.push(p); }); }
-  checkUser();
+  var p = getPathFromURL();
+  if (!p.startsWith('admin/')) {
+    loadConfig();
+    loadBanners();
+    var savedProducts = JSON.parse(localStorage.getItem('meucardapioProducts'));
+    if (savedProducts && savedProducts.length) { products.length = 0; savedProducts.forEach(function(p) { products.push(p); }); }
+    checkUser();
+  }
   restoreAdminSession();
-  if (window.location.hash === '#admin') showAdminLogin();
 }

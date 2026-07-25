@@ -6,7 +6,7 @@
 <title id="pageTitle">MeuCardapio - Cardápio Digital</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
@@ -25,7 +25,7 @@
       <input type="password" placeholder="********" id="adminLoginPass" onkeydown="if(event.key==='Enter') doAdminLogin()">
     </div>
     <button onclick="doAdminLogin()">&#128274; Entrar no Painel</button>
-    <p style="margin-top:16px;font-size:12px;color:var(--muted);cursor:pointer;" onclick="closeAdminLogin()">&#8592; Voltar ao cardápio</p>
+    <p style="margin-top:16px;font-size:12px;color:var(--muted);cursor:pointer;" onclick="if(currentSlug)navigateTo('/'+currentSlug);else closeAdminLogin()">&#8592; Voltar ao cardápio</p>
   </div>
 </div>
 
@@ -167,7 +167,7 @@
       <div><h4>Serviços</h4><a href="#">Cardápio Digital</a><a href="#">Delivery</a><a href="#">Gestão de Pedidos</a><a href="#">Suporte</a></div>
       <div><h4>Contato</h4><p id="footerPhone">(11) 99999-8888</p><p id="footerInsta">@meucardapio</p><p>Seg-Sáb: 18h-23h</p></div>
     </div>
-    <div class="container footer-bottom"><p>&copy; 2026 <span id="footerCopyright">MeuCardapio</span>.</p></div>
+    <div class="container footer-bottom"><p>&copy; 2026 <span id="footerCopyright">MeuCardapio</span>. <a href="#" onclick="if(currentSlug)navigateTo('/admin/'+currentSlug);else alert('Acesse um cardápio primeiro');return false;" style="color:var(--muted);text-decoration:none;font-size:12px;">&#128274; Admin</a></p></div>
   </footer>
 
   <a href="#" class="whatsapp-float" id="whatsappFloat">&#128172;</a>
@@ -752,6 +752,6 @@
   </div>
 </div>
 
-<script src="js/app.js"></script>
+<script src="/js/app.js"></script>
 </body>
 </html>
