@@ -63,6 +63,7 @@ function router() {
     if (store) {
       currentSlug = slug;
       sessionStorage.setItem('meucardapioAdminTarget', slug);
+      clearAdminMockData();
       if (sessionStorage.getItem('meucardapioAdmin') === '1') {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById('viewAdmin').classList.add('active');
@@ -140,7 +141,7 @@ function clearAdminMockData() {
   document.querySelectorAll('.metrics-grid .m-change').forEach(function(el) {
     el.textContent = '--';
   });
-  // Dashboard tables
+  // Dashboard tables (últimos pedidos, pedidos, clientes, financeiro)
   document.querySelectorAll('#apage-dash table tbody, #apage-pedidos table tbody, #apage-clientes table tbody, #apage-financeiro table tbody').forEach(function(tbody) {
     tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:24px;font-size:13px;">Nenhum registro ainda</td></tr>';
   });
@@ -150,19 +151,33 @@ function clearAdminMockData() {
   // Cupons
   var cuponsBody = document.getElementById('cuponsTableBody');
   if (cuponsBody) cuponsBody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;font-size:13px;">Nenhum cupom cadastrado</td></tr>';
-  // Dashboard products without sales
+  // Formas de pagamento
+  var paymentsBody = document.getElementById('paymentsTableBody');
+  if (paymentsBody) paymentsBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;font-size:13px;">Nenhuma forma de pagamento cadastrada</td></tr>';
+  // PIX key
+  var pixKey = document.getElementById('pixKey');
+  if (pixKey) pixKey.value = '';
+  // Dashboard chart: Produtos sem Venda
   document.querySelectorAll('#apage-dash .card .card-header h3').forEach(function(h3) {
     if (h3.textContent.indexOf('Produtos sem Venda') > -1) {
       var tbody = h3.closest('.card').querySelector('table tbody');
       if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;font-size:13px;">Nenhum</td></tr>';
     }
   });
-  // Pedidos em andamento na dashboard
+  // Dashboard: Pedidos em andamento
   var andamentoCards = document.querySelectorAll('#apage-dash .chart-card');
   andamentoCards.forEach(function(card) {
     var title = card.querySelector('.chart-title');
     if (title && title.textContent.indexOf('Andamento') > -1) {
       card.innerHTML = '<div class="chart-title">Pedidos em Andamento</div><p style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">Nenhum pedido no momento</p>';
+    }
+  });
+  // Dashboard: Forma de Pagamento chart
+  var paymentCards = document.querySelectorAll('#apage-dash .chart-card');
+  paymentCards.forEach(function(card) {
+    var title = card.querySelector('.chart-title');
+    if (title && title.textContent.indexOf('Pagamento') > -1) {
+      card.innerHTML = '<div class="chart-title">Forma de Pagamento</div><p style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">Nenhum dado disponível</p>';
     }
   });
 }
@@ -785,17 +800,10 @@ function switchAdminPage(page, el) {
   if (page === 'dash') drawAdminCharts();
 }
 function drawAdminCharts() {
-  const sales = [32,45,38,52,41,47,39]; const sLabels = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const sMax = Math.max(...sales);
-  document.getElementById('adminSalesChart').innerHTML = sales.map((v,i) =>
-    `<div class="bar" style="height:${(v/sMax)*100}%;background:var(--primary);"><span class="bar-label">${sLabels[i]}</span></div>`
-  ).join('');
-  const months = [42,38,47,45,52,48,55,58,51,62,58,67];
-  const mLabels = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const mMax = Math.max(...months);
-  document.getElementById('adminMonthChart').innerHTML = months.map((v,i) =>
-    `<div class="bar" style="height:${(v/mMax)*100}%;background:var(--blue);"><span class="bar-label">${mLabels[i]}</span></div>`
-  ).join('');
+  var salesChart = document.getElementById('adminSalesChart');
+  var monthChart = document.getElementById('adminMonthChart');
+  if (salesChart) salesChart.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">Sem dados de vendas</p>';
+  if (monthChart) monthChart.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">Sem dados de vendas</p>';
 }
 function renderSortableProducts() {
   const el = document.getElementById('sortableProducts');
@@ -913,13 +921,15 @@ function saveEditProduto() {
   renderSortableProducts();
 }
 function addPayment() {
-  const nome = prompt('Nome da forma de pagamento (ex: PicPay):');
-  if (!nome) return;
-  const taxa = prompt('Taxa (% ou fixa, ex: 2,99%):') || '0%';
-  const tbody = document.getElementById('paymentsTableBody');
-  const tr = document.createElement('tr');
-  tr.innerHTML = `<td><strong>${nome}</strong></td><td>&#128179;</td><td>${taxa}</td><td><span class="toggle-switch active" onclick="this.classList.toggle('active')"><span class="knob"></span></span></td><td><button class="action-btn">&#9998;</button></td>`;
-  tbody.appendChild(tr);
+  openSimpleEdit('&#128179; Nova Forma de Pagamento', [
+    { id:'nome', label:'Nome', value:'', placeholder:'Ex: PicPay', required: true },
+    { id:'taxa', label:'Taxa (%)', value:'', placeholder:'2,99' }
+  ], null, function(_, vals) {
+    var tbody = document.getElementById('paymentsTableBody');
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><strong>' + vals.nome + '</strong></td><td>&#128179;</td><td>' + (vals.taxa || '0') + '%</td><td><span class="toggle-switch active" onclick="this.classList.toggle(\'active\')"><span class="knob"></span></span></td><td><button class="action-btn" onclick="editPagamento(this)">&#9998;</button></td>';
+    tbody.appendChild(tr);
+  });
 }
 var simpleEditTarget = null;
 function deleteRow(btn) { if (confirm('Remover?')) btn.closest('tr').remove(); }
@@ -987,24 +997,28 @@ function editPagamento(btn) {
   });
 }
 function addBairro() {
-  const nome = prompt('Nome do bairro:');
-  if (!nome) return;
-  const taxa = prompt('Taxa de entrega (R$):');
-  const tempo = prompt('Tempo médio (ex: 20-30 min):');
-  const tbody = document.getElementById('bairrosTableBody');
-  const tr = document.createElement('tr');
-  tr.innerHTML = `<td><strong>${nome}</strong></td><td>R$ ${parseFloat(taxa||0).toFixed(2)}</td><td>${tempo||'30 min'}</td><td>R$ 25,00</td><td><span class="status-badge active"><span class="dot"></span>Ativo</span></td><td><button class="action-btn">&#9998;</button> <button class="action-btn">&#128465;</button></td>`;
-  tbody.appendChild(tr);
+  openSimpleEdit('&#127963; Novo Bairro', [
+    { id:'nome', label:'Nome do Bairro', value:'', placeholder:'Ex: Centro', required: true },
+    { id:'taxa', label:'Taxa de Entrega (R$)', value:'', placeholder:'4,99' },
+    { id:'tempo', label:'Tempo Médio', value:'', placeholder:'20-30 min' }
+  ], null, function(_, vals) {
+    var tbody = document.getElementById('bairrosTableBody');
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><strong>' + vals.nome + '</strong></td><td>R$ ' + parseFloat(vals.taxa||0).toFixed(2) + '</td><td>' + (vals.tempo||'30 min') + '</td><td>R$ 25,00</td><td><span class="status-badge active"><span class="dot"></span>Ativo</span></td><td><button class="action-btn" onclick="editBairro(this)">&#9998;</button> <button class="action-btn" onclick="deleteRow(this)">&#128465;</button></td>';
+    tbody.appendChild(tr);
+  });
 }
 function addCupom() {
-  const codigo = prompt('Código do cupom:');
-  if (!codigo) return;
-  const tipo = prompt('Tipo (Percentual, Valor Fixo, Frete Grátis):');
-  const valor = prompt('Valor:');
-  const tbody = document.getElementById('cuponsTableBody');
-  const tr = document.createElement('tr');
-  tr.innerHTML = `<td><strong style="font-family:monospace;">${codigo.toUpperCase()}</strong></td><td>${tipo||'Percentual'}</td><td>${valor||'10%'}</td><td>R$ 30,00</td><td>0/50</td><td>31/12/26</td><td><span class="status-badge active"><span class="dot"></span>Ativo</span></td><td><button class="action-btn">&#9998;</button> <button class="action-btn">&#128465;</button></td>`;
-  tbody.appendChild(tr);
+  openSimpleEdit('&#127991; Novo Cupom', [
+    { id:'codigo', label:'Código', value:'', placeholder:'Ex: DESCONTO10', required: true },
+    { id:'tipo', label:'Tipo', value:'', placeholder:'Percentual, Valor Fixo, Frete Grátis' },
+    { id:'valor', label:'Valor', value:'', placeholder:'Ex: 10% ou R$ 10,00' }
+  ], null, function(_, vals) {
+    var tbody = document.getElementById('cuponsTableBody');
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><strong style="font-family:monospace;">' + vals.codigo.toUpperCase() + '</strong></td><td>' + (vals.tipo||'Percentual') + '</td><td>' + (vals.valor||'10%') + '</td><td>R$ 30,00</td><td>0/50</td><td>31/12/26</td><td><span class="status-badge active"><span class="dot"></span>Ativo</span></td><td><button class="action-btn" onclick="editCupom(this)">&#9998;</button> <button class="action-btn" onclick="deleteRow(this)">&#128465;</button></td>';
+    tbody.appendChild(tr);
+  });
 }
 
 // ===== ORDER EDIT (ADMIN) =====
