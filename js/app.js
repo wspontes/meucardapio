@@ -111,11 +111,10 @@ function loadStore(slug, store) {
   (store.products || []).forEach(p => products.push(p));
   banners.length = 0;
   (store.banners || []).forEach(b => banners.push(b));
-  banners = store.banners || [];
   localStorage.setItem('meucardapioProducts', JSON.stringify(products));
   localStorage.setItem('meucardapioBanners', JSON.stringify(banners));
   localStorage.setItem('meucardapioConfig', JSON.stringify(store.config));
-  currentConfig = store.config;
+  currentConfig = JSON.parse(JSON.stringify(store.config));
   document.title = store.config.storeName + ' - Cardápio Digital';
   applyConfig(store.config);
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -253,6 +252,12 @@ function toggleDestaque(id, el) {
 function storePrefix() {
   return currentSlug ? 'store_' + currentSlug + '_' : '';
 }
+function getInitials(name) {
+  var parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0].charAt(0) + parts[parts.length-1].charAt(0)).toUpperCase();
+  var n = parts[0] || '';
+  return n.length >= 2 ? n.slice(0,2).toUpperCase() : n.toUpperCase();
+}
 
 function doLogin(fromCheckout) {
   const name = document.getElementById('loginName').value.trim();
@@ -262,7 +267,7 @@ function doLogin(fromCheckout) {
   localStorage.setItem(storePrefix() + 'burgerUser', JSON.stringify(currentUser));
   document.getElementById('loginOverlay').classList.add('hidden');
   document.getElementById('userNameDisplay').textContent = name.split(' ')[0];
-  document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('userAvatar').textContent = getInitials(name);
   loadUserData();
   if (fromCheckout) {
     document.getElementById('chkName').value = currentUser.name;
@@ -299,7 +304,7 @@ function checkUser() {
   if (saved && saved.name && saved.phone) {
     currentUser = saved;
     document.getElementById('userNameDisplay').textContent = saved.name.split(' ')[0];
-    document.getElementById('userAvatar').textContent = saved.name.charAt(0).toUpperCase();
+    document.getElementById('userAvatar').textContent = getInitials(saved.name);
     loadUserData();
   } else {
     renderProducts('all');
@@ -353,6 +358,12 @@ function loadAdminStoreData() {
   document.getElementById('cfgDeliveryFee').value = (cfg.deliveryFee || 4.99).toFixed(2).replace('.',',');
   document.getElementById('cfgMinOrder').value = (cfg.minOrder || 25).toFixed(2).replace('.',',');
   applyConfig(cfg);
+  products.length = 0;
+  (store.products || []).forEach(p => products.push(p));
+  localStorage.setItem('meucardapioProducts', JSON.stringify(products));
+  banners.length = 0;
+  (store.banners || []).forEach(b => banners.push(b));
+  localStorage.setItem('meucardapioBanners', JSON.stringify(banners));
 }
 function goToStoreView() {
   adminLoggedIn = false;
@@ -405,7 +416,7 @@ function toggleUserMenu() {
     return;
   }
   menu.classList.toggle('open');
-  document.getElementById('umAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+  document.getElementById('umAvatar').textContent = getInitials(currentUser.name);
   document.getElementById('umName').textContent = currentUser.name;
   document.getElementById('umPhone').textContent = currentUser.phone;
   document.getElementById('umLoginBtn').innerHTML = '&#128682; Trocar de Usuário';
@@ -1314,9 +1325,6 @@ function applyConfig(cfg) {
   document.getElementById('footerPhone').textContent = cfg.whatsapp;
   document.getElementById('footerInsta').textContent = cfg.instagram;
 
-  const waNum = cfg.whatsapp.replace(/\D/g,'');
-  const waLink = waNum ? 'https://wa.me/55' + waNum : '#';
-  document.getElementById('whatsappFloat').href = waLink;
 }
 
 function previewColor(target, value) {
