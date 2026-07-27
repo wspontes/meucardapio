@@ -1,6 +1,7 @@
 import { UtensilsCrossed, Phone, MapPin } from 'lucide-react'
 import { useSettings } from '@/hooks'
 import { useStore } from '@/contexts/StoreContext'
+import { resolveImageUrl } from '@/utils/resolveImageUrl'
 
 const dayLabels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
@@ -49,6 +50,7 @@ export function Footer() {
   const instagram = settings?.instagram
   const whatsapp = settings?.whatsapp
   const address = settings?.address
+  const logoUrl = settings?.theme?.logo || store?.logo
 
   const hourLines = hours ? formatHourRange(hours) : []
 
@@ -58,7 +60,16 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-3">
           <div>
             <div className="flex items-center gap-2 text-lg font-bold text-white">
-              <UtensilsCrossed className="text-accent" size={20} />
+              {logoUrl ? (
+                <img
+                  src={resolveImageUrl(logoUrl)}
+                  alt={store?.name || 'MeuCardápio'}
+                  className="h-6 w-auto object-contain"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                />
+              ) : (
+                <UtensilsCrossed className="text-accent" size={20} />
+              )}
               {store?.name || 'MeuCardápio'}
             </div>
             <p className="mt-2 text-sm text-muted">

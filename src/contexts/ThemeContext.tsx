@@ -10,6 +10,23 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
+function applyThemeVars(colorPrimary?: string, colorSecondary?: string, buttonColor?: string) {
+  const root = document.documentElement
+  if (colorPrimary) {
+    root.style.setProperty('--theme-primary', colorPrimary)
+    const r = parseInt(colorPrimary.slice(1, 3), 16)
+    const g = parseInt(colorPrimary.slice(3, 5), 16)
+    const b = parseInt(colorPrimary.slice(5, 7), 16)
+    root.style.setProperty('--theme-surface', `rgb(${Math.min(255, r + 16)}, ${Math.min(255, g + 16)}, ${Math.min(255, b + 16)})`)
+  }
+  if (colorSecondary) {
+    root.style.setProperty('--theme-secondary', colorSecondary)
+  }
+  if (buttonColor) {
+    root.style.setProperty('--theme-button', buttonColor)
+  }
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = localStorage.getItem('theme')
@@ -27,10 +44,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }
 
   const applyStoreTheme = (themeData?: { logo?: string; colorPrimary?: string; colorSecondary?: string; buttonColor?: string }) => {
-    const root = document.documentElement
-    if (themeData?.colorPrimary) root.style.setProperty('--color-primary', themeData.colorPrimary)
-    if (themeData?.colorSecondary) root.style.setProperty('--color-secondary', themeData.colorSecondary)
-    if (themeData?.buttonColor) root.style.setProperty('--color-button', themeData.buttonColor)
+    applyThemeVars(themeData?.colorPrimary, themeData?.colorSecondary, themeData?.buttonColor)
   }
 
   return (

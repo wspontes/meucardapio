@@ -4,12 +4,13 @@
   --color-brand-red: #dc2626;
   --color-brand-green: #16a34a;
   --color-brand-white: #fafafa;
-  --color-brand-black: #0a0a0a;
-  --color-surface: #1a1a1a;
+  --color-brand-black: var(--theme-primary, #0a0a0a);
+  --color-surface: var(--theme-surface, #1a1a1a);
   --color-surface-hover: #262626;
   --color-border: #333333;
   --color-muted: #a3a3a3;
-  --color-accent: #dc2626;
+  --color-accent: var(--theme-secondary, #dc2626);
+  --color-button: var(--theme-button, var(--theme-secondary, #dc2626));
   --animate-fade-in: fade-in 0.3s ease-out;
 }
 

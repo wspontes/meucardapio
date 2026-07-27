@@ -5,9 +5,11 @@ import { Header } from '@/components/layout'
 import { Footer } from '@/components/layout'
 import { UpdateToast } from '@/components/shared/UpdateToast'
 import { trackVisit } from '@/utils/analytics'
+import { useApplyStoreTheme } from '@/hooks'
 
 function StoreContent() {
   const { store, loading, error } = useStore()
+  useApplyStoreTheme()
 
   useEffect(() => { if (store) trackVisit() }, [store])
 

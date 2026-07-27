@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useCart } from '@/contexts/CartContext'
 import { useCustomer } from '@/contexts/CustomerContext'
 import { useStore } from '@/contexts/StoreContext'
+import { useSettings } from '@/hooks'
+import { resolveImageUrl } from '@/utils/resolveImageUrl'
 import { cn } from '@/utils'
 import { CustomerLoginModal } from '@/components/shared/CustomerLoginModal'
 
@@ -21,10 +23,12 @@ export function Header() {
   const { state } = useCart()
   const { customer, isLoggedIn, logout } = useCustomer()
   const { store } = useStore()
+  const { settings } = useSettings()
   const slug = useStoreSlug()
 
   const prefix = slug ? `/${slug}` : ''
   const storeName = store?.name || 'MeuCardapio'
+  const logoUrl = settings?.theme?.logo || store?.logo
   const navLinks = slug
     ? [
         { to: `${prefix}/`, label: 'Início' },
@@ -39,8 +43,25 @@ export function Header() {
       <header className="sticky top-0 z-50 bg-brand-black">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to={prefix || '/'} className="flex items-center gap-2 text-xl font-bold text-white">
-            <UtensilsCrossed className="text-accent" size={24} />
-            {storeName}
+            {logoUrl ? (
+              <img
+                src={resolveImageUrl(logoUrl)}
+                alt={storeName}
+                className="hidden h-8 w-auto object-contain md:block"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+              />
+            ) : null}
+            {logoUrl ? (
+              <img
+                src={resolveImageUrl(logoUrl)}
+                alt={storeName}
+                className="h-6 w-auto object-contain md:hidden"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+              />
+            ) : (
+              <UtensilsCrossed className="text-accent" size={24} />
+            )}
+            <span className="hidden md:inline">{storeName}</span>
           </Link>
 
           {navLinks.length > 0 && (
@@ -83,7 +104,7 @@ export function Header() {
               >
                 <ShoppingCart size={20} />
                 {itemCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
+                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-button text-[10px] font-bold text-white">
                     {itemCount > 9 ? '9+' : itemCount}
                   </span>
                 )}
