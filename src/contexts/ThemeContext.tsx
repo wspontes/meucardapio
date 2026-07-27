@@ -12,18 +12,25 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 function applyThemeVars(colorPrimary?: string, colorSecondary?: string, buttonColor?: string) {
   const root = document.documentElement
+  const s = root.style
+
   if (colorPrimary) {
-    root.style.setProperty('--theme-primary', colorPrimary)
+    s.setProperty('--theme-primary', colorPrimary)
+    s.setProperty('--color-brand-black', colorPrimary)
     const r = parseInt(colorPrimary.slice(1, 3), 16)
     const g = parseInt(colorPrimary.slice(3, 5), 16)
     const b = parseInt(colorPrimary.slice(5, 7), 16)
-    root.style.setProperty('--theme-surface', `rgb(${Math.min(255, r + 16)}, ${Math.min(255, g + 16)}, ${Math.min(255, b + 16)})`)
+    const surface = `rgb(${Math.min(255, r + 16)}, ${Math.min(255, g + 16)}, ${Math.min(255, b + 16)})`
+    s.setProperty('--theme-surface', surface)
+    s.setProperty('--color-surface', surface)
   }
   if (colorSecondary) {
-    root.style.setProperty('--theme-secondary', colorSecondary)
+    s.setProperty('--theme-secondary', colorSecondary)
+    s.setProperty('--color-accent', colorSecondary)
   }
   if (buttonColor) {
-    root.style.setProperty('--theme-button', buttonColor)
+    s.setProperty('--theme-button', buttonColor)
+    s.setProperty('--color-button', buttonColor)
   }
 }
 
