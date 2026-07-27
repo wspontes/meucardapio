@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pizzas Mania - Apresentação</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --accent: #e63946;
+      --accent-dark: #c1121f;
+      --dark: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface-light: #252525;
+      --text: #f1f1f1;
+      --muted: #888;
+      --gold: #f4a261;
+      --green: #2ec4b6;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 80px;
+      page-break-after: always;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* PAGE 1 - COVER */
+    .cover {
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a0a0c 50%, #0f0f0f 100%);
+      align-items: center;
+      text-align: center;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(230,57,70,0.15) 0%, transparent 70%);
+    }
+
+    .cover::after {
+      content: '';
+      position: absolute;
+      bottom: -150px;
+      left: -150px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(244,162,97,0.1) 0%, transparent 70%);
+    }
+
+    .logo-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 0 30px rgba(230,57,70,0.3));
+    }
+
+    .cover h1 {
+      font-size: 56px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cover .subtitle {
+      font-size: 22px;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cover .tagline {
+      display: inline-block;
+      padding: 12px 32px;
+      border: 1px solid var(--accent);
+      border-radius: 50px;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cover .date {
+      position: absolute;
+      bottom: 40px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* PAGE 2 - O QUE E */
+    .overview {
+      background: linear-gradient(180deg, var(--dark) 0%, #121212 100%);
+    }
+
+    .section-label {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(230,57,70,0.1);
+      border: 1px solid rgba(230,57,70,0.2);
+      border-radius: 20px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+
+    .overview h2 {
+      font-size: 40px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+
+    .overview .desc {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 700px;
+      margin-bottom: 50px;
+      line-height: 1.8;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover { transform: translateY(-4px); }
+
+    .stat-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card h3 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .stat-card p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* PAGE 3 - CLIENTE */
+    .customer-section {
+      background: var(--dark);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .customer-section h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .customer-section .desc {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 36px;
+      line-height: 1.8;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 20px;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .feature-list .icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .feature-list .content h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .feature-list .content p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .phone-mockup {
+      background: var(--surface);
+      border-radius: 32px;
+      border: 3px solid rgba(255,255,255,0.08);
+      padding: 16px;
+      max-width: 320px;
+      margin: 0 auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .phone-screen {
+      background: #111;
+      border-radius: 20px;
+      overflow: hidden;
+      padding: 20px 16px;
+    }
+
+    .phone-header {
+      text-align: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 16px;
+    }
+
+    .phone-header h5 {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .phone-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .phone-item .name {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .phone-item .price {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .phone-total {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 12px;
+      margin-top: 8px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .phone-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    /* PAGE 4 - ADMIN */
+    .admin-section {
+      background: linear-gradient(180deg, #0f0f0f 0%, #0d0d12 100%);
+    }
+
+    .admin-section h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .admin-section .desc {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      max-width: 700px;
+      line-height: 1.8;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .admin-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .admin-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(230,57,70,0.2);
+    }
+
+    .admin-card .card-icon {
+      font-size: 32px;
+      margin-bottom: 14px;
+    }
+
+    .admin-card h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .admin-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* PAGE 5 - FLUXO */
+    .flow-section {
+      background: var(--dark);
+      align-items: center;
+      text-align: center;
+    }
+
+    .flow-section h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .flow-section .desc {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 50px;
+      max-width: 600px;
+    }
+
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      max-width: 1000px;
+    }
+
+    .flow-step {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 24px 20px;
+      width: 160px;
+      text-align: center;
+    }
+
+    .flow-step .step-icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .flow-step h5 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .flow-step p {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .flow-arrow {
+      font-size: 24px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* PAGE 6 - TECNICO */
+    .tech-section {
+      background: linear-gradient(180deg, #0f0f0f 0%, #101015 100%);
+    }
+
+    .tech-section h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .tech-section .desc {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      max-width: 700px;
+      line-height: 1.8;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .tech-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .tech-card .t-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .tech-card h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .tech-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* PAGE 7 - PROXIMOS PASSOS */
+    .next-section {
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a0a0c 50%, #0f0f0f 100%);
+      align-items: center;
+      text-align: center;
+    }
+
+    .next-section::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(230,57,70,0.08) 0%, transparent 60%);
+    }
+
+    .next-section h2 {
+      font-size: 40px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .next-section .desc {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 50px;
+      max-width: 600px;
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+    }
+
+    .next-steps {
+      display: flex;
+      gap: 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .next-step {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 36px 32px;
+      width: 260px;
+      text-align: center;
+    }
+
+    .next-step .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(230,57,70,0.15);
+      color: var(--accent);
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .next-step h4 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .next-step p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .footer-note {
+      position: absolute;
+      bottom: 30px;
+      color: var(--muted);
+      font-size: 12px;
+      z-index: 1;
+    }
+
+    /* PRINT */
+    @media print {
+      .page {
+        min-height: 100vh;
+        page-break-after: always;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      body { background: var(--dark); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: CAPA -->
+  <div class="page cover">
+    <div class="logo-icon">&#127829;</div>
+    <h1>Pizzas Mania</h1>
+    <p class="subtitle">Sistema Completo de Delivery Online</p>
+    <div class="tagline">Apresentação Comercial</div>
+    <p class="date">Julho 2026</p>
+  </div>
+
+  <!-- PAGE 2: O QUE E -->
+  <div class="page overview">
+    <span class="section-label">Visão Geral</span>
+    <h2>O que é o Pizzas Mania?</h2>
+    <p class="desc">
+      Uma plataforma completa de delivery para pizzarias, desenvolvida para
+      gerenciar pedidos online de forma simples e eficiente. O cliente faz o
+      pedido pelo celular ou computador, e a pizzaria recebe em tempo real
+      pelo painel administrativo.
+    </p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">&#128241;</div>
+        <h3>100%</h3>
+        <p>Responsivofunciona em qualquer dispositivo</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">&#9889;</div>
+        <h3>Tempo Real</h3>
+        <p>Pedidos instantâneos sem atualizar</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">&#128274;</div>
+        <h3>Seguro</h3>
+        <p>Sem necessidade de cadastro complexo</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">&#128640;</div>
+        <h3>Rápido</h3>
+        <p>Carrega em menos de 2 segundos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 3: CLIENTE -->
+  <div class="page customer-section">
+    <div class="two-col">
+      <div>
+        <span class="section-label">Experiência do Cliente</span>
+        <h2>Como o cliente pede</h2>
+        <p class="desc">
+          Uma experiência simples e moderna, pensada para facilitar o pedido
+          e manter o cliente informado do início ao fim.
+        </p>
+        <ul class="feature-list">
+          <li>
+            <span class="icon">&#128218;</span>
+            <div class="content">
+              <h4>Cardápio Digital</h4>
+              <p>Visualize produtos, preços, descrições e imagens de forma organizada por categoria</p>
+            </div>
+          </li>
+          <li>
+            <span class="icon">&#127829;</span>
+            <div class="content">
+              <h4>Bordas Personalizadas</h4>
+              <p>Escolha bordas recheadas com preços transparentes antes de adicionar ao carrinho</p>
+            </div>
+          </li>
+          <li>
+            <span class="icon">&#128722;</span>
+            <div class="content">
+              <h4>Carrinho Inteligente</h4>
+              <p>Altere quantidades, bordas e aplique cupons de desconto direto no carrinho</p>
+            </div>
+          </li>
+          <li>
+            <span class="icon">&#128205;</span>
+            <div class="content">
+              <h4>Auto-preenchimento por CEP</h4>
+              <p>Digite o CEP e o endereço é preenchido automaticamente com aViaCEP</p>
+            </div>
+          </li>
+          <li>
+            <span class="icon">&#128176;</span>
+            <div class="content">
+              <h4>Pagamento Flexível</h4>
+              <p>PIX, cartão na entrega ou dinheiro com troco — o cliente escolhe</p>
+            </div>
+          </li>
+          <li>
+            <span class="icon">&#128240;</span>
+            <div class="content">
+              <h4>Acompanhamento em Tempo Real</h4>
+              <p>Acompanhe o status do pedido: recebido, preparando, a caminho, entregue</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;">
+        <div class="phone-mockup">
+          <div class="phone-screen">
+            <div class="phone-header">
+              <h5>&#127829; Pizzas Mania</h5>
+            </div>
+            <div class="phone-item">
+              <span class="name">1x Pizza Margherita</span>
+              <span class="price">R$ 42,90</span>
+            </div>
+            <div class="phone-item">
+              <span class="name">1x Pizza 4 Queijos</span>
+              <span class="price">R$ 49,90</span>
+            </div>
+            <div class="phone-item">
+              <span class="name">&nbsp;&nbsp;+ Borda Catupiry</span>
+              <span class="price">R$ 6,00</span>
+            </div>
+            <div class="phone-item">
+              <span class="name">1x Coca-Cola 2L</span>
+              <span class="price">R$ 14,90</span>
+            </div>
+            <div class="phone-total">
+              <span>Total</span>
+              <span style="color:var(--accent)">R$ 113,70</span>
+            </div>
+            <div class="phone-btn">Finalizar Pedido</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 4: ADMIN -->
+  <div class="page admin-section">
+    <span class="section-label">Painel Administrativo</span>
+    <h2>Controle total da pizzaria</h2>
+    <p class="desc">
+      Um painel completo para gerenciar todos os aspectos da pizzaria,
+      de produtos a configurações avançadas, tudo em um só lugar.
+    </p>
+    <div class="admin-grid">
+      <div class="admin-card">
+        <div class="card-icon">&#128202;</div>
+        <h4>Dashboard</h4>
+        <p>Visão geral de pedidos, faturamento, produtos mais vendidos e performance por período.</p>
+      </div>
+      <div class="admin-card">
+        <div class="card-icon">&#128203;</div>
+        <h4>Gestão de Pedidos</h4>
+        <p>Receba pedidos em tempo real, atualize status, envie para cozinha e notifique o cliente.</p>
+      </div>
+      <div class="admin-card">
+        <div class="card-icon">&#127860;</div>
+        <h4>Produtos e Cardápio</h4>
+        <p>Cadastre pizzas, categorias, preços, promoções, bordas recheadas e imagens.</p>
+      </div>
+      <div class="admin-card">
+        <div class="card-icon">&#127968;</div>
+        <h4>Configurações</h4>
+        <p>Horários, bairros atendidos, taxas de entrega, métodos de pagamento e dados de contato.</p>
+      </div>
+      <div class="admin-card">
+        <div class="card-icon">&#127915;</div>
+        <h4>Banner Promocional</h4>
+        <p>Configure o banner da página inicial com imagem, textos, cores e posicionamento.</p>
+      </div>
+      <div class="admin-card">
+        <div class="card-icon">&#127991;</div>
+        <h4>Cupons de Desconto</h4>
+        <p>Crie cupons por valor fixo ou percentual com validade e limite de uso.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 5: FLUXO -->
+  <div class="page flow-section">
+    <span class="section-label">Como Funciona</span>
+    <h2>Fluxo do Pedido</h2>
+    <p class="desc">
+      Do clique do cliente à entrega — um processo simples, rápido e transparente.
+    </p>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-icon">&#128270;</div>
+        <h5>Cliente acessa</h5>
+        <p>Entra no site e navega pelo cardápio</p>
+      </div>
+      <div class="flow-arrow">&#10132;</div>
+      <div class="flow-step">
+        <div class="step-icon">&#127829;</div>
+        <h5>Escolhe a pizza</h5>
+        <p>Seleciona sabor, borda e quantidade</p>
+      </div>
+      <div class="flow-arrow">&#10132;</div>
+      <div class="flow-step">
+        <div class="step-icon">&#128722;</div>
+        <h5>Carrinho</h5>
+        <p>Revisa pedido e aplica cupom</p>
+      </div>
+      <div class="flow-arrow">&#10132;</div>
+      <div class="flow-step">
+        <div class="step-icon">&#128176;</div>
+        <h5>Checkout</h5>
+        <p>Preenche endereço e paga</p>
+      </div>
+      <div class="flow-arrow">&#10132;</div>
+      <div class="flow-step">
+        <div class="step-icon">&#128227;</div>
+        <h5>Pizzaria recebe</h5>
+        <p>Notificação sonora no admin</p>
+      </div>
+      <div class="flow-arrow">&#10132;</div>
+      <div class="flow-step">
+        <div class="step-icon">&#128666;</div>
+        <h5>Entrega</h5>
+        <p>Cliente acompanha em tempo real</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 6: TECNICO -->
+  <div class="page tech-section">
+    <span class="section-label">Tecnologia</span>
+    <h2>Recursos Técnicos</h2>
+    <p class="desc">
+      Construído com tecnologias modernas para garantir performance,
+      segurança e experiência mobile nativa.
+    </p>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <span class="t-icon">&#128241;</span>
+        <div>
+          <h4>PWA (Progressive Web App)</h4>
+          <p>Funciona como um aplicativo no celular. O cliente pode "instalar" o site na tela inicial sem precisar da Play Store.</p>
+        </div>
+      </div>
+      <div class="tech-card">
+        <span class="t-icon">&#128276;</span>
+        <div>
+          <h4>Notificações Sonoras</h4>
+          <p>Som de alerta quando um novo pedido chega, garantindo que nenhum pedido passe despercebido.</p>
+        </div>
+      </div>
+      <div class="tech-card">
+        <span class="t-icon">&#128172;</span>
+        <div>
+          <h4>WhatsApp Integrado</h4>
+          <p>Links diretos para WhatsApp facilitam a comunicação entre cliente e pizzaria.</p>
+        </div>
+      </div>
+      <div class="tech-card">
+        <span class="t-icon">&#9889;</span>
+        <div>
+          <h4>Tempo Real</h4>
+          <p>Pedidos aparecem instantaneamente no painel admin e no acompanhamento do cliente, sem precisar recarregar.</p>
+        </div>
+      </div>
+      <div class="tech-card">
+        <span class="t-icon">&#128274;</span>
+        <div>
+          <h4>Sem Cadastro Obrigatório</h4>
+          <p>Cliente informa nome e WhatsApp — sem formulário longo, sem senha, sem fricção.</p>
+        </div>
+      </div>
+      <div class="tech-card">
+        <span class="t-icon">&#127760;</span>
+        <div>
+          <h4> Hospedagem na Nuvem</h4>
+          <p>Deploy automático pelo GitHub na Vercel, com alta disponibilidade e SSL incluído.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 7: PROXIMOS PASSOS -->
+  <div class="page next-section">
+    <span class="section-label">Próximos Passos</span>
+    <h2>Vamos começar?</h2>
+    <p class="desc">
+      O sistema está pronto para testes. Estes são os próximos passos
+      para colocar o Pizzas Mania no ar da sua pizzaria.
+    </p>
+    <div class="next-steps">
+      <div class="next-step">
+        <div class="step-num">1</div>
+        <h4>Demonstração</h4>
+        <p>Reunião presencial para demonstrar o sistema completo, painel admin e fluxo do cliente.</p>
+      </div>
+      <div class="next-step">
+        <div class="step-num">2</div>
+        <h4>Personalização</h4>
+        <p>Cadastro do cardápio, fotos dos produtos, configuração de bairros, horários e dados da pizzaria.</p>
+      </div>
+      <div class="next-step">
+        <div class="step-num">3</div>
+        <h4>Testes</h4>
+        <p>Pedidos simulados para validar todo o fluxo: cardápio, carrinho, pagamento e acompanhamento.</p>
+      </div>
+      <div class="next-step">
+        <div class="step-num">4</div>
+        <h4>Lançamento</h4>
+        <p>Ativação do site, compartilhamento do link e início das operações reais de delivery.</p>
+      </div>
+    </div>
+    <p class="footer-note">Pizzas Mania &mdash; Sistema de Delivery &mdash; 2026</p>
+  </div>
+
+</body>
+</html>
