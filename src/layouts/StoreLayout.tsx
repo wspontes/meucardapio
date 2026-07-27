@@ -13,6 +13,14 @@ function StoreContent() {
 
   useEffect(() => { if (store) trackVisit() }, [store])
 
+  useEffect(() => {
+    if (store?.name) {
+      document.title = store.name
+      const ogTitle = document.querySelector('meta[property="og:title"]')
+      if (ogTitle) ogTitle.setAttribute('content', store.name)
+    }
+  }, [store?.name])
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-brand-black">
