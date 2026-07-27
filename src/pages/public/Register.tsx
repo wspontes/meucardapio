@@ -45,7 +45,7 @@ export default function Register() {
 
   return (
     <div className="rounded-xl border border-border bg-surface p-6">
-      <h2 className="mb-6 text-xl font-bold text-white">Criar Conta</h2>
+      <h2 className="mb-6 text-xl font-bold text-brand-white">Criar Conta</h2>
 
       {error && (
         <div className="mb-4 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-400">
@@ -88,7 +88,7 @@ export default function Register() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-[38px] text-muted hover:text-white transition-colors"
+            className="absolute right-3 top-[38px] text-muted hover:text-brand-white transition-colors"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>

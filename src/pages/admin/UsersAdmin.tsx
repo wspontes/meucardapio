@@ -83,7 +83,7 @@ export default function UsersAdmin() {
     <div className="pb-20">
       <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-white">Usuários</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-brand-white">Usuários</h1>
           <p className="text-xs md:text-sm text-muted mt-0.5">{users.length} usuários cadastrados</p>
         </div>
         <Button onClick={() => setShowForm(!showForm)}>
@@ -94,15 +94,15 @@ export default function UsersAdmin() {
 
       {showForm && (
         <div className="mb-6 rounded-xl border border-border bg-surface p-4 md:p-6">
-          <h2 className="mb-4 text-base font-semibold text-white">Criar Novo Usuário</h2>
+          <h2 className="mb-4 text-base font-semibold text-brand-white">Criar Novo Usuário</h2>
           <div className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <Input label="Nome" placeholder="Nome completo" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               <Input label="Email" type="email" placeholder="email@exemplo.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
               <Input label="Senha" type="password" placeholder="Mínimo 6 caracteres" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
               <div className="w-full">
-                <label className="mb-1.5 block text-sm font-medium text-white">Função</label>
-                <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as User['role'] })} className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-white focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent">
+                <label className="mb-1.5 block text-sm font-medium text-brand-white">Função</label>
+                <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as User['role'] })} className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-brand-white focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent">
                   {Object.entries(userRoles).map(([key, label]) => (
                     <option key={key} value={key}>{label}</option>
                   ))}
@@ -121,7 +121,7 @@ export default function UsersAdmin() {
       <div className="mb-4">
         <div className="relative">
           <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input type="text" placeholder="Buscar por nome ou email..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full rounded-lg border border-border bg-surface pl-9 pr-3 py-2.5 text-sm text-white placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" />
+          <input type="text" placeholder="Buscar por nome ou email..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full rounded-lg border border-border bg-surface pl-9 pr-3 py-2.5 text-sm text-brand-white placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" />
         </div>
       </div>
 
@@ -140,7 +140,7 @@ export default function UsersAdmin() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-white truncate">{u.name}</p>
+                      <p className="text-sm font-medium text-brand-white truncate">{u.name}</p>
                       <p className="text-xs text-muted mt-0.5 truncate">{u.email}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -155,7 +155,7 @@ export default function UsersAdmin() {
                 </div>
               </div>
               <div className="mt-3 flex items-center gap-2 border-t border-border pt-3">
-                <button onClick={() => handleToggleActive(u)} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-white transition-colors" title={u.active ? 'Desativar' : 'Ativar'}>
+                <button onClick={() => handleToggleActive(u)} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors" title={u.active ? 'Desativar' : 'Ativar'}>
                   <Pencil size={15} />
                 </button>
                 {u.email !== 'admin@pizzasmania.com.br' && (

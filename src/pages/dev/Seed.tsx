@@ -116,15 +116,15 @@ export default function Seed() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-brand-black px-4">
       <div className="w-full max-w-md rounded-xl border border-border bg-surface p-6 text-center">
-        <h1 className="mb-2 text-xl font-bold text-white">Seed - Dados Iniciais</h1>
+        <h1 className="mb-2 text-xl font-bold text-brand-white">Seed - Dados Iniciais</h1>
         <p className="mb-6 text-sm text-muted">
           Cria usuário admin + dados de exemplo no Firestore
         </p>
 
         <div className="mb-6 rounded-lg bg-surface-hover p-4 text-left text-sm">
-          <p className="text-white font-medium mb-2">Conta que será criada:</p>
-          <p className="text-muted">Usuário: <span className="text-white">teste</span></p>
-          <p className="text-muted">Senha: <span className="text-white">Teste@123</span></p>
+          <p className="text-brand-white font-medium mb-2">Conta que será criada:</p>
+          <p className="text-muted">Usuário: <span className="text-brand-white">teste</span></p>
+          <p className="text-muted">Senha: <span className="text-brand-white">Teste@123</span></p>
           <p className="text-muted">+ Categorias e produtos de exemplo</p>
         </div>
 

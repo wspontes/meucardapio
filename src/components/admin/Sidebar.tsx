@@ -36,11 +36,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         )}
       >
         <div className="flex h-16 items-center justify-between border-b border-border px-4">
-          <div className="flex items-center gap-2 text-lg font-bold text-white">
+          <div className="flex items-center gap-2 text-lg font-bold text-brand-white">
             <UtensilsCrossed className="text-accent" size={20} />
             {storeName}
           </div>
-          <button onClick={onClose} className="text-muted hover:text-white lg:hidden">
+          <button onClick={onClose} className="text-muted hover:text-brand-white lg:hidden">
             <X size={20} />
           </button>
         </div>
@@ -59,7 +59,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors mb-1',
                     isActive
                       ? 'bg-accent text-white'
-                      : 'text-muted hover:bg-surface-hover hover:text-white'
+                      : 'text-muted hover:bg-surface-hover hover:text-brand-white'
                   )
                 }
               >

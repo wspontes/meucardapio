@@ -153,7 +153,7 @@ export default function Products() {
     <div className="pb-20">
       <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-white">Produtos</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-brand-white">Produtos</h1>
           <p className="text-xs md:text-sm text-muted mt-0.5">{products.length} produtos cadastrados</p>
         </div>
         <Link to={`${prefix}/produtos/novo`}>
@@ -167,17 +167,17 @@ export default function Products() {
       <div className="mb-4">
         <div className="relative">
           <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input type="text" placeholder="Buscar produto..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full rounded-lg border border-border bg-surface pl-9 pr-3 py-2.5 text-sm text-white placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" />
+          <input type="text" placeholder="Buscar produto..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full rounded-lg border border-border bg-surface pl-9 pr-3 py-2.5 text-sm text-brand-white placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" />
         </div>
       </div>
 
       <div className="mb-5">
         <div className="flex flex-wrap items-center gap-2">
-          <button onClick={() => setFilterCat('all')} className={`rounded-full px-3.5 py-2 text-xs font-medium transition-colors ${filterCat === 'all' ? 'bg-accent text-white' : 'bg-surface text-muted hover:text-white border border-border'}`}>
+          <button onClick={() => setFilterCat('all')} className={`rounded-full px-3.5 py-2 text-xs font-medium transition-colors ${filterCat === 'all' ? 'bg-accent text-white' : 'bg-surface text-muted hover:text-brand-white border border-border'}`}>
             Todas
           </button>
           {categories.filter((c) => c.active).map((cat) => (
-            <button key={cat.id} onClick={() => setFilterCat(cat.id)} className={`rounded-full px-3.5 py-2 text-xs font-medium transition-colors ${filterCat === cat.id ? 'bg-accent text-white' : 'bg-surface text-muted hover:text-white border border-border'}`}>
+            <button key={cat.id} onClick={() => setFilterCat(cat.id)} className={`rounded-full px-3.5 py-2 text-xs font-medium transition-colors ${filterCat === cat.id ? 'bg-accent text-white' : 'bg-surface text-muted hover:text-brand-white border border-border'}`}>
               {cat.name}
             </button>
           ))}
@@ -203,7 +203,7 @@ export default function Products() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-white truncate">{product.name}</p>
+                      <p className="text-sm font-medium text-brand-white truncate">{product.name}</p>
                       <p className="text-xs text-muted mt-0.5 truncate">{getCategoryName(product.categoryId)}</p>
                     </div>
                     <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${product.active ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
@@ -211,16 +211,16 @@ export default function Products() {
                     </span>
                   </div>
                   <div className="mt-1.5 text-sm">
-                    <span className="text-white font-medium">{formatCurrency((product.discountPrice ?? 0) > 0 ? (product.discountPrice as number) : product.price)}</span>
+                    <span className="text-brand-white font-medium">{formatCurrency((product.discountPrice ?? 0) > 0 ? (product.discountPrice as number) : product.price)}</span>
                     {(product.discountPrice ?? 0) > 0 && <span className="ml-1.5 text-xs text-muted line-through">{formatCurrency(product.price)}</span>}
                   </div>
                 </div>
               </div>
               <div className="mt-3 flex items-center gap-2 border-t border-border pt-3">
-                <button onClick={() => navigate(`${prefix}/produtos/${product.id}/editar`)} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-white transition-colors" title="Editar">
+                <button onClick={() => navigate(`${prefix}/produtos/${product.id}/editar`)} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors" title="Editar">
                   <Pencil size={15} />
                 </button>
-                <button onClick={() => setCloneConfirm(product)} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-white transition-colors" title="Clonar">
+                <button onClick={() => setCloneConfirm(product)} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors" title="Clonar">
                   <Copy size={15} />
                 </button>
                 <button onClick={() => handleDelete(product.id, product.name)} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-red-500/10 hover:text-red-400 transition-colors" title="Excluir">
@@ -241,9 +241,9 @@ export default function Products() {
                 <Copy size={28} className="text-accent" />
               </div>
             </div>
-            <h3 className="mb-2 text-center text-base font-semibold text-white">Clonar produto?</h3>
+            <h3 className="mb-2 text-center text-base font-semibold text-brand-white">Clonar produto?</h3>
             <div className="mb-4 rounded-lg bg-surface-hover p-3 text-center">
-              <p className="text-sm font-medium text-white">{cloneConfirm.name}</p>
+              <p className="text-sm font-medium text-brand-white">{cloneConfirm.name}</p>
               <p className="text-lg font-bold text-accent mt-1">{formatCurrency((cloneConfirm.discountPrice ?? 0) > 0 ? (cloneConfirm.discountPrice as number) : cloneConfirm.price)}</p>
             </div>
             <p className="mb-4 text-center text-sm text-muted">Uma cópia será criada e você será redirecionado para editá-la.</p>
@@ -262,7 +262,7 @@ export default function Products() {
       {showBulkModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowBulkModal(false)}>
           <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-5 md:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="mb-1 text-base font-semibold text-white">Ajustar Preços</h3>
+            <h3 className="mb-1 text-base font-semibold text-brand-white">Ajustar Preços</h3>
             <p className="text-xs text-muted mb-4">
               {filterCat === 'all'
                 ? `Todos os ${bulkTargets.length} produtos — preço promocional`
@@ -270,13 +270,13 @@ export default function Products() {
             </p>
 
             <div className="flex gap-2 mb-3">
-              <button onClick={() => setBulkType('percent')} className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-medium transition-colors ${bulkType === 'percent' ? 'bg-accent text-white' : 'bg-surface-hover text-muted border border-border hover:text-white'}`}>
+              <button onClick={() => setBulkType('percent')} className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-medium transition-colors ${bulkType === 'percent' ? 'bg-accent text-white' : 'bg-surface-hover text-muted border border-border hover:text-brand-white'}`}>
                 <Percent size={14} /> Percentual
               </button>
-              <button onClick={() => setBulkType('fixed')} className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-medium transition-colors ${bulkType === 'fixed' ? 'bg-accent text-white' : 'bg-surface-hover text-muted border border-border hover:text-white'}`}>
+              <button onClick={() => setBulkType('fixed')} className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-medium transition-colors ${bulkType === 'fixed' ? 'bg-accent text-white' : 'bg-surface-hover text-muted border border-border hover:text-brand-white'}`}>
                 <DollarSign size={14} /> Valor Fixo
               </button>
-              <button onClick={() => setBulkType('clear')} className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-medium transition-colors ${bulkType === 'clear' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-surface-hover text-muted border border-border hover:text-white'}`}>
+              <button onClick={() => setBulkType('clear')} className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-medium transition-colors ${bulkType === 'clear' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-surface-hover text-muted border border-border hover:text-brand-white'}`}>
                 Limpar
               </button>
             </div>
@@ -284,10 +284,10 @@ export default function Products() {
             {bulkType !== 'clear' && (
               <>
                 <div className="flex gap-2 mb-3">
-                  <button onClick={() => setBulkDirection('increase')} className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${bulkDirection === 'increase' ? 'bg-green-500/10 text-green-400 border border-green-500/30' : 'bg-surface-hover text-muted border border-border hover:text-white'}`}>
+                  <button onClick={() => setBulkDirection('increase')} className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${bulkDirection === 'increase' ? 'bg-green-500/10 text-green-400 border border-green-500/30' : 'bg-surface-hover text-muted border border-border hover:text-brand-white'}`}>
                     Aumentar
                   </button>
-                  <button onClick={() => setBulkDirection('decrease')} className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${bulkDirection === 'decrease' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-surface-hover text-muted border border-border hover:text-white'}`}>
+                  <button onClick={() => setBulkDirection('decrease')} className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${bulkDirection === 'decrease' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-surface-hover text-muted border border-border hover:text-brand-white'}`}>
                     Reduzir
                   </button>
                 </div>
@@ -301,7 +301,7 @@ export default function Products() {
                     placeholder={bulkType === 'percent' ? 'Ex: 10' : 'Ex: 5.00'}
                     value={bulkValue}
                     onChange={(e) => setBulkValue(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-surface-hover pl-8 pr-3 py-2.5 text-sm text-white placeholder:text-muted focus:border-accent focus:outline-none"
+                    className="w-full rounded-lg border border-border bg-surface-hover pl-8 pr-3 py-2.5 text-sm text-brand-white placeholder:text-muted focus:border-accent focus:outline-none"
                   />
                 </div>
               </>
@@ -332,7 +332,7 @@ export default function Products() {
       {showBulkConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowBulkConfirm(false)}>
           <div className="w-full max-w-lg rounded-xl border border-border bg-surface p-5 md:p-6 shadow-2xl max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-            <h3 className="mb-1 text-base font-semibold text-white">Confirmar Alteração</h3>
+            <h3 className="mb-1 text-base font-semibold text-brand-white">Confirmar Alteração</h3>
             <p className="text-xs text-muted mb-3">
               {bulkType === 'clear'
                 ? `Removendo promoção de ${bulkPreview.length} produtos`
@@ -352,7 +352,7 @@ export default function Products() {
                 <tbody>
                   {bulkPreview.map((item) => (
                     <tr key={item.product.id} className="border-b border-border/50 last:border-0">
-                      <td className="px-3 py-2 text-white truncate max-w-[180px]">{item.product.name}</td>
+                      <td className="px-3 py-2 text-brand-white truncate max-w-[180px]">{item.product.name}</td>
                       <td className="px-3 py-2 text-right text-muted">
                         {item.oldDiscount > 0 ? formatCurrency(item.oldDiscount) : formatCurrency(item.product.price)}
                       </td>

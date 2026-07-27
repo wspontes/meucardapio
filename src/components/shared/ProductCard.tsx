@@ -67,7 +67,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
         </div>
 
         <div className="flex flex-1 flex-col p-4">
-          <h3 className="text-base font-semibold text-white transition-colors group-hover:text-accent">
+          <h3 className="text-base font-semibold text-brand-white transition-colors group-hover:text-accent">
             {product.name}
           </h3>
           <p className="mt-1 line-clamp-2 text-sm text-muted flex-1">

@@ -114,28 +114,28 @@ export default function RegisterStore() {
     <div className="min-h-screen bg-brand-black flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 text-xl font-bold text-white mb-6">
+          <Link to="/" className="inline-flex items-center gap-2 text-xl font-bold text-brand-white mb-6">
             <UtensilsCrossed className="text-accent" size={24} />
             MeuCardapio
           </Link>
-          <h1 className="text-2xl font-bold text-white">Criar cardápio digital</h1>
+          <h1 className="text-2xl font-bold text-brand-white">Criar cardápio digital</h1>
           <p className="text-muted text-sm mt-1">Preencha os dados da sua lanchonete</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white">Nome da lanchonete</label>
+            <label className="text-sm font-medium text-brand-white">Nome da lanchonete</label>
             <input
               type="text"
               value={storeName}
               onChange={(e) => handleStoreNameChange(e.target.value)}
               placeholder="Ex: Pizzas Mania"
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-white placeholder:text-muted focus:border-accent focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-brand-white placeholder:text-muted focus:border-accent focus:outline-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white">Link do cardápio</label>
+            <label className="text-sm font-medium text-brand-white">Link do cardápio</label>
             <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 focus-within:border-accent">
               <span className="text-muted text-sm shrink-0">meucardapio.digital/</span>
               <input
@@ -144,7 +144,7 @@ export default function RegisterStore() {
                 onChange={(e) => handleSlugChange(e.target.value)}
                 onBlur={checkSlug}
                 placeholder="minha-lanchonete"
-                className="flex-1 bg-transparent text-white placeholder:text-muted focus:outline-none"
+                className="flex-1 bg-transparent text-brand-white placeholder:text-muted focus:outline-none"
               />
               {checkingSlug ? (
                 <Loader2 size={16} className="animate-spin text-muted" />
@@ -160,48 +160,48 @@ export default function RegisterStore() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white">WhatsApp</label>
+            <label className="text-sm font-medium text-brand-white">WhatsApp</label>
             <input
               type="tel"
               value={whatsapp}
               onChange={(e) => setWhatsapp(e.target.value)}
               placeholder="(11) 99999-8888"
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-white placeholder:text-muted focus:border-accent focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-brand-white placeholder:text-muted focus:border-accent focus:outline-none"
             />
           </div>
 
           <hr className="border-border" />
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white">Seu nome</label>
+            <label className="text-sm font-medium text-brand-white">Seu nome</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Seu nome"
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-white placeholder:text-muted focus:border-accent focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-brand-white placeholder:text-muted focus:border-accent focus:outline-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white">Email</label>
+            <label className="text-sm font-medium text-brand-white">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-white placeholder:text-muted focus:border-accent focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-brand-white placeholder:text-muted focus:border-accent focus:outline-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white">Senha</label>
+            <label className="text-sm font-medium text-brand-white">Senha</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mínimo 6 caracteres"
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-white placeholder:text-muted focus:border-accent focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-brand-white placeholder:text-muted focus:border-accent focus:outline-none"
             />
           </div>
 

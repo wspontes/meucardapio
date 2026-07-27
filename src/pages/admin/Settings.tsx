@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, CircleDot, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, CircleDot, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { ImageUpload, ProductCard } from '@/components/shared'
 import { settingsService, productsService } from '@/services'
@@ -7,6 +7,7 @@ import { type BusinessSettings } from '@/services/settings'
 import type { Product } from '@/types'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
 import { formatCurrency } from '@/utils'
+import { THEMES, DEFAULT_THEME_ID } from '@/config/themes'
 
 export default function Settings() {
   const [saving, setSaving] = useState(false)
@@ -50,9 +51,7 @@ export default function Settings() {
   const [crustOptions, setCrustOptions] = useState<{ name: string; price: number }[]>([])
   const [newCrust, setNewCrust] = useState({ name: '', price: '' })
   const [themeLogo, setThemeLogo] = useState('')
-  const [themeColorPrimary, setThemeColorPrimary] = useState('#dc2626')
-  const [themeColorSecondary, setThemeColorSecondary] = useState('#16a34a')
-  const [themeButtonColor, setThemeButtonColor] = useState('#dc2626')
+  const [selectedThemeId, setSelectedThemeId] = useState(DEFAULT_THEME_ID)
 
   useEffect(() => {
     settingsService.get().then((data) => {
@@ -85,9 +84,7 @@ export default function Settings() {
         if (data.defaultDeliveryFee !== undefined) setDefaultDeliveryFee(String(data.defaultDeliveryFee))
         if (data.theme) {
           if (data.theme.logo) setThemeLogo(data.theme.logo)
-          if (data.theme.colorPrimary) setThemeColorPrimary(data.theme.colorPrimary)
-          if (data.theme.colorSecondary) setThemeColorSecondary(data.theme.colorSecondary)
-          if (data.theme.buttonColor) setThemeButtonColor(data.theme.buttonColor)
+          if (data.theme.themeId) setSelectedThemeId(data.theme.themeId)
         }
       }
     }).catch(() => {})
@@ -120,9 +117,7 @@ export default function Settings() {
         address,
         theme: {
           logo: themeLogo || undefined,
-          colorPrimary: themeColorPrimary,
-          colorSecondary: themeColorSecondary,
-          buttonColor: themeButtonColor,
+          themeId: selectedThemeId,
         },
       }
       await settingsService.save(JSON.parse(JSON.stringify(data)))
@@ -178,13 +173,13 @@ export default function Settings() {
   return (
     <div className="max-w-3xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">Configurações</h1>
+        <h1 className="text-2xl font-bold text-brand-white">Configurações</h1>
         <p className="text-sm text-muted">Gerencie as configurações do estabelecimento</p>
       </div>
 
       <div className="space-y-6">
         <div className="rounded-xl border border-border bg-surface p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <Image size={18} className="text-accent" />
             Banner Principal
           </h2>
@@ -195,7 +190,7 @@ export default function Settings() {
                   <input type="checkbox" checked={banners.active} onChange={(e) => setBanners((prev) => ({ ...prev, active: e.target.checked }))} className="sr-only" />
                   <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 ${banners.active ? 'translate-x-[22px]' : 'translate-x-[2px]'}`} />
                 </label>
-                <span className="text-sm text-white">{banners.active ? 'Banners ativos' : 'Banners inativos'}</span>
+                <span className="text-sm text-brand-white">{banners.active ? 'Banners ativos' : 'Banners inativos'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <label className="text-xs text-muted mr-1">Estilo:</label>
@@ -205,7 +200,7 @@ export default function Settings() {
                     type="button"
                     onClick={() => setBanners((prev) => ({ ...prev, scrollStyle: style }))}
                     className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${
-                      banners.scrollStyle === style ? 'border-accent bg-accent/10 text-accent' : 'border-border bg-surface-hover text-muted hover:text-white'
+                      banners.scrollStyle === style ? 'border-accent bg-accent/10 text-accent' : 'border-border bg-surface-hover text-muted hover:text-brand-white'
                     }`}
                   >
                     {style === 'dots' ? 'Pontos' : style === 'arrows' ? 'Setas' : 'Nenhum'}
@@ -226,7 +221,7 @@ export default function Settings() {
                       <div className="flex items-center gap-3 min-w-0">
                         <GripVertical size={16} className="text-muted shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-white truncate">{item.title || 'Sem título'}</p>
+                          <p className="text-sm font-medium text-brand-white truncate">{item.title || 'Sem título'}</p>
                           <p className="text-[11px] text-muted truncate">{item.subtitle || 'Sem subtítulo'}</p>
                         </div>
                       </div>
@@ -313,7 +308,7 @@ export default function Settings() {
 
                         <div className="grid gap-3 sm:grid-cols-3">
                           <div>
-                            <label className="mb-1.5 block text-sm font-medium text-white">Vincular a um produto</label>
+                            <label className="mb-1.5 block text-sm font-medium text-brand-white">Vincular a um produto</label>
                             <select
                               value={item.linkProductId || ''}
                               onChange={(e) => {
@@ -321,7 +316,7 @@ export default function Settings() {
                                 updated[idx] = { ...updated[idx], linkProductId: e.target.value || undefined }
                                 setBanners((prev) => ({ ...prev, items: updated }))
                               }}
-                              className="w-full rounded-lg border border-border bg-surface-hover px-3 py-2.5 text-sm text-white transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                              className="w-full rounded-lg border border-border bg-surface-hover px-3 py-2.5 text-sm text-brand-white transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             >
                               <option value="">Nenhum</option>
                               {products.map((p) => (
@@ -330,7 +325,7 @@ export default function Settings() {
                             </select>
                           </div>
                           <div>
-                            <label className="mb-1.5 block text-sm font-medium text-white">Alinhamento do texto</label>
+                            <label className="mb-1.5 block text-sm font-medium text-brand-white">Alinhamento do texto</label>
                             <div className="flex gap-1.5">
                               {(['left', 'center', 'right'] as const).map((align) => (
                                 <button
@@ -342,7 +337,7 @@ export default function Settings() {
                                     setBanners((prev) => ({ ...prev, items: updated }))
                                   }}
                                   className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                                    (item.align || 'left') === align ? 'border-accent bg-accent/10 text-accent' : 'border-border bg-surface-hover text-muted hover:text-white'
+                                    (item.align || 'left') === align ? 'border-accent bg-accent/10 text-accent' : 'border-border bg-surface-hover text-muted hover:text-brand-white'
                                   }`}
                                 >
                                   {align === 'left' ? 'Esquerda' : align === 'center' ? 'Centro' : 'Direita'}
@@ -351,7 +346,7 @@ export default function Settings() {
                             </div>
                           </div>
                           <div>
-                            <label className="mb-1.5 block text-sm font-medium text-white">Cor do texto</label>
+                            <label className="mb-1.5 block text-sm font-medium text-brand-white">Cor do texto</label>
                             <div className="flex items-center gap-2">
                               <input type="color" value={item.textColor || '#ffffff'} onChange={(e) => {
                                 const updated = [...banners.items]
@@ -383,7 +378,7 @@ export default function Settings() {
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <CreditCard size={18} className="text-accent" />
             Métodos de Pagamento
           </h2>
@@ -396,24 +391,24 @@ export default function Settings() {
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="flex items-center gap-2 cursor-pointer rounded-lg border border-border bg-surface-hover p-3">
                 <input type="checkbox" checked={acceptCard} onChange={(e) => setAcceptCard(e.target.checked)} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
-                <span className="text-sm text-white">Cartão crédito/débito na entrega/retirada</span>
+                <span className="text-sm text-brand-white">Cartão crédito/débito na entrega/retirada</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer rounded-lg border border-border bg-surface-hover p-3">
                 <input type="checkbox" checked={acceptCash} onChange={(e) => setAcceptCash(e.target.checked)} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
-                <span className="text-sm text-white">Dinheiro</span>
+                <span className="text-sm text-brand-white">Dinheiro</span>
               </label>
             </div>
           </div>
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <Clock size={18} className="text-accent" />
             Horários de Funcionamento
           </h2>
           <div className="flex items-center justify-between rounded-lg bg-surface-hover px-4 py-3 mb-4">
             <div>
-              <p className="text-sm font-medium text-white">Restrição de horário</p>
+              <p className="text-sm font-medium text-brand-white">Restrição de horário</p>
               <p className="text-xs text-muted mt-0.5">{businessHoursEnabled ? 'Pedidos bloqueados fora do horário' : 'Pedidos aceitos em qualquer horário'}</p>
             </div>
             <button
@@ -426,14 +421,14 @@ export default function Settings() {
           <div className="space-y-2">
             {hours.map((day, index) => (
               <div key={day.day} className="flex flex-wrap items-center gap-2 md:gap-3">
-                <span className="w-20 md:w-28 text-xs md:text-sm text-white shrink-0">{day.day}</span>
+                <span className="w-20 md:w-28 text-xs md:text-sm text-brand-white shrink-0">{day.day}</span>
                 {day.closed ? (
                   <span className="text-xs md:text-sm text-red-400 font-medium">Fechado</span>
                 ) : (
                   <div className="flex items-center gap-1.5 md:gap-2 flex-1 min-w-0">
-                    <input type="time" value={day.open} onChange={(e) => setHours((prev) => prev.map((d, i) => i === index ? { ...d, open: e.target.value } : d))} className="w-24 md:w-auto rounded-lg border border-border bg-surface-hover px-2 md:px-3 py-1.5 text-xs md:text-sm text-white" />
+                    <input type="time" value={day.open} onChange={(e) => setHours((prev) => prev.map((d, i) => i === index ? { ...d, open: e.target.value } : d))} className="w-24 md:w-auto rounded-lg border border-border bg-surface-hover px-2 md:px-3 py-1.5 text-xs md:text-sm text-brand-white" />
                     <span className="text-muted text-xs md:text-sm">às</span>
-                    <input type="time" value={day.close} onChange={(e) => setHours((prev) => prev.map((d, i) => i === index ? { ...d, close: e.target.value } : d))} className="w-24 md:w-auto rounded-lg border border-border bg-surface-hover px-2 md:px-3 py-1.5 text-xs md:text-sm text-white" />
+                    <input type="time" value={day.close} onChange={(e) => setHours((prev) => prev.map((d, i) => i === index ? { ...d, close: e.target.value } : d))} className="w-24 md:w-auto rounded-lg border border-border bg-surface-hover px-2 md:px-3 py-1.5 text-xs md:text-sm text-brand-white" />
                   </div>
                 )}
                 <button onClick={() => toggleDay(index)} className={`ml-auto shrink-0 rounded-full px-2.5 md:px-3 py-1 text-[10px] md:text-xs font-medium transition-colors ${day.closed ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20' : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'}`}>
@@ -445,7 +440,7 @@ export default function Settings() {
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <Phone size={18} className="text-accent" />
             Contato do Estabelecimento
           </h2>
@@ -459,7 +454,7 @@ export default function Settings() {
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <MapPin size={18} className="text-accent" />
             Bairros Atendidos
           </h2>
@@ -481,17 +476,17 @@ export default function Settings() {
             {neighborhoods.map((n, index) => (
               editingNb === index ? (
                 <div key={index} className="rounded-lg bg-surface-hover border border-accent/30 p-3 space-y-2">
-                  <input type="text" value={editNb.name} onChange={(e) => setEditNb({ ...editNb, name: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-white" placeholder="Bairro" />
+                  <input type="text" value={editNb.name} onChange={(e) => setEditNb({ ...editNb, name: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-brand-white" placeholder="Bairro" />
                   <div className="grid grid-cols-2 gap-2">
-                    <input type="number" value={editNb.fee} onChange={(e) => setEditNb({ ...editNb, fee: e.target.value })} className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-white" placeholder="Taxa R$" step="0.50" />
-                    <input type="number" value={editNb.time} onChange={(e) => setEditNb({ ...editNb, time: e.target.value })} className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-white" placeholder="Tempo min" />
+                    <input type="number" value={editNb.fee} onChange={(e) => setEditNb({ ...editNb, fee: e.target.value })} className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-brand-white" placeholder="Taxa R$" step="0.50" />
+                    <input type="number" value={editNb.time} onChange={(e) => setEditNb({ ...editNb, time: e.target.value })} className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-brand-white" placeholder="Tempo min" />
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => setEditNb({ ...editNb, active: !editNb.active })} className={`text-xs font-medium px-2 py-1 rounded-full transition-colors ${editNb.active ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                       {editNb.active ? 'Ativo' : 'Inativo'}
                     </button>
                     <div className="ml-auto flex gap-2">
-                      <button onClick={() => setEditingNb(null)} className="text-xs text-muted hover:text-white transition-colors px-2 py-1">Cancelar</button>
+                      <button onClick={() => setEditingNb(null)} className="text-xs text-muted hover:text-brand-white transition-colors px-2 py-1">Cancelar</button>
                       <button onClick={saveEditNb} className="text-xs text-accent hover:text-accent/80 font-medium transition-colors px-2 py-1">Salvar</button>
                     </div>
                   </div>
@@ -499,7 +494,7 @@ export default function Settings() {
               ) : (
                 <div key={index} className="flex items-center justify-between gap-2 rounded-lg bg-surface-hover px-3 md:px-4 py-2.5">
                   <div className="min-w-0">
-                    <span className={`text-sm font-medium truncate block ${n.active ? 'text-white' : 'text-muted line-through'}`}>{n.name}</span>
+                    <span className={`text-sm font-medium truncate block ${n.active ? 'text-brand-white' : 'text-muted line-through'}`}>{n.name}</span>
                   </div>
                   <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm text-muted shrink-0">
                     <span>R$ {n.fee.toFixed(2)}</span>
@@ -514,42 +509,50 @@ export default function Settings() {
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <Palette size={18} className="text-accent" />
             Aparência
           </h2>
-          <p className="mb-4 text-xs text-muted">Personalize as cores e o logo que aparecem no site do seu estabelecimento.</p>
-          <div className="space-y-4">
+          <p className="mb-4 text-xs text-muted">Personalize o visual do seu estabelecimento.</p>
+          <div className="space-y-6">
             <ImageUpload value={themeLogo} onChange={setThemeLogo} label="Logo do estabelecimento" />
             <Input label="Ou cole a URL do logo" placeholder="https://..." value={themeLogo.startsWith('data:') ? '' : themeLogo} onChange={(e) => setThemeLogo(e.target.value)} />
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-white">Cor principal</label>
-                <div className="flex items-center gap-2">
-                  <input type="color" value={themeColorPrimary} onChange={(e) => setThemeColorPrimary(e.target.value)} className="h-9 w-9 cursor-pointer rounded-lg border border-border bg-transparent" />
-                  <span className="text-xs text-muted">{themeColorPrimary}</span>
-                </div>
-              </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-white">Cor secundária</label>
-                <div className="flex items-center gap-2">
-                  <input type="color" value={themeColorSecondary} onChange={(e) => setThemeColorSecondary(e.target.value)} className="h-9 w-9 cursor-pointer rounded-lg border border-border bg-transparent" />
-                  <span className="text-xs text-muted">{themeColorSecondary}</span>
-                </div>
-              </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-white">Cor dos botões</label>
-                <div className="flex items-center gap-2">
-                  <input type="color" value={themeButtonColor} onChange={(e) => setThemeButtonColor(e.target.value)} className="h-9 w-9 cursor-pointer rounded-lg border border-border bg-transparent" />
-                  <span className="text-xs text-muted">{themeButtonColor}</span>
-                </div>
+            <div>
+              <label className="mb-3 block text-sm font-medium text-brand-white">Tema de cores</label>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {THEMES.map((theme) => (
+                  <button
+                    key={theme.id}
+                    type="button"
+                    onClick={() => setSelectedThemeId(theme.id)}
+                    className={`relative rounded-xl border-2 p-4 text-left transition-all ${
+                      selectedThemeId === theme.id
+                        ? 'border-accent ring-1 ring-accent/30'
+                        : 'border-border hover:border-muted'
+                    }`}
+                  >
+                    {selectedThemeId === theme.id && (
+                      <div className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-white">
+                        <Check size={12} />
+                      </div>
+                    )}
+                    <div className="mb-3 flex gap-1.5">
+                      <div className="h-6 w-6 rounded-full border border-white/10" style={{ backgroundColor: theme.preview.bg }} />
+                      <div className="h-6 w-6 rounded-full border border-white/10" style={{ backgroundColor: theme.preview.surface }} />
+                      <div className="h-6 w-6 rounded-full border border-white/10" style={{ backgroundColor: theme.preview.accent }} />
+                      <div className="h-6 w-6 rounded-full border border-white/10" style={{ backgroundColor: theme.preview.button }} />
+                    </div>
+                    <p className="text-sm font-medium text-brand-white">{theme.name}</p>
+                    <p className="text-xs text-muted">{theme.description}</p>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <CircleDot size={18} className="text-accent" />
             Bordas da Pizza
           </h2>
@@ -557,7 +560,7 @@ export default function Settings() {
           <div className="space-y-3">
             {crustOptions.map((opt, i) => (
               <div key={i} className="flex items-center gap-2 rounded-lg bg-surface-hover px-3 py-2.5">
-                <span className="flex-1 text-sm text-white font-medium">{opt.name}</span>
+                <span className="flex-1 text-sm text-brand-white font-medium">{opt.name}</span>
                 <span className="text-sm text-accent font-semibold">{formatCurrency(opt.price)}</span>
                 <button onClick={() => setCrustOptions(crustOptions.filter((_, idx) => idx !== i))} className="ml-2 text-muted hover:text-red-400 transition-colors">
                   <Trash2 size={14} />

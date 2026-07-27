@@ -42,26 +42,18 @@ export function Header() {
     <>
       <header className="sticky top-0 z-50 bg-brand-black">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to={prefix || '/'} className="flex items-center gap-2 text-xl font-bold text-white">
+          <Link to={prefix || '/'} className="flex items-center gap-2 text-xl font-bold text-brand-white">
             {logoUrl ? (
               <img
                 src={resolveImageUrl(logoUrl)}
                 alt={storeName}
-                className="hidden h-8 w-auto object-contain md:block"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-              />
-            ) : null}
-            {logoUrl ? (
-              <img
-                src={resolveImageUrl(logoUrl)}
-                alt={storeName}
-                className="h-6 w-auto object-contain md:hidden"
+                className="h-8 w-auto object-contain"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
               />
             ) : (
               <UtensilsCrossed className="text-accent" size={24} />
             )}
-            <span className="hidden md:inline">{storeName}</span>
+            <span>{storeName}</span>
           </Link>
 
           {navLinks.length > 0 && (
@@ -70,7 +62,7 @@ export function Header() {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="text-sm text-muted transition-colors hover:text-white"
+                  className="text-sm text-muted transition-colors hover:text-brand-white"
                 >
                   {link.label}
                 </Link>
@@ -82,7 +74,7 @@ export function Header() {
             {isLoggedIn ? (
               <Link
                 to={`${prefix}/meus-pedidos`}
-                className="hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-muted transition-colors hover:bg-surface hover:text-white md:flex"
+                className="hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-muted transition-colors hover:bg-surface hover:text-brand-white md:flex"
               >
                 <User size={14} />
                 {customer?.name}
@@ -90,7 +82,7 @@ export function Header() {
             ) : (
               <button
                 onClick={() => setShowLogin(true)}
-                className="hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-muted transition-colors hover:bg-surface hover:text-white md:flex"
+                className="hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-muted transition-colors hover:bg-surface hover:text-brand-white md:flex"
               >
                 <User size={14} />
                 Entrar
@@ -100,7 +92,7 @@ export function Header() {
             {slug && (
               <Link
                 to={`${prefix}/carrinho`}
-                className="relative flex h-10 w-10 items-center justify-center rounded-lg text-muted transition-colors hover:text-white"
+                className="relative flex h-10 w-10 items-center justify-center rounded-lg text-muted transition-colors hover:text-brand-white"
               >
                 <ShoppingCart size={20} />
                 {itemCount > 0 && (
@@ -113,7 +105,7 @@ export function Header() {
 
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="flex h-10 w-10 items-center justify-center rounded-lg text-muted hover:text-white md:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-lg text-muted hover:text-brand-white md:hidden"
             >
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -133,7 +125,7 @@ export function Header() {
                   <Link
                     to={`${prefix}/meus-pedidos`}
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-white"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-brand-white"
                   >
                     <User size={14} />
                     Meus Pedidos
@@ -149,7 +141,7 @@ export function Header() {
               ) : (
                 <button
                   onClick={() => { setShowLogin(true); setMobileOpen(false) }}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-white"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-brand-white"
                 >
                   <User size={14} />
                   Entrar
@@ -160,7 +152,7 @@ export function Header() {
                   key={link.to}
                   to={link.to}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-white"
+                  className="rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-brand-white"
                 >
                   {link.label}
                 </Link>

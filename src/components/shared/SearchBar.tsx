@@ -15,12 +15,12 @@ export function SearchBar({ value, onChange, placeholder = 'Buscar no cardápio.
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-border bg-surface py-3 pl-10 pr-10 text-sm text-white placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+        className="w-full rounded-xl border border-border bg-surface py-3 pl-10 pr-10 text-sm text-brand-white placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
       />
       {value && (
         <button
           onClick={() => onChange('')}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-brand-white transition-colors"
         >
           <X size={18} />
         </button>

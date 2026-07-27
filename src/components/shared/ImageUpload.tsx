@@ -41,7 +41,7 @@ export function ImageUpload({ value, onChange, label = 'Imagem', maxSize = 200 }
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-white">{label}</label>
+      <label className="mb-1.5 block text-sm font-medium text-brand-white">{label}</label>
       <div className="flex gap-3">
         <div
           onClick={() => inputRef.current?.click()}

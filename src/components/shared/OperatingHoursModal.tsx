@@ -25,9 +25,9 @@ export function OperatingHoursModal({ isOpen, onClose, message }: OperatingHours
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500/10">
               <AlertTriangle size={20} className="text-yellow-400" />
             </div>
-            <h3 className="text-lg font-bold text-white">Pizzaria Fechada</h3>
+            <h3 className="text-lg font-bold text-brand-white">Pizzaria Fechada</h3>
           </div>
-          <button onClick={onClose} className="rounded-full p-1 text-muted hover:text-white hover:bg-surface-hover transition-colors">
+          <button onClick={onClose} className="rounded-full p-1 text-muted hover:text-brand-white hover:bg-surface-hover transition-colors">
             <X size={18} />
           </button>
         </div>
@@ -37,7 +37,7 @@ export function OperatingHoursModal({ isOpen, onClose, message }: OperatingHours
         <div className="rounded-xl bg-surface-hover p-4 mb-5">
           <div className="flex items-center gap-2 mb-3">
             <Clock size={14} className="text-accent" />
-            <span className="text-xs font-medium text-white uppercase tracking-wider">Horários da Semana</span>
+            <span className="text-xs font-medium text-brand-white uppercase tracking-wider">Horários da Semana</span>
           </div>
           <div className="space-y-1.5">
             {hours.map((h, i) => (
@@ -46,7 +46,7 @@ export function OperatingHoursModal({ isOpen, onClose, message }: OperatingHours
                 {h.closed ? (
                   <span className="text-red-400 font-medium">Fechado</span>
                 ) : (
-                  <span className="text-white">{h.open} às {h.close}</span>
+                  <span className="text-brand-white">{h.open} às {h.close}</span>
                 )}
               </div>
             ))}

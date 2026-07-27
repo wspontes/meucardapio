@@ -34,7 +34,7 @@ export default function Menu() {
     <div className="container mx-auto px-4 py-8">
       <div className="sticky top-16 z-30 -mx-4 bg-brand-black px-4 pt-8 pb-4 border-b border-border/50">
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-white">Cardápio</h1>
+          <h1 className="text-2xl font-bold text-brand-white">Cardápio</h1>
           <p className="mt-1 text-sm text-muted">Escolha seu sabor favorito</p>
         </div>
 

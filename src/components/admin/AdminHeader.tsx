@@ -15,7 +15,7 @@ export function AdminHeader({ onMenuClick }: AdminHeaderProps) {
     <header className="flex h-16 items-center justify-between border-b border-border bg-surface px-4 lg:px-6">
       <button
         onClick={onMenuClick}
-        className="flex h-10 w-10 items-center justify-center rounded-lg text-muted hover:text-white lg:hidden"
+        className="flex h-10 w-10 items-center justify-center rounded-lg text-muted hover:text-brand-white lg:hidden"
       >
         <Menu size={20} />
       </button>
@@ -24,7 +24,7 @@ export function AdminHeader({ onMenuClick }: AdminHeaderProps) {
 
       <div className="flex items-center gap-3">
         <div className="hidden text-right sm:block">
-          <p className="text-sm font-medium text-white">{user?.name || 'Admin'}</p>
+          <p className="text-sm font-medium text-brand-white">{user?.name || 'Admin'}</p>
           <p className="text-xs text-muted">{roleLabel}</p>
         </div>
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/20 text-accent">

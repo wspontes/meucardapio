@@ -1,21 +1,33 @@
-import { Link, useParams, useNavigate } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useState, useEffect, useCallback } from 'react'
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { ProductCard, ProductCardSkeleton } from '@/components/shared'
-import { useFeaturedProducts, useSectionProducts, useSettings } from '@/hooks'
+import { ProductModal } from '@/components/shared/ProductModal'
+import { OperatingHoursModal } from '@/components/shared/OperatingHoursModal'
+import { useFeaturedProducts, useSectionProducts, useSettings, useBusinessStatus } from '@/hooks'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
 import { formatCurrency } from '@/utils'
+import { productsService } from '@/services'
+import type { Product } from '@/types'
 
 export default function Home() {
   const { slug } = useParams<{ slug: string }>()
-  const navigate = useNavigate()
   const prefix = slug ? `/${slug}` : ''
   const { products: featured, loading: featuredLoading } = useFeaturedProducts()
   const { products: newProducts, loading: newLoading } = useSectionProducts('new')
   const { products: promoProducts, loading: promoLoading } = useSectionProducts('promotion')
   const { settings, loading: settingsLoading } = useSettings()
+  const { status } = useBusinessStatus()
   const [bannerIndex, setBannerIndex] = useState(0)
+  const [allProducts, setAllProducts] = useState<Product[]>([])
+  const [linkedProduct, setLinkedProduct] = useState<Product | null>(null)
+  const [showProductModal, setShowProductModal] = useState(false)
+  const [showHoursModal, setShowHoursModal] = useState(false)
+
+  useEffect(() => {
+    productsService.getActiveProducts().then(setAllProducts).catch(() => {})
+  }, [])
 
   const banners = settings?.banners
   const showBanner = settingsLoading || (banners?.active ?? true)
@@ -38,6 +50,23 @@ export default function Home() {
   const hasImage = !!currentBanner?.image
   const alignClass = currentBanner?.align === 'center' ? 'items-center text-center' : currentBanner?.align === 'right' ? 'items-end text-right' : 'items-start text-left'
 
+  useEffect(() => {
+    if (currentBanner?.linkProductId && allProducts.length > 0) {
+      setLinkedProduct(allProducts.find((p) => p.id === currentBanner.linkProductId) || null)
+    } else {
+      setLinkedProduct(null)
+    }
+  }, [currentBanner?.linkProductId, allProducts])
+
+  const handleLinkedProductClick = () => {
+    if (!linkedProduct) return
+    if (!status.isOpen) {
+      setShowHoursModal(true)
+      return
+    }
+    setShowProductModal(true)
+  }
+
   const [touchX, setTouchX] = useState(0)
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -53,6 +82,7 @@ export default function Home() {
   }, [multi, touchX, bannerIndex, goTo])
 
   return (
+    <>
     <div className="container mx-auto px-4 py-6 pb-6">
       {showBanner && items.length > 0 && (
       <section className="relative mb-10 overflow-hidden rounded-2xl min-h-[220px] md:min-h-[300px] flex flex-col" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
@@ -95,20 +125,20 @@ export default function Home() {
                 <h2
                   className="text-xl md:text-5xl font-bold leading-tight cursor-pointer hover:underline decoration-accent/50 underline-offset-4"
                   style={{ color: textColor }}
-                  onClick={() => currentBanner.linkProductId && navigate(`${prefix}/cardapio/${currentBanner.linkProductId}`)}
+                  onClick={handleLinkedProductClick}
                 >
                   {currentBanner.title || 'A melhor pizza\nda cidade'}
                 </h2>
                 <p className="mt-2 md:mt-4 text-sm md:text-lg" style={{ color: textColor, opacity: 0.8 }}>
                   {currentBanner.subtitle || 'Ingredientes selecionados e o melhor sabor da cidade.'}
                 </p>
-                {currentBanner.linkProductId && (
-                  <Link
-                    to={`${prefix}/cardapio/${currentBanner.linkProductId}`}
+                {linkedProduct && (
+                  <button
+                    onClick={handleLinkedProductClick}
                     className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:underline"
                   >
-                    Ver produto <ArrowRight size={12} />
-                  </Link>
+                    Conferir <ArrowRight size={12} />
+                  </button>
                 )}
               </div>
             </div>
@@ -151,7 +181,7 @@ export default function Home() {
       <section className="mb-12">
         <div className="sticky top-16 z-30 -mx-4 bg-brand-black px-4 py-4 border-b border-border/50">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg md:text-xl font-bold text-white">Mais Pedidos</h2>
+            <h2 className="text-lg md:text-xl font-bold text-brand-white">Mais Pedidos</h2>
             <Link to={`${prefix}/cardapio`}>
               <Button size="sm">
                 Ver Cardápio
@@ -184,7 +214,7 @@ export default function Home() {
       <section className="mb-12">
         <div className="sticky top-16 z-30 -mx-4 bg-brand-black px-4 py-4 border-b border-border/50">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg md:text-xl font-bold text-white">Novidades</h2>
+            <h2 className="text-lg md:text-xl font-bold text-brand-white">Novidades</h2>
             <Link to={`${prefix}/cardapio`}>
               <Button size="sm">
                 Ver Cardápio
@@ -213,7 +243,7 @@ export default function Home() {
       <section className="mb-12">
         <div className="sticky top-16 z-30 -mx-4 bg-brand-black px-4 py-4 border-b border-border/50">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg md:text-xl font-bold text-white">Promoções</h2>
+            <h2 className="text-lg md:text-xl font-bold text-brand-white">Promoções</h2>
             <Link to={`${prefix}/cardapio`}>
               <Button size="sm">
                 Ver Cardápio
@@ -238,5 +268,10 @@ export default function Home() {
       </section>
       )}
     </div>
+    {showProductModal && linkedProduct && (
+      <ProductModal product={linkedProduct} onClose={() => setShowProductModal(false)} />
+    )}
+    <OperatingHoursModal isOpen={showHoursModal} onClose={() => setShowHoursModal(false)} message={status.message} />
+    </>
   )
 }

@@ -96,7 +96,7 @@ export default function Dashboard() {
     <div>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-white">Dashboard</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-brand-white">Dashboard</h1>
           <p className="text-xs md:text-sm text-muted mt-0.5">{analytics.todayVisits} acessos hoje, {analytics.monthlyVisits} acessos este mês</p>
         </div>
         <div className="flex gap-1 self-start rounded-lg border border-border bg-surface p-1">
@@ -109,7 +109,7 @@ export default function Dashboard() {
               key={opt.key}
               onClick={() => setDateRange(opt.key)}
               className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                dateRange === opt.key ? 'bg-accent text-white' : 'text-muted hover:text-white'
+                dateRange === opt.key ? 'bg-accent text-white' : 'text-muted hover:text-brand-white'
               }`}
             >
               {opt.label}
@@ -128,7 +128,7 @@ export default function Dashboard() {
                   <Icon size={18} />
                 </div>
               </div>
-              <p className="mt-2 text-xl md:text-2xl font-bold text-white">{stat.value}</p>
+              <p className="mt-2 text-xl md:text-2xl font-bold text-brand-white">{stat.value}</p>
               <p className="text-xs md:text-sm text-muted">{stat.label}</p>
               <p className="text-[10px] md:text-xs text-muted/60">{stat.sub}</p>
             </div>
@@ -140,7 +140,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between border-b border-border p-3 md:p-4">
           <div className="flex items-center gap-2">
             <Trophy size={16} className="text-accent" />
-            <h2 className="text-sm md:text-base font-semibold text-white">Mais Pedidos</h2>
+            <h2 className="text-sm md:text-base font-semibold text-brand-white">Mais Pedidos</h2>
           </div>
           <div className="flex gap-1 rounded-lg border border-border bg-surface-hover p-0.5">
             {([
@@ -152,7 +152,7 @@ export default function Dashboard() {
                 key={opt.key}
                 onClick={() => setTopRange(opt.key)}
                 className={`rounded-md px-2.5 py-1 text-[10px] md:text-xs font-medium transition-colors ${
-                  topRange === opt.key ? 'bg-accent text-white' : 'text-muted hover:text-white'
+                  topRange === opt.key ? 'bg-accent text-white' : 'text-muted hover:text-brand-white'
                 }`}
               >
                 {opt.label}
@@ -172,11 +172,11 @@ export default function Dashboard() {
                   {i + 1}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-white truncate">{item.name}</p>
+                  <p className="text-sm font-medium text-brand-white truncate">{item.name}</p>
                   <p className="text-xs text-muted">{item.qty} un. vendidas</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-medium text-white">{formatCurrency(item.revenue)}</p>
+                  <p className="text-sm font-medium text-brand-white">{formatCurrency(item.revenue)}</p>
                 </div>
               </div>
             ))}
@@ -186,7 +186,7 @@ export default function Dashboard() {
 
       <div className="rounded-xl border border-border bg-surface">
         <div className="border-b border-border p-3 md:p-4">
-          <h2 className="text-sm md:text-base font-semibold text-white">Pedidos Recentes</h2>
+          <h2 className="text-sm md:text-base font-semibold text-brand-white">Pedidos Recentes</h2>
         </div>
         {recentOrders.length === 0 ? (
           <div className="p-8 text-center text-xs md:text-sm text-muted">Nenhum pedido neste período</div>
@@ -195,14 +195,14 @@ export default function Dashboard() {
             {recentOrders.map((order) => (
               <div key={order.id} className="flex items-center justify-between p-3 md:p-4 hover:bg-surface-hover transition-colors">
                 <div className="min-w-0 flex-1 mr-3">
-                  <p className="text-sm font-medium text-white truncate">{order.customerName}</p>
+                  <p className="text-sm font-medium text-brand-white truncate">{order.customerName}</p>
                   <p className="text-xs text-muted">
                     {formatDate(new Date(order.createdAt))} • {formatTime(new Date(order.createdAt))}
                     {' • '}{order.items.reduce((s, i) => s + i.quantity, 0)} itens
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-medium text-white">{formatCurrency(order.total)}</p>
+                  <p className="text-sm font-medium text-brand-white">{formatCurrency(order.total)}</p>
                   <p className="text-xs text-muted capitalize">{order.status === 'delivered' ? 'Entregue' : order.status === 'preparing' ? 'Preparando' : order.status === 'received' ? 'Recebido' : order.status === 'outForDelivery' ? (order.deliveryType === 'pickup' ? 'Pronto' : 'Saiu') : order.status}</p>
                 </div>
               </div>

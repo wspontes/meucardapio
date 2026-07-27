@@ -88,7 +88,7 @@ export function StoreGuard({ children }: StoreGuardProps) {
   if (!store) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-brand-black px-4 text-center">
-        <h1 className="text-xl font-bold text-white mb-2">Loja não encontrada</h1>
+        <h1 className="text-xl font-bold text-brand-white mb-2">Loja não encontrada</h1>
         <p className="text-muted">Entre em contato com o suporte.</p>
       </div>
     )

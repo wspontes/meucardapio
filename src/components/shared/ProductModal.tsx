@@ -73,7 +73,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
         )}
 
         <div className="p-5">
-          <h2 className="text-lg font-bold text-white">{product.name}</h2>
+          <h2 className="text-lg font-bold text-brand-white">{product.name}</h2>
           <p className="mt-2 text-sm text-muted leading-relaxed">{product.description}</p>
 
           <div className="mt-4 flex items-end gap-2">
@@ -95,7 +95,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
                     onChange={() => setSelectedBorder('')}
                     className="h-4 w-4 accent-accent"
                   />
-                  <span className="text-sm text-white">Sem borda recheada</span>
+                  <span className="text-sm text-brand-white">Sem borda recheada</span>
                 </label>
                 {crustOptions.map((opt) => (
                   <label key={opt.name} className="flex items-center gap-2 cursor-pointer rounded-lg px-3 py-2 transition-colors hover:bg-surface">
@@ -106,7 +106,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
                       onChange={() => setSelectedBorder(opt.name)}
                       className="h-4 w-4 accent-accent"
                     />
-                    <span className="flex-1 text-sm text-white">{opt.name}</span>
+                    <span className="flex-1 text-sm text-brand-white">{opt.name}</span>
                     <span className="text-sm text-accent font-medium">+{formatCurrency(opt.price)}</span>
                   </label>
                 ))}

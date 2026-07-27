@@ -144,7 +144,7 @@ export default function OrderConfirmed() {
         <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 animate-[fadeIn_0.2s_ease-out]">
           <div className="flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 shadow-lg backdrop-blur-sm">
             <Bell size={16} className="text-accent shrink-0" />
-            <span className="text-sm font-medium text-white">{toast}</span>
+            <span className="text-sm font-medium text-brand-white">{toast}</span>
           </div>
         </div>
       )}
@@ -154,7 +154,7 @@ export default function OrderConfirmed() {
           {isPaidOrNotPix ? <CheckCircle size={48} className="text-green-500" /> : <QrCode size={48} className="text-yellow-500" />}
         </div>
 
-        <h1 className="text-xl md:text-2xl font-bold text-white">
+        <h1 className="text-xl md:text-2xl font-bold text-brand-white">
           {currentStatus === 'waitingPayment' ? 'Pedido Registrado!' : 'Pedido Confirmado!'}
         </h1>
         <p className="mt-2 text-sm md:text-base text-muted">
@@ -188,10 +188,10 @@ export default function OrderConfirmed() {
             )}
             <p className="mb-2 text-xs text-muted">Faça o PIX para a chave abaixo:</p>
             <div className="flex items-center gap-2 rounded-lg bg-surface-hover px-3 py-2">
-              <p className="flex-1 text-sm font-mono text-white select-all break-all">{settings?.paymentMethods?.pix?.key}</p>
+              <p className="flex-1 text-sm font-mono text-brand-white select-all break-all">{settings?.paymentMethods?.pix?.key}</p>
               <button
                 onClick={() => navigator.clipboard.writeText(settings?.paymentMethods?.pix?.key || '')}
-                className="shrink-0 rounded-lg p-2 text-muted hover:bg-surface hover:text-white transition-colors"
+                className="shrink-0 rounded-lg p-2 text-muted hover:bg-surface hover:text-brand-white transition-colors"
                 title="Copiar chave"
               >
                 <Copy size={14} />
@@ -228,19 +228,19 @@ export default function OrderConfirmed() {
         </div>
 
         <div className="mt-6 rounded-xl border border-border bg-surface p-4">
-          <h3 className="mb-3 font-semibold text-white text-sm">Detalhes do Pedido</h3>
+          <h3 className="mb-3 font-semibold text-brand-white text-sm">Detalhes do Pedido</h3>
           <div className="space-y-1 text-sm">
-            <p className="flex justify-between text-muted"><span>Cliente</span><span className="text-white">{order.customerName as string}</span></p>
+            <p className="flex justify-between text-muted"><span>Cliente</span><span className="text-brand-white">{order.customerName as string}</span></p>
             {(order.items as Array<{ quantity: number; productName: string; price: number }>)?.map((item, i) => (
-              <p key={i} className="flex justify-between text-muted"><span>{item.quantity}x {item.productName}</span><span className="text-white">{formatCurrency(item.price * item.quantity)}</span></p>
+              <p key={i} className="flex justify-between text-muted"><span>{item.quantity}x {item.productName}</span><span className="text-brand-white">{formatCurrency(item.price * item.quantity)}</span></p>
             ))}
             <div className="border-t border-border mt-2 pt-2 space-y-1">
-              <p className="flex justify-between text-muted"><span>Subtotal</span><span className="text-white">{formatCurrency(order.subtotal as number)}</span></p>
+              <p className="flex justify-between text-muted"><span>Subtotal</span><span className="text-brand-white">{formatCurrency(order.subtotal as number)}</span></p>
               {(order.discount as number) > 0 && <p className="flex justify-between text-green-400"><span>Desconto</span><span>-{formatCurrency(order.discount as number)}</span></p>}
-              {(order.deliveryFee as number) > 0 && <p className="flex justify-between text-muted"><span>Entrega</span><span className="text-white">{formatCurrency(order.deliveryFee as number)}</span></p>}
-              <p className="flex justify-between font-semibold text-white pt-1 border-t border-border"><span>Total</span><span className="text-accent">{formatCurrency(order.total as number)}</span></p>
+              {(order.deliveryFee as number) > 0 && <p className="flex justify-between text-muted"><span>Entrega</span><span className="text-brand-white">{formatCurrency(order.deliveryFee as number)}</span></p>}
+              <p className="flex justify-between font-semibold text-brand-white pt-1 border-t border-border"><span>Total</span><span className="text-accent">{formatCurrency(order.total as number)}</span></p>
             </div>
-            <p className="flex justify-between text-muted"><span>Pagamento</span><span className="text-white">
+            <p className="flex justify-between text-muted"><span>Pagamento</span><span className="text-brand-white">
               {paymentLabels[order.paymentMethod as string] || (order.paymentMethod as string)}
             </span></p>
           </div>

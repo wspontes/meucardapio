@@ -150,14 +150,14 @@ export default function OrdersAdmin() {
   return (
     <div className="pb-20">
       <div className="mb-5">
-        <h1 className="text-xl md:text-2xl font-bold text-white">Pedidos</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-brand-white">Pedidos</h1>
         <p className="text-xs md:text-sm text-muted mt-0.5">{orders.length} pedidos no total</p>
       </div>
 
       <div className="mb-4">
         <div className="relative">
           <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input type="text" placeholder="Buscar por nome ou ID..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full rounded-lg border border-border bg-surface pl-9 pr-3 py-2.5 text-sm text-white placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" />
+          <input type="text" placeholder="Buscar por nome ou ID..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full rounded-lg border border-border bg-surface pl-9 pr-3 py-2.5 text-sm text-brand-white placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" />
         </div>
       </div>
 
@@ -169,7 +169,7 @@ export default function OrdersAdmin() {
         <div className="space-y-6">
           {activeOrders.length > 0 && (
             <div>
-              <button onClick={() => toggleSection('ativos')} className="mb-3 flex items-center gap-2 text-sm font-semibold text-white hover:text-accent transition-colors">
+              <button onClick={() => toggleSection('ativos')} className="mb-3 flex items-center gap-2 text-sm font-semibold text-brand-white hover:text-accent transition-colors">
                 <Bell size={14} />
                 Em Andamento ({activeOrders.length})
                 {collapsed.has('ativos') ? <ChevronDown size={14} className="text-muted" /> : <ChevronUp size={14} className="text-muted" />}
@@ -218,16 +218,16 @@ export default function OrdersAdmin() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setWhatsappModal(null)}>
           <div className="w-full max-w-md rounded-xl border border-border bg-surface p-5 md:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="flex items-center gap-2 text-base md:text-lg font-semibold text-white">
+              <h3 className="flex items-center gap-2 text-base md:text-lg font-semibold text-brand-white">
                 <MessageSquare size={18} className="text-green-500" />
                 WhatsApp
               </h3>
-              <button onClick={() => setWhatsappModal(null)} className="text-muted hover:text-white transition-colors">
+              <button onClick={() => setWhatsappModal(null)} className="text-muted hover:text-brand-white transition-colors">
                 <XCircle size={18} />
               </button>
             </div>
-            <p className="mb-4 text-sm text-muted">Enviar mensagem para <span className="text-white font-medium">{whatsappModal.name}</span></p>
-            <textarea className="mb-4 w-full rounded-lg border border-border bg-surface-hover px-3 py-2.5 text-sm text-white" rows={4} value={whatsappModal.message} onChange={(e) => setWhatsappModal({ ...whatsappModal, message: e.target.value })} />
+            <p className="mb-4 text-sm text-muted">Enviar mensagem para <span className="text-brand-white font-medium">{whatsappModal.name}</span></p>
+            <textarea className="mb-4 w-full rounded-lg border border-border bg-surface-hover px-3 py-2.5 text-sm text-brand-white" rows={4} value={whatsappModal.message} onChange={(e) => setWhatsappModal({ ...whatsappModal, message: e.target.value })} />
             <div className="flex gap-2 flex-col sm:flex-row">
               <Button className="flex-1 text-sm h-10" onClick={() => { window.open(`https://wa.me/${whatsappModal.phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappModal.message)}`, '_blank'); setWhatsappModal(null) }}>
                 <MessageSquare size={16} />
@@ -247,7 +247,7 @@ export default function OrdersAdmin() {
                 <XCircle size={28} className="text-red-400" />
               </div>
             </div>
-            <h3 className="mb-2 text-center text-base font-semibold text-white">Cancelar pedido?</h3>
+            <h3 className="mb-2 text-center text-base font-semibold text-brand-white">Cancelar pedido?</h3>
             <p className="mb-5 text-center text-sm text-muted">Tem certeza que deseja cancelar este pedido? Esta ação não pode ser desfeita.</p>
             <div className="flex gap-2">
               <Button variant="ghost" className="flex-1 text-sm h-10" onClick={() => setCancelConfirm(null)}>
@@ -290,7 +290,7 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="text-sm font-medium text-white truncate">{order.customerName}</p>
+              <p className="text-sm font-medium text-brand-white truncate">{order.customerName}</p>
               <p className="text-xs text-muted mt-0.5">#{order.id.slice(0, 8)}</p>
             </div>
             <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${status.color}`}>
@@ -308,7 +308,7 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
             {order.paymentMethod === 'cash' && order.changeNeeded && order.changeFor && (
               <span className="text-green-400">Troco: {formatCurrency(order.changeFor - order.total)}</span>
             )}
-            <span className="text-white font-semibold ml-auto">{formatCurrency(order.total)}</span>
+            <span className="text-brand-white font-semibold ml-auto">{formatCurrency(order.total)}</span>
           </div>
         </div>
       </div>

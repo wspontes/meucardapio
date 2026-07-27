@@ -99,7 +99,7 @@ export default function Categories() {
   return (
     <div className="pb-20">
       <div className="mb-5">
-        <h1 className="text-xl md:text-2xl font-bold text-white">Categorias</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-brand-white">Categorias</h1>
         <p className="text-xs md:text-sm text-muted mt-0.5">{categories.length} categorias</p>
       </div>
 
@@ -130,7 +130,7 @@ export default function Categories() {
                   <button
                     onClick={() => moveUp(index)}
                     disabled={index === 0}
-                    className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-lg text-muted hover:text-white hover:bg-surface-hover transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                    className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-lg text-muted hover:text-brand-white hover:bg-surface-hover transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
                     title="Mover para cima"
                   >
                     <ChevronUp size={14} />
@@ -138,7 +138,7 @@ export default function Categories() {
                   <button
                     onClick={() => moveDown(index)}
                     disabled={index === categories.length - 1}
-                    className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-lg text-muted hover:text-white hover:bg-surface-hover transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                    className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-lg text-muted hover:text-brand-white hover:bg-surface-hover transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
                     title="Mover para baixo"
                   >
                     <ChevronDown size={14} />
@@ -159,14 +159,14 @@ export default function Categories() {
                     <button onClick={confirmEdit} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-green-400 hover:bg-green-500/10 transition-colors">
                       <Check size={16} />
                     </button>
-                    <button onClick={cancelEdit} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-white transition-colors">
+                    <button onClick={cancelEdit} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors">
                       <X size={16} />
                     </button>
                   </div>
                 ) : (
                   <>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate">{category.name}</p>
+                      <p className="text-sm font-medium text-brand-white truncate">{category.name}</p>
                     </div>
                     <button
                       onClick={() => toggleActive(category.id)}
@@ -178,7 +178,7 @@ export default function Categories() {
                     >
                       {category.active ? 'Ativo' : 'Inativo'}
                     </button>
-                    <button onClick={() => startEdit(category)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-white transition-colors" title="Editar">
+                    <button onClick={() => startEdit(category)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors" title="Editar">
                       <Pencil size={15} />
                     </button>
                     <button onClick={() => handleDelete(category.id, category.name)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-red-500/10 hover:text-red-400 transition-colors" title="Excluir">

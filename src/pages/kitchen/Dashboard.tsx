@@ -65,7 +65,7 @@ export default function KitchenDashboard() {
     <div className="container mx-auto px-4 py-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Pedidos</h1>
+          <h1 className="text-2xl font-bold text-brand-white">Pedidos</h1>
           <p className="text-sm text-muted">{activeOrders.length} pedidos ativos</p>
         </div>
       </div>
@@ -84,7 +84,7 @@ export default function KitchenDashboard() {
                 <div key={order.id} className={`rounded-xl border-l-4 bg-surface p-5 transition-all ${statusColor[order.status] || ''} ${delayed ? 'ring-2 ring-red-500/30' : ''}`}>
                   <div className="mb-3 flex items-start justify-between">
                     <div>
-                      <h3 className="text-lg font-bold text-white">{order.customerName}</h3>
+                      <h3 className="text-lg font-bold text-brand-white">{order.customerName}</h3>
                       <div className="flex items-center gap-2 text-sm text-muted">
                         <span>{order.id}</span><span>•</span>
                         <Clock size={14} />
@@ -100,7 +100,7 @@ export default function KitchenDashboard() {
                   <div className="mb-4 space-y-1.5">
                     {order.items.map((item, idx) => (
                       <div key={idx} className="flex justify-between text-sm">
-                        <span className="text-white">{item.quantity}x {item.productName}</span>
+                        <span className="text-brand-white">{item.quantity}x {item.productName}</span>
                       </div>
                     ))}
                   </div>
@@ -126,13 +126,13 @@ export default function KitchenDashboard() {
                 {readyOrders.map((order) => (
                   <div key={order.id} className="rounded-xl border border-green-500/30 bg-surface p-5">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-bold text-white">{order.customerName}</h3>
+                      <h3 className="font-bold text-brand-white">{order.customerName}</h3>
                       <CheckCircle size={20} className="text-green-400" />
                     </div>
                     <p className="text-sm text-muted">{order.id}</p>
                     <div className="mt-3 space-y-1">
                       {order.items.map((item, idx) => (
-                        <p key={idx} className="text-sm text-white">{item.quantity}x {item.productName}</p>
+                        <p key={idx} className="text-sm text-brand-white">{item.quantity}x {item.productName}</p>
                       ))}
                     </div>
                   </div>

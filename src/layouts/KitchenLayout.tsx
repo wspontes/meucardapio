@@ -11,7 +11,7 @@ export function KitchenLayout() {
     <div className="flex min-h-screen flex-col bg-brand-black">
       <header className="sticky top-0 z-50 border-b border-border bg-surface">
         <div className="container mx-auto flex h-14 items-center justify-between px-4">
-          <Link to={`/${slug}/cozinha`} className="flex items-center gap-2 font-bold text-white">
+          <Link to={`/${slug}/cozinha`} className="flex items-center gap-2 font-bold text-brand-white">
             <UtensilsCrossed className="text-accent" size={20} />
             Cozinha
           </Link>

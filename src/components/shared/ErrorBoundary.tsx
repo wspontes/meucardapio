@@ -36,7 +36,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-black px-4 text-center">
         <div className="mb-4 h-12 w-12 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-        <h1 className="text-lg font-bold text-white">
+        <h1 className="text-lg font-bold text-brand-white">
           {this.state.isStale ? 'Atualizando...' : 'Algo deu errado'}
         </h1>
         <p className="mt-2 text-sm text-muted">

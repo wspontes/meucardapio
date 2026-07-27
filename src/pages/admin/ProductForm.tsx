@@ -101,11 +101,11 @@ export default function ProductForm() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6 flex items-center gap-4">
-        <button onClick={() => navigate(`${prefix}/produtos`)} className="text-muted hover:text-white transition-colors">
+        <button onClick={() => navigate(`${prefix}/produtos`)} className="text-muted hover:text-brand-white transition-colors">
           <ArrowLeft size={20} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-white">{isEditing ? 'Editar' : 'Novo'} Produto</h1>
+          <h1 className="text-2xl font-bold text-brand-white">{isEditing ? 'Editar' : 'Novo'} Produto</h1>
           <p className="text-sm text-muted">{isEditing ? 'Altere os dados do produto' : 'Adicione um novo item ao cardápio'}</p>
         </div>
       </div>
@@ -120,14 +120,14 @@ export default function ProductForm() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-white">Descrição</label>
-          <textarea className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-white placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" rows={3} placeholder="Descrição do produto" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          <label className="mb-1.5 block text-sm font-medium text-brand-white">Descrição</label>
+          <textarea className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-brand-white placeholder:text-muted transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" rows={3} placeholder="Descrição do produto" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-white">Categoria</label>
-            <select className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-white transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}>
+            <label className="mb-1.5 block text-sm font-medium text-brand-white">Categoria</label>
+            <select className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-brand-white transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}>
               <option value="">Selecione</option>
               {categories.map((cat) => (<option key={cat.id} value={cat.id}>{cat.name}</option>))}
             </select>
@@ -140,8 +140,8 @@ export default function ProductForm() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-white">Seção na Home</label>
-            <select className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-white transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" value={form.section} onChange={(e) => setForm({ ...form, section: e.target.value as typeof form.section })}>
+            <label className="mb-1.5 block text-sm font-medium text-brand-white">Seção na Home</label>
+            <select className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-brand-white transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" value={form.section} onChange={(e) => setForm({ ...form, section: e.target.value as typeof form.section })}>
               <option value="">Nenhuma</option>
               <option value="featured">Mais Pedidos</option>
               <option value="new">Novidades</option>
@@ -153,15 +153,15 @@ export default function ProductForm() {
         <div className="flex flex-wrap items-center gap-6">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
-            <span className="text-sm text-white">Ativo</span>
+            <span className="text-sm text-brand-white">Ativo</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
-            <span className="text-sm text-white">Destaque (Home)</span>
+            <span className="text-sm text-brand-white">Destaque (Home)</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={form.hasCrust} onChange={(e) => setForm({ ...form, hasCrust: e.target.checked })} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
-            <span className="text-sm text-white">Opção de borda</span>
+            <span className="text-sm text-brand-white">Opção de borda</span>
           </label>
         </div>
 

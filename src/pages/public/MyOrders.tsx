@@ -131,7 +131,7 @@ export default function MyOrders() {
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-surface">
             <LogIn size={36} className="text-muted" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Faça login para ver seus pedidos</h1>
+          <h1 className="text-2xl font-bold text-brand-white">Faça login para ver seus pedidos</h1>
           <p className="mt-2 text-muted">Entre com seu WhatsApp para acompanhar seus pedidos.</p>
           <Button className="mt-6" onClick={() => setShowLogin(true)}>
             <LogIn size={16} />
@@ -152,17 +152,17 @@ export default function MyOrders() {
         <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 animate-[fadeIn_0.2s_ease-out]">
           <div className="flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 shadow-lg backdrop-blur-sm">
             <Bell size={16} className="text-accent shrink-0" />
-            <span className="text-sm font-medium text-white">{toast}</span>
+            <span className="text-sm font-medium text-brand-white">{toast}</span>
           </div>
         </div>
       )}
 
       <div className="mb-6 flex items-center gap-3">
-        <Link to={prefix || '/'} className="text-muted transition-colors hover:text-white">
+        <Link to={prefix || '/'} className="text-muted transition-colors hover:text-brand-white">
           <ArrowLeft size={20} />
         </Link>
         <div className="flex-1">
-          <h1 className="text-xl md:text-2xl font-bold text-white">Meus Pedidos</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-brand-white">Meus Pedidos</h1>
           <p className="text-xs md:text-sm text-muted">Olá, {customer?.name}</p>
         </div>
         <button
@@ -268,7 +268,7 @@ function OrderItem({ order, prefix }: { order: Order; prefix?: string }) {
             Pedir novamente
           </button>
         )}
-        <span className="text-sm font-semibold text-white ml-auto">{formatCurrency(order.total)}</span>
+        <span className="text-sm font-semibold text-brand-white ml-auto">{formatCurrency(order.total)}</span>
       </div>
     </div>
   )

@@ -26,7 +26,7 @@ export function CustomerLoginModal({ onClose }: CustomerLoginModalProps) {
         className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute right-3 top-3 text-muted hover:text-white transition-colors">
+        <button onClick={onClose} className="absolute right-3 top-3 text-muted hover:text-brand-white transition-colors">
           <X size={18} />
         </button>
 
@@ -34,7 +34,7 @@ export function CustomerLoginModal({ onClose }: CustomerLoginModalProps) {
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
             <User size={24} className="text-accent" />
           </div>
-          <h2 className="text-lg font-bold text-white">Entrar</h2>
+          <h2 className="text-lg font-bold text-brand-white">Entrar</h2>
           <p className="mt-1 text-xs text-muted">Use seu WhatsApp para acompanhar seus pedidos</p>
         </div>
 

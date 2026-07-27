@@ -59,7 +59,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid gap-8 md:grid-cols-3">
           <div>
-            <div className="flex items-center gap-2 text-lg font-bold text-white">
+            <div className="flex items-center gap-2 text-lg font-bold text-brand-white">
               {logoUrl ? (
                 <img
                   src={resolveImageUrl(logoUrl)}
@@ -78,7 +78,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-white">Horários</h4>
+            <h4 className="mb-3 text-sm font-semibold text-brand-white">Horários</h4>
             <div className="space-y-1 text-sm text-muted">
               {loading ? (
                 <p>Carregando...</p>
@@ -93,7 +93,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-white">Contato</h4>
+            <h4 className="mb-3 text-sm font-semibold text-brand-white">Contato</h4>
             <div className="space-y-1 text-sm text-muted">
               {address && <p className="flex items-center gap-2"><MapPin size={14} /> {address}</p>}
               {phone && <p className="flex items-center gap-2"><Phone size={14} /> {phone}</p>}

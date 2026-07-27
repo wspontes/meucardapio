@@ -46,9 +46,7 @@ export interface BusinessSettings {
   }
   theme?: {
     logo?: string
-    colorPrimary?: string
-    colorSecondary?: string
-    buttonColor?: string
+    themeId?: string
   }
 }
 

@@ -185,17 +185,17 @@ export default function Checkout() {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="mb-6 flex items-center gap-3">
-        <Link to={`${prefix}/carrinho`} className="text-muted transition-colors hover:text-white">
+        <Link to={`${prefix}/carrinho`} className="text-muted transition-colors hover:text-brand-white">
           <ArrowLeft size={20} />
         </Link>
-        <h1 className="text-xl md:text-2xl font-bold text-white">Finalizar Pedido</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-brand-white">Finalizar Pedido</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
-              <h2 className="mb-4 flex items-center gap-2 text-base md:text-lg font-semibold text-white">
+              <h2 className="mb-4 flex items-center gap-2 text-base md:text-lg font-semibold text-brand-white">
                 <User size={18} className="text-accent" />
                 Seus Dados
               </h2>
@@ -206,7 +206,7 @@ export default function Checkout() {
             </div>
 
             <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
-              <h2 className="mb-4 flex items-center gap-2 text-base md:text-lg font-semibold text-white">
+              <h2 className="mb-4 flex items-center gap-2 text-base md:text-lg font-semibold text-brand-white">
                 <Truck size={18} className="text-accent" />
                 Tipo de Pedido
               </h2>
@@ -214,14 +214,14 @@ export default function Checkout() {
                 <button type="button" onClick={() => setDeliveryType('delivery')} className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${deliveryType === 'delivery' ? 'border-accent bg-accent/10' : 'border-border bg-surface-hover hover:border-accent/50'}`}>
                   <Truck size={22} className={deliveryType === 'delivery' ? 'text-accent' : 'text-muted'} />
                   <div>
-                    <p className={`text-sm font-medium ${deliveryType === 'delivery' ? 'text-white' : 'text-muted'}`}>Entrega</p>
+                    <p className={`text-sm font-medium ${deliveryType === 'delivery' ? 'text-brand-white' : 'text-muted'}`}>Entrega</p>
                     <p className="text-xs text-muted">Receba em casa</p>
                   </div>
                 </button>
                 <button type="button" onClick={() => { setDeliveryType('pickup'); setDeliveryFee(0) }} className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${deliveryType === 'pickup' ? 'border-accent bg-accent/10' : 'border-border bg-surface-hover hover:border-accent/50'}`}>
                   <Store size={22} className={deliveryType === 'pickup' ? 'text-accent' : 'text-muted'} />
                   <div>
-                    <p className={`text-sm font-medium ${deliveryType === 'pickup' ? 'text-white' : 'text-muted'}`}>Retirada</p>
+                    <p className={`text-sm font-medium ${deliveryType === 'pickup' ? 'text-brand-white' : 'text-muted'}`}>Retirada</p>
                     <p className="text-xs text-muted">Retire no local</p>
                   </div>
                 </button>
@@ -230,7 +230,7 @@ export default function Checkout() {
 
             {deliveryType === 'delivery' ? (
               <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
-                <h2 className="mb-4 flex items-center gap-2 text-base md:text-lg font-semibold text-white">
+                <h2 className="mb-4 flex items-center gap-2 text-base md:text-lg font-semibold text-brand-white">
                   <MapPin size={18} className="text-accent" />
                   Endereço de Entrega
                 </h2>
@@ -253,13 +253,13 @@ export default function Checkout() {
               </div>
             ) : (
               <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
-                <h2 className="mb-4 flex items-center gap-2 text-base md:text-lg font-semibold text-white">
+                <h2 className="mb-4 flex items-center gap-2 text-base md:text-lg font-semibold text-brand-white">
                   <Store size={18} className="text-accent" />
                   Retirada no Local
                 </h2>
                 {settings?.address ? (
                   <div className="rounded-lg bg-surface-hover p-4">
-                    <p className="text-sm font-medium text-white">{settings.address}</p>
+                    <p className="text-sm font-medium text-brand-white">{settings.address}</p>
                     <p className="mt-1 text-xs text-muted">Retire seu pedido neste endereço</p>
                   </div>
                 ) : (
@@ -269,7 +269,7 @@ export default function Checkout() {
             )}
 
             <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
-              <h2 className="mb-4 flex items-center gap-2 text-base md:text-lg font-semibold text-white">
+              <h2 className="mb-4 flex items-center gap-2 text-base md:text-lg font-semibold text-brand-white">
                 <Banknote size={18} className="text-accent" />
                 Forma de Pagamento
               </h2>
@@ -284,7 +284,7 @@ export default function Checkout() {
                       <button key={method.id} type="button" onClick={() => setPaymentMethod(method.id)} className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${selected ? 'border-accent bg-accent/10' : 'border-border bg-surface-hover hover:border-accent/50'}`}>
                         <Icon size={24} className={selected ? 'text-accent' : 'text-muted'} />
                         <div>
-                          <p className={`text-sm font-medium ${selected ? 'text-white' : 'text-muted'}`}>{method.label}</p>
+                          <p className={`text-sm font-medium ${selected ? 'text-brand-white' : 'text-muted'}`}>{method.label}</p>
                           <p className="text-xs text-muted">{method.desc}</p>
                         </div>
                       </button>
@@ -299,7 +299,7 @@ export default function Checkout() {
                     <Coins size={20} className="text-muted" />
                     <label className="flex cursor-pointer items-center gap-3">
                       <input type="checkbox" checked={changeNeeded} onChange={(e) => setChangeNeeded(e.target.checked)} className="h-4 w-4 accent-red-600" />
-                      <span className="text-sm text-white">Vai precisar de troco?</span>
+                      <span className="text-sm text-brand-white">Vai precisar de troco?</span>
                     </label>
                   </div>
                   {changeNeeded && (
@@ -314,12 +314,12 @@ export default function Checkout() {
 
           <div className="space-y-4">
             <div className="rounded-xl border border-border bg-surface p-4">
-              <h3 className="mb-3 font-semibold text-white text-sm">Resumo do Pedido</h3>
+              <h3 className="mb-3 font-semibold text-brand-white text-sm">Resumo do Pedido</h3>
               <div className="mb-3 max-h-48 space-y-2 overflow-y-auto scrollbar-thin">
                 {state.items.map((item) => (
                   <div key={`${item.productId}-${item.size}`} className="flex justify-between text-sm">
                     <span className="text-muted truncate mr-2">{item.quantity}x {item.productName}{item.border ? ` (${item.border})` : ''}</span>
-                    <span className="text-white shrink-0">{formatCurrency((item.price + (item.borderPrice || 0)) * item.quantity)}</span>
+                    <span className="text-brand-white shrink-0">{formatCurrency((item.price + (item.borderPrice || 0)) * item.quantity)}</span>
                   </div>
                 ))}
               </div>
@@ -327,7 +327,7 @@ export default function Checkout() {
                 <div className="flex justify-between text-muted"><span>Subtotal</span><span>{formatCurrency(subtotal)}</span></div>
                 {discount > 0 && <div className="flex justify-between text-green-400"><span>Desconto</span><span>-{formatCurrency(discount)}</span></div>}
                 {state.deliveryFee > 0 && <div className="flex justify-between text-muted"><span>Entrega</span><span>{formatCurrency(state.deliveryFee)}</span></div>}
-                <div className="flex justify-between font-semibold text-white pt-2 border-t border-border"><span>Total</span><span>{formatCurrency(orderTotal)}</span></div>
+                <div className="flex justify-between font-semibold text-brand-white pt-2 border-t border-border"><span>Total</span><span>{formatCurrency(orderTotal)}</span></div>
               </div>
             </div>
 
@@ -336,7 +336,7 @@ export default function Checkout() {
                 <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold text-green-400"><QrCode size={16} />Pagamento PIX</h4>
                 <p className="mb-2 text-xs text-muted">Após confirmar, faça o PIX para a chave abaixo:</p>
                 <div className="rounded-lg bg-surface-hover px-3 py-2 text-center">
-                  <p className="text-sm font-mono text-white select-all">{pixKey}</p>
+                  <p className="text-sm font-mono text-brand-white select-all">{pixKey}</p>
                 </div>
                 <p className="mt-2 text-xs text-muted">Pedido processado após confirmação do pagamento.</p>
               </div>
