@@ -4,13 +4,36 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Pizzas Mania - A melhor pizza da cidade" />
-    <meta property="og:title" content="Pizzas Mania" />
-    <meta property="og:description" content="A melhor pizza da cidade" />
+    <meta name="description" content="MeuCardápio Digital" />
+    <meta property="og:title" content="MeuCardápio Digital" />
+    <meta property="og:description" content="A melhor opção da cidade" />
     <meta property="og:type" content="website" />
-    <title>Pizzas Mania</title>
+    <title>MeuCardápio Digital</title>
+    <script>
+      (function(){
+        var t = localStorage.getItem('meucardapio-theme');
+        var themes = {
+          escuro:  { bb:'#0a0a0a', bw:'#fafafa', sf:'#1a1a1a', sh:'#262626', bd:'transparent', mt:'#a3a3a3', ac:'#dc2626', bt:'#dc2626' },
+          claro:   { bb:'#f8f9fa', bw:'#1a1a1a', sf:'#ffffff', sh:'#f1f3f5', bd:'transparent', mt:'#868e96', ac:'#e03131', bt:'#e03131' },
+          moderno: { bb:'#0f172a', bw:'#f1f5f9', sf:'#1e293b', sh:'#334155', bd:'transparent', mt:'#94a3b8', ac:'#38bdf8', bt:'#38bdf8' },
+          elegante:{ bb:'#1a1410', bw:'#f5f0e8', sf:'#2a2218', sh:'#3a3028', bd:'transparent', mt:'#a89880', ac:'#d4a843', bt:'#d4a843' },
+          vivo:    { bb:'#0a1a0f', bw:'#e8f5e9', sf:'#132a18', sh:'#1e3a24', bd:'transparent', mt:'#7fbf8f', ac:'#22c55e', bt:'#22c55e' }
+        };
+        var v = themes[t];
+        if(!v) return;
+        var s = document.documentElement.style;
+        s.setProperty('--color-brand-black',v.bb);
+        s.setProperty('--color-brand-white',v.bw);
+        s.setProperty('--color-surface',v.sf);
+        s.setProperty('--color-surface-hover',v.sh);
+        s.setProperty('--color-border',v.bd);
+        s.setProperty('--color-muted',v.mt);
+        s.setProperty('--color-accent',v.ac);
+        s.setProperty('--color-button',v.bt);
+      })();
+    </script>
   </head>
-  <body class="bg-black text-white antialiased">
+  <body class="antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

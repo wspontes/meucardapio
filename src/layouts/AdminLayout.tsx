@@ -9,7 +9,7 @@ export function AdminLayout() {
   useApplyTheme()
 
   return (
-    <div className="flex min-h-screen bg-brand-black">
+    <div className="admin-borders flex min-h-screen bg-brand-black">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex flex-1 flex-col">
         <AdminHeader onMenuClick={() => setSidebarOpen(true)} />

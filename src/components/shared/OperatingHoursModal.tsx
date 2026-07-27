@@ -25,7 +25,7 @@ export function OperatingHoursModal({ isOpen, onClose, message }: OperatingHours
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500/10">
               <AlertTriangle size={20} className="text-yellow-400" />
             </div>
-            <h3 className="text-lg font-bold text-brand-white">Pizzaria Fechada</h3>
+            <h3 className="text-lg font-bold text-brand-white">Estabelecimento Fechado</h3>
           </div>
           <button onClick={onClose} className="rounded-full p-1 text-muted hover:text-brand-white hover:bg-surface-hover transition-colors">
             <X size={18} />

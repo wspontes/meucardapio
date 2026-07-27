@@ -133,12 +133,9 @@ export default function Home() {
                   {currentBanner.subtitle || 'Ingredientes selecionados e o melhor sabor da cidade.'}
                 </p>
                 {linkedProduct && (
-                  <button
-                    onClick={handleLinkedProductClick}
-                    className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:underline"
-                  >
-                    Conferir <ArrowRight size={12} />
-                  </button>
+                  <Button onClick={handleLinkedProductClick} className="mt-4" size="sm">
+                    Conferir <ArrowRight size={14} />
+                  </Button>
                 )}
               </div>
             </div>
