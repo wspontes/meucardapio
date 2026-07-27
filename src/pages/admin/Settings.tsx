@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, CircleDot, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check } from 'lucide-react'
+import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { ImageUpload, ProductCard } from '@/components/shared'
 import { settingsService, productsService } from '@/services'
 import { type BusinessSettings } from '@/services/settings'
 import type { Product } from '@/types'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
-import { formatCurrency } from '@/utils'
 import { THEMES, DEFAULT_THEME_ID } from '@/config/themes'
 
 export default function Settings() {
@@ -48,8 +47,6 @@ export default function Settings() {
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
   const [businessHoursEnabled, setBusinessHoursEnabled] = useState(true)
-  const [crustOptions, setCrustOptions] = useState<{ name: string; price: number }[]>([])
-  const [newCrust, setNewCrust] = useState({ name: '', price: '' })
   const [themeLogo, setThemeLogo] = useState('')
   const [selectedThemeId, setSelectedThemeId] = useState(DEFAULT_THEME_ID)
 
@@ -80,7 +77,6 @@ export default function Settings() {
         if (data.instagram) setInstagram(data.instagram)
         if (data.phone) setPhone(data.phone)
         if (data.address) setAddress(data.address)
-        if (data.crustOptions?.length) setCrustOptions(data.crustOptions)
         if (data.defaultDeliveryFee !== undefined) setDefaultDeliveryFee(String(data.defaultDeliveryFee))
         if (data.theme) {
           if (data.theme.logo) setThemeLogo(data.theme.logo)
@@ -110,7 +106,6 @@ export default function Settings() {
           cash: { enabled: acceptCash },
         },
         banners,
-        crustOptions,
         whatsapp,
         instagram,
         phone,
@@ -547,34 +542,6 @@ export default function Settings() {
                   </button>
                 ))}
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-border bg-surface p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
-            <CircleDot size={18} className="text-accent" />
-            Bordas da Pizza
-          </h2>
-          <p className="mb-3 text-xs text-muted">Opções de borda recheada que o cliente pode escolher ao pedir</p>
-          <div className="space-y-3">
-            {crustOptions.map((opt, i) => (
-              <div key={i} className="flex items-center gap-2 rounded-lg bg-surface-hover px-3 py-2.5">
-                <span className="flex-1 text-sm text-brand-white font-medium">{opt.name}</span>
-                <span className="text-sm text-accent font-semibold">{formatCurrency(opt.price)}</span>
-                <button onClick={() => setCrustOptions(crustOptions.filter((_, idx) => idx !== i))} className="ml-2 text-muted hover:text-red-400 transition-colors">
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))}
-            <div className="flex gap-2">
-              <Input placeholder="Nome da borda" value={newCrust.name} onChange={(e) => setNewCrust({ ...newCrust, name: e.target.value })} />
-              <Input placeholder="Preço R$" type="number" step="0.01" value={newCrust.price} onChange={(e) => setNewCrust({ ...newCrust, price: e.target.value })} />
-              <Button onClick={() => {
-                if (!newCrust.name.trim() || !newCrust.price) return
-                setCrustOptions([...crustOptions, { name: newCrust.name.trim(), price: Number(newCrust.price) }])
-                setNewCrust({ name: '', price: '' })
-              }}><Plus size={16} /></Button>
             </div>
           </div>
         </div>

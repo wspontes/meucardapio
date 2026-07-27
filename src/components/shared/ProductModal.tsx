@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { X, ShoppingCart, Star } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
-import { useSettings, useBusinessStatus } from '@/hooks'
+import { useBusinessStatus } from '@/hooks'
 import { formatCurrency } from '@/utils'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
 import { Button } from '@/components/ui'
@@ -17,15 +17,9 @@ interface ProductModalProps {
 export function ProductModal({ product, onClose }: ProductModalProps) {
   const { addItem } = useCart()
   const { showToast } = useToast()
-  const { settings } = useSettings()
   const { status } = useBusinessStatus()
-  const [selectedBorder, setSelectedBorder] = useState<string>('')
   const [showHoursModal, setShowHoursModal] = useState(false)
   const price = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price
-
-  const crustOptions = settings?.crustOptions || []
-  const hasCrust = product.hasCrust && crustOptions.length > 0
-  const borderPrice = crustOptions.find((c) => c.name === selectedBorder)?.price || 0
 
   const handleAddToCart = () => {
     if (!status.isOpen) {
@@ -37,9 +31,6 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
       productName: product.name,
       quantity: 1,
       price,
-      hasCrust: product.hasCrust,
-      border: selectedBorder || undefined,
-      borderPrice: selectedBorder ? borderPrice : undefined,
     })
     showToast('Adicionado no carrinho!')
     onClose()
@@ -82,37 +73,6 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
             )}
             <span className="text-2xl font-bold text-accent">{formatCurrency(price)}</span>
           </div>
-
-          {hasCrust && (
-            <div className="mt-4 rounded-xl border border-border bg-surface-hover p-3">
-              <p className="mb-2 text-xs font-medium text-muted uppercase tracking-wider">Borda recheada</p>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 cursor-pointer rounded-lg px-3 py-2 transition-colors hover:bg-surface">
-                  <input
-                    type="radio"
-                    name="crust"
-                    checked={selectedBorder === ''}
-                    onChange={() => setSelectedBorder('')}
-                    className="h-4 w-4 accent-accent"
-                  />
-                  <span className="text-sm text-brand-white">Sem borda recheada</span>
-                </label>
-                {crustOptions.map((opt) => (
-                  <label key={opt.name} className="flex items-center gap-2 cursor-pointer rounded-lg px-3 py-2 transition-colors hover:bg-surface">
-                    <input
-                      type="radio"
-                      name="crust"
-                      checked={selectedBorder === opt.name}
-                      onChange={() => setSelectedBorder(opt.name)}
-                      className="h-4 w-4 accent-accent"
-                    />
-                    <span className="flex-1 text-sm text-brand-white">{opt.name}</span>
-                    <span className="text-sm text-accent font-medium">+{formatCurrency(opt.price)}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
 
           <Button onClick={handleAddToCart} className="mt-5 w-full" size="lg">
             <ShoppingCart size={18} />

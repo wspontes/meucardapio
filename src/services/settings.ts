@@ -30,7 +30,6 @@ export interface BusinessSettings {
   instagram?: string
   phone?: string
   address?: string
-  crustOptions?: { name: string; price: number }[]
   banners?: {
     items: {
       title: string

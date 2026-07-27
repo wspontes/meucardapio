@@ -14,7 +14,6 @@ type CartAction =
   | { type: 'ADD_ITEM'; payload: OrderItem }
   | { type: 'REMOVE_ITEM'; payload: { productId: string } }
   | { type: 'UPDATE_QUANTITY'; payload: { productId: string; quantity: number } }
-  | { type: 'UPDATE_BORDER'; payload: { productId: string; border?: string; borderPrice?: number } }
   | { type: 'APPLY_COUPON'; payload: { code: string; type: 'percentage' | 'fixed'; value: number } }
   | { type: 'SET_DELIVERY_FEE'; payload: number }
   | { type: 'CLEAR_CART' }
@@ -24,7 +23,6 @@ interface CartContextType {
   addItem: (item: OrderItem) => void
   removeItem: (productId: string) => void
   updateQuantity: (productId: string, quantity: number) => void
-  updateBorder: (productId: string, border?: string, borderPrice?: number) => void
   applyCoupon: (code: string, type: 'percentage' | 'fixed', value: number) => void
   setDeliveryFee: (fee: number) => void
   clearCart: () => void
@@ -77,15 +75,6 @@ function cartReducer(state: CartState, action: CartAction): CartState {
             : i
         ),
       }
-    case 'UPDATE_BORDER':
-      return {
-        ...state,
-        items: state.items.map((i) =>
-          i.productId === action.payload.productId
-            ? { ...i, border: action.payload.border, borderPrice: action.payload.borderPrice }
-            : i
-        ),
-      }
     case 'APPLY_COUPON':
       return {
         ...state,
@@ -111,7 +100,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [state])
 
   const subtotal = state.items.reduce(
-    (acc, item) => acc + (item.price + (item.borderPrice || 0)) * item.quantity,
+    (acc, item) => acc + item.price * item.quantity,
     0
   )
 
@@ -130,8 +119,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'REMOVE_ITEM', payload: { productId } })
   const updateQuantity = (productId: string, quantity: number) =>
     dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } })
-  const updateBorder = (productId: string, border?: string, borderPrice?: number) =>
-    dispatch({ type: 'UPDATE_BORDER', payload: { productId, border, borderPrice } })
   const applyCoupon = (code: string, type: 'percentage' | 'fixed', value: number) =>
     dispatch({ type: 'APPLY_COUPON', payload: { code, type, value } })
   const setDeliveryFee = (fee: number) =>
@@ -145,7 +132,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         addItem,
         removeItem,
         updateQuantity,
-        updateBorder,
         applyCoupon,
         setDeliveryFee,
         clearCart,

@@ -11,7 +11,7 @@ import { formatCurrency } from '@/utils'
 export default function Cart() {
   const { slug } = useParams<{ slug: string }>()
   const prefix = slug ? `/${slug}` : ''
-  const { state, removeItem, updateQuantity, updateBorder, applyCoupon, subtotal, discount, total } = useCart()
+  const { state, removeItem, updateQuantity, applyCoupon, subtotal, discount, total } = useCart()
   const { settings } = useSettings()
   const [couponInput, setCouponInput] = useState('')
   const couponApplied = !!state.couponCode
@@ -38,8 +38,6 @@ export default function Cart() {
       setCouponLoading(false)
     }
   }
-
-  const crustOptions = settings?.crustOptions || []
 
   if (state.items.length === 0) {
     return (
@@ -78,7 +76,6 @@ export default function Cart() {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-brand-white text-sm md:text-base truncate">{item.productName}</h3>
                   {item.size && <p className="text-xs text-muted mt-0.5">Tamanho: {item.size}</p>}
-                  {!item.hasCrust && item.border && <p className="text-xs text-accent mt-0.5">Borda: {item.border}{item.borderPrice ? ` (+${formatCurrency(item.borderPrice)})` : ''}</p>}
                   <p className="mt-1.5 font-semibold text-accent text-sm">{formatCurrency(item.price)}</p>
                 </div>
 
@@ -92,32 +89,12 @@ export default function Cart() {
                   </button>
                 </div>
 
-                <p className="w-16 md:w-20 text-right font-medium text-brand-white text-sm shrink-0">{formatCurrency((item.price + (item.borderPrice || 0)) * item.quantity)}</p>
+                <p className="w-16 md:w-20 text-right font-medium text-brand-white text-sm shrink-0">{formatCurrency(item.price * item.quantity)}</p>
 
                 <button onClick={() => removeItem(item.productId)} className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-lg text-muted hover:bg-red-500/10 hover:text-red-400 transition-colors shrink-0">
                   <Trash2 size={14} />
                 </button>
               </div>
-
-              {item.hasCrust && crustOptions.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-border/50">
-                  <label className="text-[11px] text-muted font-medium uppercase tracking-wider mb-1.5 block">Borda recheada</label>
-                  <select
-                    value={item.border || ''}
-                    onChange={(e) => {
-                      const val = e.target.value || undefined
-                      const opt = crustOptions.find((c) => c.name === val)
-                      updateBorder(item.productId, val, opt?.price)
-                    }}
-                    className="w-full rounded-lg border border-border bg-surface-hover px-3 py-2 text-sm text-brand-white focus:border-accent focus:outline-none transition-colors"
-                  >
-                    <option value="">Sem borda recheada</option>
-                    {crustOptions.map((c) => (
-                      <option key={c.name} value={c.name}>{c.name} — {formatCurrency(c.price)}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
             </div>
           ))}
         </div>

@@ -67,7 +67,6 @@ export interface Product {
   featured: boolean
   section?: 'featured' | 'new' | 'promotion'
   customizable: boolean
-  hasCrust?: boolean
   order?: number
   sizes?: Size[]
   ingredients?: ProductIngredient[]
@@ -93,13 +92,6 @@ export interface Ingredient {
   id: string
   name: string
   category: string
-  active: boolean
-}
-
-export interface Border {
-  id: string
-  name: string
-  price: number
   active: boolean
 }
 
@@ -153,9 +145,6 @@ export interface OrderItem {
   price: number
   size?: string
   flavors?: string[]
-  border?: string
-  borderPrice?: number
-  hasCrust?: boolean
   extras?: string[]
   removedIngredients?: string[]
   notes?: string

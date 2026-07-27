@@ -318,8 +318,8 @@ export default function Checkout() {
               <div className="mb-3 max-h-48 space-y-2 overflow-y-auto scrollbar-thin">
                 {state.items.map((item) => (
                   <div key={`${item.productId}-${item.size}`} className="flex justify-between text-sm">
-                    <span className="text-muted truncate mr-2">{item.quantity}x {item.productName}{item.border ? ` (${item.border})` : ''}</span>
-                    <span className="text-brand-white shrink-0">{formatCurrency((item.price + (item.borderPrice || 0)) * item.quantity)}</span>
+                    <span className="text-muted truncate mr-2">{item.quantity}x {item.productName}</span>
+                    <span className="text-brand-white shrink-0">{formatCurrency(item.price * item.quantity)}</span>
                   </div>
                 ))}
               </div>

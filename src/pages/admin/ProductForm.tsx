@@ -25,7 +25,6 @@ export default function ProductForm() {
     active: true,
     featured: false,
     section: '' as '' | 'featured' | 'new' | 'promotion',
-    hasCrust: false,
   })
 
   useEffect(() => {
@@ -44,7 +43,6 @@ export default function ProductForm() {
             active: product.active,
             featured: product.featured ?? false,
             section: product.section ?? '',
-            hasCrust: product.hasCrust ?? false,
           })
         }
       }).catch(() => {})
@@ -83,7 +81,6 @@ export default function ProductForm() {
       active: form.active,
       featured: form.featured,
       section: form.section || undefined,
-      hasCrust: form.hasCrust,
     }
 
     try {
@@ -158,10 +155,6 @@ export default function ProductForm() {
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
             <span className="text-sm text-brand-white">Destaque (Home)</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={form.hasCrust} onChange={(e) => setForm({ ...form, hasCrust: e.target.checked })} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
-            <span className="text-sm text-brand-white">Opção de borda</span>
           </label>
         </div>
 
