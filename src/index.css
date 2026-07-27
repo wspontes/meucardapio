@@ -14,13 +14,6 @@
   --animate-fade-in: fade-in 0.3s ease-out;
 }
 
-:root {
-  --theme-primary: #0a0a0a;
-  --theme-secondary: #dc2626;
-  --theme-button: #dc2626;
-  --theme-surface: #1a1a1a;
-}
-
 @keyframes fade-in {
   from { opacity: 0; transform: translate(-50%, -10px); }
   to { opacity: 1; transform: translate(-50%, 0); }
@@ -31,8 +24,7 @@
     @apply border-border;
   }
   body {
-    background-color: var(--theme-primary) !important;
-    color: #fafafa;
+    @apply bg-brand-black text-brand-white;
   }
 }
 
@@ -52,11 +44,3 @@
     border-radius: 3px;
   }
 }
-
-.theme-primary-bg { background-color: var(--theme-primary) !important; }
-.theme-primary-text { color: var(--theme-primary) !important; }
-.theme-secondary-bg { background-color: var(--theme-secondary) !important; }
-.theme-secondary-text { color: var(--theme-secondary) !important; }
-.theme-button-bg { background-color: var(--theme-button) !important; }
-.theme-button-text { color: var(--theme-button) !important; }
-.theme-surface-bg { background-color: var(--theme-surface) !important; }
