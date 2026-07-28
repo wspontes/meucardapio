@@ -166,14 +166,14 @@ export default function Settings() {
   }
 
   return (
-    <div className="w-full max-w-4xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-brand-white">Configurações</h1>
-        <p className="text-sm text-muted">Gerencie as configurações do estabelecimento</p>
+    <div className="w-full">
+      <div className="mb-4">
+        <h1 className="text-xl md:text-2xl font-bold text-brand-white">Configurações</h1>
+        <p className="text-xs md:text-sm text-muted">Gerencie as configurações do estabelecimento</p>
       </div>
 
       <div className="space-y-6">
-        <div className="rounded-xl border border-border bg-surface p-6">
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <Image size={18} className="text-accent" />
             Banner Principal
@@ -372,7 +372,7 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface p-6">
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <CreditCard size={18} className="text-accent" />
             Métodos de Pagamento
@@ -396,7 +396,7 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface p-6">
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <Clock size={18} className="text-accent" />
             Horários de Funcionamento
@@ -434,7 +434,7 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface p-6">
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <Phone size={18} className="text-accent" />
             Contato do Estabelecimento
@@ -448,7 +448,7 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface p-6">
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <MapPin size={18} className="text-accent" />
             Bairros Atendidos
@@ -503,7 +503,7 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface p-6">
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
             <Palette size={18} className="text-accent" />
             Aparência
@@ -512,7 +512,6 @@ export default function Settings() {
           <div className="space-y-6">
             <ImageUpload value={themeLogo} onChange={setThemeLogo} label="Logo do estabelecimento" />
             <Input label="Ou cole a URL do logo" placeholder="https://..." value={themeLogo.startsWith('data:') ? '' : themeLogo} onChange={(e) => setThemeLogo(e.target.value)} />
-            <p className="text-[11px] text-muted -mt-4">Tamanho ideal: <strong className="text-brand-white">400×100px</strong> (proporção 4:1). Fundo transparente recomendado.</p>
             <div>
               <label className="mb-3 block text-sm font-medium text-brand-white">Tema de cores</label>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
