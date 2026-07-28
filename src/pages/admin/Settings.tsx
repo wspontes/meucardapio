@@ -166,7 +166,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="w-full max-w-4xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-brand-white">Configurações</h1>
         <p className="text-sm text-muted">Gerencie as configurações do estabelecimento</p>
@@ -512,6 +512,7 @@ export default function Settings() {
           <div className="space-y-6">
             <ImageUpload value={themeLogo} onChange={setThemeLogo} label="Logo do estabelecimento" />
             <Input label="Ou cole a URL do logo" placeholder="https://..." value={themeLogo.startsWith('data:') ? '' : themeLogo} onChange={(e) => setThemeLogo(e.target.value)} />
+            <p className="text-[11px] text-muted -mt-4">Tamanho ideal: <strong className="text-brand-white">400×100px</strong> (proporção 4:1). Fundo transparente recomendado.</p>
             <div>
               <label className="mb-3 block text-sm font-medium text-brand-white">Tema de cores</label>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
