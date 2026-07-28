@@ -47,6 +47,11 @@ export interface BusinessSettings {
     logo?: string
     themeId?: string
   }
+  notificationSettings?: {
+    enabled: boolean
+    sound: 'bell' | 'chime' | 'buzzer' | 'beep'
+    volume: number
+  }
 }
 
 function getDocRef(storeId?: string) {

@@ -6,7 +6,6 @@ import { onSnapshot, collection, query, orderBy } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import type { Order } from '@/types'
 import { formatCurrency, formatTime } from '@/utils'
-import { useToast } from '@/contexts/ToastContext'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   waitingPayment: { label: 'Aguard. Pagamento', color: 'bg-yellow-500/10 text-yellow-400' },
@@ -24,24 +23,6 @@ const sectionOrder = ['waitingPayment', 'received', 'accepted', 'preparing', 'ou
 const doneStatus = 'delivered'
 const cancelledStatus = 'cancelled'
 
-function playNotification() {
-  try {
-    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.frequency.value = 800
-    osc.type = 'sine'
-    gain.gain.setValueAtTime(0.3, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4)
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 0.4)
-  } catch {
-    // Audio not available
-  }
-}
-
 export default function OrdersAdmin() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -49,25 +30,12 @@ export default function OrdersAdmin() {
   const [whatsappModal, setWhatsappModal] = useState<{ phone: string; name: string; message: string } | null>(null)
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [cancelConfirm, setCancelConfirm] = useState<string | null>(null)
-  const prevIds = useRef<Set<string>>(new Set())
-  const { showToast } = useToast()
 
   useEffect(() => {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
     const unsub = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Order))
       setOrders(data)
-
-      const currentIds = new Set(data.map((o) => o.id))
-      const newIds = [...currentIds].filter((id) => !prevIds.current.has(id))
-      if (prevIds.current.size > 0 && newIds.length > 0) {
-        playNotification()
-        const newOrders = data.filter((o) => newIds.includes(o.id))
-        newOrders.forEach((o) => {
-          showToast(`Novo pedido de ${o.customerName}!`, 'success')
-        })
-      }
-      prevIds.current = currentIds
       setLoading(false)
     })
     return () => unsub()

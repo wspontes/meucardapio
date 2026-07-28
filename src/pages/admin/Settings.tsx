@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check } from 'lucide-react'
+import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2 } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { ImageUpload, ProductCard } from '@/components/shared'
 import { settingsService, productsService } from '@/services'
@@ -49,6 +49,9 @@ export default function Settings() {
   const [businessHoursEnabled, setBusinessHoursEnabled] = useState(true)
   const [themeLogo, setThemeLogo] = useState('')
   const [selectedThemeId, setSelectedThemeId] = useState(DEFAULT_THEME_ID)
+  const [notifEnabled, setNotifEnabled] = useState(true)
+  const [notifSound, setNotifSound] = useState<'bell' | 'chime' | 'buzzer' | 'beep'>('bell')
+  const [notifVolume, setNotifVolume] = useState(0.5)
 
   useEffect(() => {
     settingsService.get().then((data) => {
@@ -82,6 +85,12 @@ export default function Settings() {
           if (data.theme.logo) setThemeLogo(data.theme.logo)
           if (data.theme.themeId) setSelectedThemeId(data.theme.themeId)
         }
+        if (data.notificationSettings) {
+          const ns = data.notificationSettings
+          setNotifEnabled(ns.enabled)
+          setNotifSound(ns.sound)
+          setNotifVolume(ns.volume)
+        }
       }
     }).catch(() => {})
     productsService.getActiveProducts().then(setProducts).catch(() => {})
@@ -113,6 +122,11 @@ export default function Settings() {
         theme: {
           logo: themeLogo || undefined,
           themeId: selectedThemeId,
+        },
+        notificationSettings: {
+          enabled: notifEnabled,
+          sound: notifSound,
+          volume: notifVolume,
         },
       }
       await settingsService.save(JSON.parse(JSON.stringify(data)))
@@ -541,6 +555,66 @@ export default function Settings() {
                     <p className="text-xs text-muted">{theme.description}</p>
                   </button>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
+            <Bell size={18} className="text-accent" />
+            Notificação de Pedidos
+          </h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between rounded-lg bg-surface-hover px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-brand-white">Notificação sonora</p>
+                <p className="text-xs text-muted mt-0.5">Tocar som ao receber novo pedido</p>
+              </div>
+              <button
+                onClick={() => setNotifEnabled(!notifEnabled)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors ${notifEnabled ? 'bg-accent' : 'bg-surface-hover border border-border'}`}
+              >
+                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${notifEnabled ? 'translate-x-5.5 mt-0.5 ml-0.5' : 'translate-x-0.5 mt-0.5 ml-0.5'}`} />
+              </button>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-brand-white">Som da notificação</label>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {(['bell', 'chime', 'buzzer', 'beep'] as const).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setNotifSound(s)}
+                    className={`rounded-lg border px-3 py-2 text-xs font-medium text-left transition-colors ${
+                      notifSound === s
+                        ? 'border-accent bg-accent/10 text-accent'
+                        : 'border-border bg-surface-hover text-muted hover:text-brand-white'
+                    }`}
+                  >
+                    {s === 'bell' ? 'Campainha' : s === 'chime' ? 'Chime' : s === 'buzzer' ? 'Buzina' : 'Beep'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block flex items-center gap-2 text-sm font-medium text-brand-white">
+                <Volume2 size={14} className="text-accent" />
+                Volume
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={notifVolume}
+                  onChange={(e) => setNotifVolume(Number(e.target.value))}
+                  className="w-full h-2 appearance-none cursor-pointer rounded-full bg-surface-hover accent-accent"
+                />
+                <span className="text-sm text-brand-white w-8 shrink-0 tabular-nums">{Math.round(notifVolume * 100)}%</span>
               </div>
             </div>
           </div>
