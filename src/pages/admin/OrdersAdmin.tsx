@@ -7,7 +7,6 @@ import { db } from '@/firebase/config'
 import type { Order } from '@/types'
 import { formatCurrency, formatTime } from '@/utils'
 import { useToast } from '@/contexts/ToastContext'
-import { useStore } from '@/contexts/StoreContext'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   waitingPayment: { label: 'Aguard. Pagamento', color: 'bg-yellow-500/10 text-yellow-400' },
@@ -44,8 +43,6 @@ function playNotification() {
 }
 
 export default function OrdersAdmin() {
-  const { store } = useStore()
-  const storeName = store?.name || 'estabelecimento'
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -86,7 +83,7 @@ export default function OrdersAdmin() {
     if (nextStatus === 'received') updateData.paymentStatus = 'paid'
     await ordersService.update(orderId, updateData as Partial<Order>)
     if (nextStatus === 'accepted') {
-      setWhatsappModal({ phone: order.customerPhone, name: order.customerName, message: `Olá ${order.customerName}! Seu pedido foi ACEITO e já está em preparação. Obrigado por escolher a ${storeName}! 🍔` })
+      setWhatsappModal({ phone: order.customerPhone, name: order.customerName, message: `Olá ${order.customerName}! Seu pedido foi ACEITO e já está em preparação. Obrigado por escolher! 🍔` })
     } else if (nextStatus === 'outForDelivery') {
       const isPickup = order.deliveryType === 'pickup'
       setWhatsappModal({
