@@ -64,7 +64,6 @@ export default function Products() {
         image: product.image,
         order: products.length + 1,
         active: false,
-        featured: false,
         customizable: product.customizable,
       })
       setCloneConfirm(null)

@@ -36,7 +36,6 @@ export const productSchema = z.object({
   price: z.number().positive('Preço deve ser positivo'),
   discountPrice: z.number().positive().optional(),
   active: z.boolean(),
-  featured: z.boolean(),
 })
 
 export type LoginFormData = z.infer<typeof loginSchema>

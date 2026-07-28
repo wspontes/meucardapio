@@ -11,7 +11,7 @@ import { resolveImageUrl } from '@/utils/resolveImageUrl'
 
 const stepOrder = ['waitingPayment', 'received', 'preparing', 'outForDelivery', 'delivered']
 
-const ORDER_ID_KEY = 'pizzasmania_lastOrderId'
+const ORDER_ID_KEY = 'cardapio_lastOrderId'
 
 function playStatusBeep() {
   try {

@@ -64,7 +64,6 @@ export interface Product {
   price: number
   discountPrice?: number
   active: boolean
-  featured: boolean
   section?: 'featured' | 'new' | 'promotion'
   customizable: boolean
   order?: number

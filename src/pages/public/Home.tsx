@@ -5,7 +5,7 @@ import { Button } from '@/components/ui'
 import { ProductCard, ProductCardSkeleton } from '@/components/shared'
 import { ProductModal } from '@/components/shared/ProductModal'
 import { OperatingHoursModal } from '@/components/shared/OperatingHoursModal'
-import { useFeaturedProducts, useSectionProducts, useSettings, useBusinessStatus } from '@/hooks'
+import { useSectionProducts, useSettings, useBusinessStatus } from '@/hooks'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
 import { formatCurrency } from '@/utils'
 import { productsService } from '@/services'
@@ -14,7 +14,7 @@ import type { Product } from '@/types'
 export default function Home() {
   const { slug } = useParams<{ slug: string }>()
   const prefix = slug ? `/${slug}` : ''
-  const { products: featured, loading: featuredLoading } = useFeaturedProducts()
+  const { products: featured, loading: featuredLoading } = useSectionProducts('featured')
   const { products: newProducts, loading: newLoading } = useSectionProducts('new')
   const { products: promoProducts, loading: promoLoading } = useSectionProducts('promotion')
   const { settings, loading: settingsLoading } = useSettings()
@@ -127,7 +127,7 @@ export default function Home() {
                   style={{ color: textColor }}
                   onClick={handleLinkedProductClick}
                 >
-                  {currentBanner.title || 'A melhor pizza\nda cidade'}
+                  {currentBanner.title || 'A melhor opção\nda cidade'}
                 </h2>
                 <p className="mt-2 md:mt-4 text-sm md:text-lg" style={{ color: textColor, opacity: 0.8 }}>
                   {currentBanner.subtitle || 'Ingredientes selecionados e o melhor sabor da cidade.'}

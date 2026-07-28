@@ -31,7 +31,7 @@ interface CartContextType {
   total: number
 }
 
-const STORAGE_KEY = 'pizzamania_cart'
+const STORAGE_KEY = 'cardapio_cart'
 
 function loadCart(): CartState {
   try {

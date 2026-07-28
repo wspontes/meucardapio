@@ -23,7 +23,7 @@ function normalizePhone(raw: string): string {
 export function CustomerProvider({ children }: { children: ReactNode }) {
   const [customer, setCustomer] = useState<Customer | null>(() => {
     try {
-      const stored = localStorage.getItem('pizzasmania_customer')
+      const stored = localStorage.getItem('cardapio_customer')
       if (!stored) return null
       const parsed = JSON.parse(stored) as Customer
       return { ...parsed, phone: normalizePhone(parsed.phone) }
@@ -34,9 +34,9 @@ export function CustomerProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (customer) {
-      localStorage.setItem('pizzasmania_customer', JSON.stringify(customer))
+      localStorage.setItem('cardapio_customer', JSON.stringify(customer))
     } else {
-      localStorage.removeItem('pizzasmania_customer')
+      localStorage.removeItem('cardapio_customer')
     }
   }, [customer])
 

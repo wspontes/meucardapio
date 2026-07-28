@@ -280,7 +280,7 @@ export default function Settings() {
                             const updated = [...banners.items]
                             updated[idx] = { ...updated[idx], title: e.target.value }
                             setBanners((prev) => ({ ...prev, items: updated }))
-                          }} placeholder="Ex: A melhor pizza da cidade" />
+                          }} placeholder="Ex: A melhor opção da cidade" />
                           <Input label="Subtítulo" value={item.subtitle} onChange={(e) => {
                             const updated = [...banners.items]
                             updated[idx] = { ...updated[idx], subtitle: e.target.value }

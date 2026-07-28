@@ -23,7 +23,6 @@ export default function ProductForm() {
     image: '',
     order: '',
     active: true,
-    featured: false,
     section: '' as '' | 'featured' | 'new' | 'promotion',
   })
 
@@ -41,7 +40,6 @@ export default function ProductForm() {
             image: product.image || '',
             order: product.order ? String(product.order) : '',
             active: product.active,
-            featured: product.featured ?? false,
             section: product.section ?? '',
           })
         }
@@ -79,7 +77,6 @@ export default function ProductForm() {
       image: form.image || '',
       order: newOrder || 0,
       active: form.active,
-      featured: form.featured,
       section: form.section || undefined,
     }
 
@@ -108,7 +105,7 @@ export default function ProductForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-border bg-surface p-6">
-        <Input label="Nome do produto" placeholder="Ex: Pizza Margherita" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+        <Input label="Nome do produto" placeholder="Ex: Hambúrguer Clássico" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
         <ImageUpload value={form.image} onChange={(v) => setForm({ ...form, image: v })} label="Imagem do produto" />
         <Input label="URL da Imagem (alternativa)" placeholder="Ou cole um link" value={form.image.startsWith('data:') ? '' : form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
         <div className="grid grid-cols-2 gap-3">
@@ -151,10 +148,6 @@ export default function ProductForm() {
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
             <span className="text-sm text-brand-white">Ativo</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
-            <span className="text-sm text-brand-white">Destaque (Home)</span>
           </label>
         </div>
 

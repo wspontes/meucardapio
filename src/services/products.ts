@@ -22,14 +22,6 @@ class ProductsService extends FirestoreService<Product> {
     return data.sort((a, b) => (a.order ?? 99) - (b.order ?? 99) || a.name.localeCompare(b.name))
   }
 
-  async getFeatured() {
-    const data = await this.getAll([
-      where('featured', '==', true),
-      where('active', '==', true),
-    ])
-    return data.slice(0, 8)
-  }
-
   async searchByName(term: string) {
     const products = await this.getActiveProducts()
     const lowerTerm = term.toLowerCase()

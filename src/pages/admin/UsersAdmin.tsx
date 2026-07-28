@@ -158,7 +158,7 @@ export default function UsersAdmin() {
                 <button onClick={() => handleToggleActive(u)} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors" title={u.active ? 'Desativar' : 'Ativar'}>
                   <Pencil size={15} />
                 </button>
-                {u.email !== 'admin@pizzasmania.com.br' && (
+                {u.email !== 'admin@meucardapio.com.br' && (
                   <button onClick={() => handleDelete(u.id, u.name)} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-red-500/10 hover:text-red-400 transition-colors" title="Excluir">
                     <Trash2 size={15} />
                   </button>

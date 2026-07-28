@@ -46,7 +46,7 @@ export default function Seed() {
         updatedAt: new Date().toISOString(),
       })
 
-      await setDoc(doc(db, 'categories', 'pizzas'), {
+      await setDoc(doc(db, 'categories', 'lanches'), {
         name: 'Lanches',
         slug: 'lanches',
         order: 1,
@@ -67,25 +67,23 @@ export default function Seed() {
         active: true,
       })
 
-      await setDoc(doc(db, 'products', 'pizza-margherita'), {
+      await setDoc(doc(db, 'products', 'x-burger-especial'), {
         name: 'X-Burger Especial',
         slug: 'x-burger-especial',
         description: 'Pão, hambúrguer, queijo, alface, tomate e molho especial',
-        categoryId: 'pizzas',
+        categoryId: 'lanches',
         price: 28.90,
         active: true,
-        featured: true,
         customizable: true,
       })
 
-      await setDoc(doc(db, 'products', 'pizza-calabresa'), {
+      await setDoc(doc(db, 'products', 'combo-fritas'), {
         name: 'Combo Fritas',
         slug: 'combo-fritas',
         description: 'Porção de batata frita com queijo derretido e bacon',
-        categoryId: 'pizzas',
+        categoryId: 'lanches',
         price: 32.00,
         active: true,
-        featured: true,
         customizable: true,
       })
 
@@ -96,7 +94,6 @@ export default function Seed() {
         categoryId: 'bebidas',
         price: 10.00,
         active: true,
-        featured: false,
         customizable: false,
       })
 
