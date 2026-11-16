@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, Pencil, Trash2, Check, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, Check, X, ChevronUp, ChevronDown } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { categoriesService } from '@/services'
 import type { Category } from '@/types'
