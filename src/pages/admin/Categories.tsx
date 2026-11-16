@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Plus, Pencil, Trash2, Check, X, ChevronUp, ChevronDown } from 'lucide-react'
+import { Plus, Pencil, Trash2, Check, X } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { categoriesService } from '@/services'
 import type { Category } from '@/types'
+import sortablerjs from 'sortablejs'
 
 export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -10,6 +11,8 @@ export default function Categories() {
   const [newCategory, setNewCategory] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  let sortableInstance: ReturnType<typeof sortablerjs> | null = null
 
   const load = async () => {
     try {
@@ -37,26 +40,51 @@ export default function Categories() {
     setNewCategory('')
   }
 
-  const moveUp = async (index: number) => {
-    if (index === 0) return
-    const updated = [...categories]
-    const temp = updated[index].order
-    updated[index] = { ...updated[index], order: updated[index - 1].order }
-    updated[index - 1] = { ...updated[index - 1], order: temp }
-    const reordered = updated.sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
-    setCategories(reordered)
-    await Promise.all(reordered.map((cat, i) => categoriesService.update(cat.id, { order: i + 1 })))
-  }
+  useEffect(() => {
+    // Initialize sortable after categories are loaded
+    if (!sortableInstance && categories.length > 0 && containerRef.current) {
+      sortableInstance = sortablerjs(containerRef.current, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        onSort: () => {
+          // Small delay to let React settle, then reorder
+          setTimeout(reorderCategories, 150)
+        },
+        onEnd: () => {
+          // Final update after user finishes dragging
+          reorderCategories()
+        },
+      })
+    }
 
-  const moveDown = async (index: number) => {
-    if (index === categories.length - 1) return
-    const updated = [...categories]
-    const temp = updated[index].order
-    updated[index] = { ...updated[index], order: updated[index + 1].order }
-    updated[index + 1] = { ...updated[index + 1], order: temp }
-    const reordered = updated.sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
-    setCategories(reordered)
-    await Promise.all(reordered.map((cat, i) => categoriesService.update(cat.id, { order: i + 1 })))
+    return () => {
+      sortableInstance?.destroy()
+    }
+  }, [categories.length])
+
+  const reorderCategories = async () => {
+    if (!sortableInstance) return
+    // Get the current order from the sorted DOM
+    const orderedIds = sortableInstance.toArray()
+    const reordered = orderedIds.map((id, index) => {
+      const category = categories.find((c) => c.id === id)
+      if (!category) return null
+      return { id: category.id, order: index + 1 }
+    }).filter(Boolean) as { id: string; order: number }[]
+
+    // Update Firestore order for each category
+    await Promise.all(
+      reordered.map((cat) => categoriesService.update(cat.id, { order: cat.order }))
+    )
+
+    // Update local state to reflect the new order
+    setCategories((prev) =>
+      prev.map((cat) => {
+        const reorderedCat = reordered.find((r) => r.id === cat.id)
+        return reorderedCat ? { ...cat, order: reorderedCat.order } : cat
+      })
+    )
   }
 
   const startEdit = (cat: Category) => {
@@ -78,6 +106,11 @@ export default function Categories() {
     if (window.confirm(`Tem certeza que deseja excluir "${name}"?`)) {
       await categoriesService.delete(id)
       setCategories((prev) => prev.filter((c) => c.id !== id))
+      // Reinitialize sortable after deletion
+      setTimeout(() => {
+        sortableInstance?.destroy()
+        sortableInstance = null
+      }, 100)
     }
   }
 
@@ -123,69 +156,36 @@ export default function Categories() {
         </div>
       ) : (
         <div className="rounded-xl border border-border bg-surface">
-          <div className="divide-y divide-border">
+          <div
+            ref={containerRef}
+            className="divide-y divide-border space-y-3 pb-3"
+          >
             {categories.map((category, index) => (
-              <div key={category.id} className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-3">
-                <div className="flex flex-col gap-0.5">
-                  <button
-                    onClick={() => moveUp(index)}
-                    disabled={index === 0}
-                    className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-lg text-muted hover:text-brand-white hover:bg-surface-hover transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
-                    title="Mover para cima"
-                  >
-                    <ChevronUp size={14} />
-                  </button>
-                  <button
-                    onClick={() => moveDown(index)}
-                    disabled={index === categories.length - 1}
-                    className="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-lg text-muted hover:text-brand-white hover:bg-surface-hover transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
-                    title="Mover para baixo"
-                  >
-                    <ChevronDown size={14} />
-                  </button>
-                </div>
-
-                <span className="w-5 md:w-6 text-center text-xs text-muted shrink-0">{index + 1}</span>
-
-                {editingId === category.id ? (
-                  <div className="flex flex-1 items-center gap-2 min-w-0">
-                    <Input
-                      value={editingName}
-                      onChange={(e) => setEditingName(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && confirmEdit()}
-                      className="h-9 md:h-10 text-sm"
-                      autoFocus
-                    />
-                    <button onClick={confirmEdit} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-green-400 hover:bg-green-500/10 transition-colors">
-                      <Check size={16} />
-                    </button>
-                    <button onClick={cancelEdit} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors">
-                      <X size={16} />
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-brand-white truncate">{category.name}</p>
-                    </div>
-                    <button
-                      onClick={() => toggleActive(category.id)}
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] md:text-xs font-medium transition-colors ${
-                        category.active
-                          ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20'
-                          : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
-                      }`}
-                    >
-                      {category.active ? 'Ativo' : 'Inativo'}
-                    </button>
-                    <button onClick={() => startEdit(category)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors" title="Editar">
-                      <Pencil size={15} />
-                    </button>
-                    <button onClick={() => handleDelete(category.id, category.name)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-red-500/10 hover:text-red-400 transition-colors" title="Excluir">
-                      <Trash2 size={15} />
-                    </button>
-                  </>
-                )}
+              <div
+                key={category.id}
+                className="flex items-center gap-2 px-4 py-3 rounded-lg bg-surface/50 transition-colors hover:bg-surface/80"
+                style={{ cursor: 'grab' }}
+              >
+                <span
+                  className="flex-1 min-w-0 text-sm font-medium text-brand-white truncate"
+                >
+                  {category.name}
+                </span>
+                <span className="text-xs text-muted/50">Posição {index + 1}</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 opacity-50 cursor-grab"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="8" cy="8" r="3"></circle>
+                  <circle cx="16" cy="16" r="3"></circle>
+                  <line x1="8" y1="16" x2="16" y2="8"></line>
+                </svg>
               </div>
             ))}
           </div>
