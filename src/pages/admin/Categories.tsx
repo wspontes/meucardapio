@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Plus, Pencil, Trash2, Check, X } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { categoriesService } from '@/services'
 import type { Category } from '@/types'
 import sortablerjs from 'sortablejs'
+import 'sortablejs/Sortable.min.css'
 
 export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -66,7 +67,7 @@ export default function Categories() {
   const reorderCategories = async () => {
     if (!sortableInstance) return
     const orderedIds = sortableInstance.toArray()
-    const reordered = orderedIds.map((id, index) => {
+    const reordered = orderedIds.map((id: string, index: number) => {
       const category = categories.find((c) => c.id === id)
       if (!category) return null
       return { id: category.id, order: index + 1 }
@@ -164,7 +165,7 @@ export default function Categories() {
                 style={{ alignItems: 'center' }}
               >
                 <div className="flex items-center gap-2 min-w-[30px]">
-                  {/* Drag handle area */}
+                  {/* Drag handle */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 opacity-70 cursor-grab"
@@ -179,7 +180,7 @@ export default function Categories() {
                     <circle cx="16" cy="16" r="3"></circle>
                     <line x1="8" y1="16" x2="16" y2="8"></line>
                   </svg>
-                  {/* Label showing position */}
+                  {/* Position label */}
                   <span className="text-xs text-muted/60">#{index + 1}</span>
                 </div>
                 <span
