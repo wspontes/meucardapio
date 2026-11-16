@@ -111,3 +111,4 @@ export function getThemeById(id: string | undefined): ThemePreset | undefined {
 }
 
 export const DEFAULT_THEME_ID = 'escuro'
+export const CUSTOM_THEME_ID = 'personalizado'
