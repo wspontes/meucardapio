@@ -4,7 +4,6 @@ import { Button, Input } from '@/components/ui'
 import { categoriesService } from '@/services'
 import type { Category } from '@/types'
 import sortablerjs from 'sortablejs'
-import 'sortablejs/Sortable.min.css'
 
 export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([])
