@@ -6,7 +6,7 @@ import { settingsService, productsService } from '@/services'
 import { type BusinessSettings } from '@/services/settings'
 import type { Product } from '@/types'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
-import { THEMES, DEFAULT_THEME_ID, CUSTOM_THEME_ID, type ThemeColors } from '@/config/themes'
+import { THEMES, DEFAULT_THEME_ID, CUSTOM_THEME_ID, getThemeById, type ThemeColors } from '@/config/themes'
 
 export default function Settings() {
   const [saving, setSaving] = useState(false)
@@ -612,11 +612,20 @@ export default function Settings() {
                 </button>
               </div>
 
-              {selectedThemeId === CUSTOM_THEME_ID && (
-                <div className="rounded-xl border border-border bg-surface p-4">
-                  <ThemeColorPicker colors={customColors} onChange={setCustomColors} />
-                </div>
-              )}
+              {/* Preview e seletores de cor */}
+              <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
+                {selectedThemeId === CUSTOM_THEME_ID ? (
+                  <ThemeColorPicker
+                    colors={customColors}
+                    onChange={setCustomColors}
+                    editable
+                  />
+                ) : (
+                  <ThemeColorPicker
+                    colors={getThemeById(selectedThemeId)?.colors ?? customColors}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
