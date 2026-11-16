@@ -47,12 +47,12 @@ export default function Categories() {
         animation: 150,
         ghostClass: 'sortable-ghost',
         chosenClass: 'sortable-chosen',
+        multiDrag: false,
+        dragClass: 'sortable-drag',
         onSort: () => {
-          // Small delay to let React settle, then reorder
           setTimeout(reorderCategories, 150)
         },
         onEnd: () => {
-          // Final update after user finishes dragging
           reorderCategories()
         },
       })
@@ -65,7 +65,6 @@ export default function Categories() {
 
   const reorderCategories = async () => {
     if (!sortableInstance) return
-    // Get the current order from the sorted DOM
     const orderedIds = sortableInstance.toArray()
     const reordered = orderedIds.map((id, index) => {
       const category = categories.find((c) => c.id === id)
@@ -73,12 +72,10 @@ export default function Categories() {
       return { id: category.id, order: index + 1 }
     }).filter(Boolean) as { id: string; order: number }[]
 
-    // Update Firestore order for each category
     await Promise.all(
       reordered.map((cat) => categoriesService.update(cat.id, { order: cat.order }))
     )
 
-    // Update local state to reflect the new order
     setCategories((prev) =>
       prev.map((cat) => {
         const reorderedCat = reordered.find((r) => r.id === cat.id)
@@ -106,7 +103,6 @@ export default function Categories() {
     if (window.confirm(`Tem certeza que deseja excluir "${name}"?`)) {
       await categoriesService.delete(id)
       setCategories((prev) => prev.filter((c) => c.id !== id))
-      // Reinitialize sortable after deletion
       setTimeout(() => {
         sortableInstance?.destroy()
         sortableInstance = null
@@ -159,33 +155,38 @@ export default function Categories() {
           <div
             ref={containerRef}
             className="divide-y divide-border space-y-3 pb-3"
+            style={{ minHeight: '120px' }}
           >
             {categories.map((category, index) => (
               <div
                 key={category.id}
-                className="flex items-center gap-2 px-4 py-3 rounded-lg bg-surface/50 transition-colors hover:bg-surface/80"
-                style={{ cursor: 'grab' }}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface/50 transition-colors hover:bg-surface/80 cursor-grab"
+                style={{ alignItems: 'center' }}
               >
+                <div className="flex items-center gap-2 min-w-[30px]">
+                  {/* Drag handle area */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 opacity-70 cursor-grab"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="8" cy="8" r="3"></circle>
+                    <circle cx="16" cy="16" r="3"></circle>
+                    <line x1="8" y1="16" x2="16" y2="8"></line>
+                  </svg>
+                  {/* Label showing position */}
+                  <span className="text-xs text-muted/60">#{index + 1}</span>
+                </div>
                 <span
                   className="flex-1 min-w-0 text-sm font-medium text-brand-white truncate"
                 >
                   {category.name}
                 </span>
-                <span className="text-xs text-muted/50">Posição {index + 1}</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 opacity-50 cursor-grab"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="8" cy="8" r="3"></circle>
-                  <circle cx="16" cy="16" r="3"></circle>
-                  <line x1="8" y1="16" x2="16" y2="8"></line>
-                </svg>
               </div>
             ))}
           </div>
