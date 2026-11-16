@@ -103,7 +103,9 @@ export default function Home() {
                   className="absolute inset-0 h-full w-full object-cover rounded-2xl"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                 />
-                <div className="absolute inset-0 bg-black/50 rounded-2xl" />
+                <div
+                  className={`absolute inset-0 bg-black/${currentBanner.opacity || 50} rounded-2xl`}
+                />
               </>
             )}
             {!hasImage && (

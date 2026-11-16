@@ -366,6 +366,25 @@ export default function Settings() {
                             </div>
                           </div>
                         </div>
+                        <div>
+                          <label className="mb-1.5 block text-sm font-medium text-brand-white">Opacidade do banner</label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="range"
+                              min="10"
+                              max="100"
+                              step="5"
+                              value={item.opacity || 50}
+                              onChange={(e) => {
+                                const updated = [...banners.items]
+                                updated[idx] = { ...updated[idx], opacity: Number(e.target.value) }
+                                setBanners((prev) => ({ ...prev, items: updated }))
+                              }}
+                              className="w-full h-2 appearance-none cursor-pointer rounded-full bg-surface-hover accent-accent"
+                            />
+                            <span className="text-xs text-brand-white w-6 shrink-0 tabular-nums">{item.opacity || 50}%</span>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
