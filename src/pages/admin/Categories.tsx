@@ -3,7 +3,7 @@ import { Plus, Pencil, Trash2, Check, X } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { categoriesService } from '@/services'
 import type { Category } from '@/types'
-import sortablerjs from 'sortablejs'
+import sortablerjs, { Sortable } from 'sortablejs'
 
 export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -12,7 +12,7 @@ export default function Categories() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
   const containerRef = React.useRef<HTMLDivElement>(null)
-  let sortableInstance: any = null
+  let sortableInstance: Sortable | null = null
 
   const load = async () => {
     try {
