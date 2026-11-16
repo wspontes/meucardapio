@@ -13,7 +13,7 @@ export default function Categories() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
   const containerRef = React.useRef<HTMLDivElement>(null)
-  let sortableInstance: ReturnType<typeof sortablerjs> | null = null
+  let sortableInstance: any = null
 
   const load = async () => {
     try {
