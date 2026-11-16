@@ -100,18 +100,10 @@ export default function Home() {
                 <img
                   src={resolveImageUrl(currentBanner.image!)}
                   alt=""
-                  className="absolute inset-0 h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-cover rounded-2xl"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                 />
-                <div className="absolute inset-0 bg-black/70" />
-                <div className="absolute inset-0 w-1/2 left-1/2 z-10">
-                  <img
-                    src={resolveImageUrl(currentBanner.image!)}
-                    alt=""
-                    className="h-full w-full object-cover object-right"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                  />
-                </div>
+                <div className="absolute inset-0 bg-black/70 rounded-2xl" />
               </>
             )}
             {!hasImage && (
