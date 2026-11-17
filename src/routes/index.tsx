@@ -21,6 +21,7 @@ const AdminCategories = lazy(() => import('@/pages/admin/Categories'))
 const AdminOrders = lazy(() => import('@/pages/admin/OrdersAdmin'))
 const AdminSettings = lazy(() => import('@/pages/admin/Settings'))
 const AdminCoupons = lazy(() => import('@/pages/admin/CouponsAdmin'))
+const AdminMotoboys = lazy(() => import('@/pages/admin/MotoboysAdmin'))
 const KitchenDashboard = lazy(() => import('@/pages/kitchen/Dashboard'))
 const Seed = lazy(() => import('@/pages/dev/Seed'))
 
@@ -94,6 +95,7 @@ export const router = createBrowserRouter([
       { path: 'categorias', element: <Suspense fallback={<PageLoader />}><AdminCategories /></Suspense> },
       { path: 'cupons', element: <Suspense fallback={<PageLoader />}><AdminCoupons /></Suspense> },
       { path: 'configuracoes', element: <Suspense fallback={<PageLoader />}><AdminSettings /></Suspense> },
+      { path: 'motoboys', element: <Suspense fallback={<PageLoader />}><AdminMotoboys /></Suspense> },
     ],
   },
   {
