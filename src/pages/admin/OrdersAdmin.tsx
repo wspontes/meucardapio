@@ -267,7 +267,15 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
           </div>
           <div className="mt-2 space-y-0.5">
             {order.items.map((item, idx) => (
-              <p key={idx} className="text-xs text-muted">{item.quantity}x {item.productName}</p>
+              <div key={idx} className="space-y-0.5">
+                <p className="text-xs text-muted">{item.quantity}x {item.productName}</p>
+                {item.flavors?.length && (
+                  <p className="text-[10px] text-accent font-medium">Sabores: {item.flavors.join(', ')}</p>
+                )}
+                {item.notes && (
+                  <p className="text-[10px] text-muted">{item.notes}</p>
+                )}
+              </div>
             ))}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">

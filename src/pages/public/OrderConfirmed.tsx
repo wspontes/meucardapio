@@ -231,8 +231,16 @@ export default function OrderConfirmed() {
           <h3 className="mb-3 font-semibold text-brand-white text-sm">Detalhes do Pedido</h3>
           <div className="space-y-1 text-sm">
             <p className="flex justify-between text-muted"><span>Cliente</span><span className="text-brand-white">{order.customerName as string}</span></p>
-            {(order.items as Array<{ quantity: number; productName: string; price: number }>)?.map((item, i) => (
-              <p key={i} className="flex justify-between text-muted"><span>{item.quantity}x {item.productName}</span><span className="text-brand-white">{formatCurrency(item.price * item.quantity)}</span></p>
+            {(order.items as Array<{ quantity: number; productName: string; price: number; flavors?: string[]; notes?: string }>)?.map((item, i) => (
+              <div key={i} className="space-y-0.5">
+                <p className="flex justify-between text-muted"><span>{item.quantity}x {item.productName}</span><span className="text-brand-white">{formatCurrency(item.price * item.quantity)}</span></p>
+                {item.flavors?.length && (
+                  <p className="text-[10px] text-accent font-medium ml-1">Sabores: {item.flavors.join(', ')}</p>
+                )}
+                {item.notes && (
+                  <p className="text-[10px] text-muted ml-1">{item.notes}</p>
+                )}
+              </div>
             ))}
             <div className="border-t border-border mt-2 pt-2 space-y-1">
               <p className="flex justify-between text-muted"><span>Subtotal</span><span className="text-brand-white">{formatCurrency(order.subtotal as number)}</span></p>
