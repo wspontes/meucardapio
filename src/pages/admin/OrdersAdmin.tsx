@@ -243,7 +243,6 @@ export default function OrdersAdmin() {
               )}
             </div>
           )}
-        }
         </div>
       )}
 
