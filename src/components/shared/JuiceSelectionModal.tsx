@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Droplets, Wine, Cup, CheckCircle, ArrowLeft } from 'lucide-react'
+import { X, Droplets, Wine, CheckCircle, ArrowLeft } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
 import { useBusinessStatus } from '@/hooks'
@@ -107,7 +107,7 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
           />
         ) : (
           <div className="flex h-64 w-full items-center justify-center bg-surface-hover">
-            <Cup size={48} className="text-muted" />
+            <Wine size={48} className="text-muted" />
           </div>
         )}
 
@@ -135,7 +135,7 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
                       }`}
                     >
                       <div className="flex-shrink-0 h-8 w-8 rounded-full border border-white/20 flex items-center justify-center">
-                        <Cup size={16} className="text-muted" />
+                        <Wine size={16} className="text-muted" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-brand-white">
