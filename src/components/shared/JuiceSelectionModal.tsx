@@ -73,10 +73,10 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
   const goBack = () => setStep((prev) => (prev === 'base' ? 'sabores' : 'confirmar'))
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="relative w-full max-w-md overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl"
+        className="relative w-full max-w-md max-h-[85vh] overflow-y-auto rounded-2xl border border-border bg-surface shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <button
