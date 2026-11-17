@@ -65,7 +65,7 @@ export default function Products() {
         order: products.length + 1,
         active: false,
         customizable: product.customizable,
-        sizes: product.sizes,
+        sizes: [],
         ingredients: product.ingredients,
       })
       setCloneConfirm(null)

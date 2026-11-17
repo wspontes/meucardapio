@@ -1,18 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Plus, Trash2, Palette } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { ImageUpload } from '@/components/shared'
 import { productsService, categoriesService } from '@/services'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
-import type { Product, Category, Size, ProductIngredient } from '@/types'
-
-interface SizeForm {
-  id: string
-  name: string
-  price: string
-  maxFlavors: string
-}
+import type { Product, Category, ProductIngredient } from '@/types'
 
 interface IngredientForm {
   id: string
@@ -31,12 +24,10 @@ interface ProductFormData {
   order: string
   active: boolean
   section: '' | 'featured' | 'new' | 'promotion'
-  sizes: SizeForm[]
   ingredients: IngredientForm[]
   customizable: boolean
 }
 
-const EMPTY_SIZE: SizeForm = { id: '', name: '', price: '0', maxFlavors: '1' }
 const EMPTY_INGREDIENT: IngredientForm = { id: '', name: '', removable: true, extraPrice: '0' }
 
 export default function ProductForm() {
@@ -56,7 +47,6 @@ export default function ProductForm() {
     order: '',
     active: true,
     section: '',
-    sizes: [EMPTY_SIZE],
     ingredients: [EMPTY_INGREDIENT],
     customizable: false,
   })
@@ -76,12 +66,6 @@ export default function ProductForm() {
             order: product.order ? String(product.order) : '',
             active: product.active,
             section: product.section ?? '',
-            sizes: (product.sizes ?? []).map((s) => ({
-              id: s.id,
-              name: s.name,
-              price: String(s.price),
-              maxFlavors: String(s.maxFlavors),
-            })) || [EMPTY_SIZE],
             ingredients: (product.ingredients ?? []).map((ing) => ({
               id: ing.ingredientId,
               name: ing.name,
@@ -94,15 +78,6 @@ export default function ProductForm() {
       }).catch(() => {})
     }
   }, [id])
-
-  const addSize = () => {
-    setForm((prev) => ({ ...prev, sizes: [...prev.sizes, { ...EMPTY_SIZE, id: Date.now().toString() }] }))
-  }
-
-  const removeSize = (index: number) => {
-    if (form.sizes.length <= 1) return
-    setForm((prev) => ({ ...prev, sizes: prev.sizes.filter((_, i) => i !== index) }))
-  }
 
   const addIngredient = () => {
     setForm((prev) => ({ ...prev, ingredients: [...prev.ingredients, { ...EMPTY_INGREDIENT, id: Date.now().toString() }] }))
@@ -133,15 +108,6 @@ export default function ProductForm() {
       }
     }
 
-    const cleanSizes: Size[] = form.sizes
-      .filter((s) => s.name.trim() && s.maxFlavors.trim())
-      .map((s) => ({
-        id: s.id || Date.now().toString(),
-        name: s.name,
-        price: Number(s.price) || 0,
-        maxFlavors: Number(s.maxFlavors) || 1,
-      }))
-
     const cleanIngredients: ProductIngredient[] = form.ingredients
       .filter((ing) => ing.name.trim())
       .map((ing) => ({
@@ -162,7 +128,7 @@ export default function ProductForm() {
       order: newOrder || 0,
       active: form.active,
       section: form.section || undefined,
-      sizes: cleanSizes,
+      sizes: [],
       ingredients: cleanIngredients,
       customizable: form.customizable,
     }
@@ -232,65 +198,7 @@ export default function ProductForm() {
           </div>
         </div>
 
-        {/* Tamanhos (para sucos/jarras) */}
-        <div className="pt-4 border-t border-border">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-brand-white flex items-center gap-2">
-              <Palette size={16} className="text-accent" />
-              Tamanhos (ex: Copo, Jarra)
-            </h3>
-            <button type="button" onClick={addSize} className="flex items-center gap-1 text-xs text-accent hover:text-accent/80 transition-colors">
-              <Plus size={14} /> Adicionar tamanho
-            </button>
-          </div>
-          <p className="text-xs text-muted mb-3">Defina os tamanhos disponíveis e o limite de sabores para cada um.</p>
-          <div className="space-y-2">
-            {form.sizes.map((size, index) => (
-              <div key={size.id} className="flex flex-col sm:flex-row gap-3 rounded-lg border border-border bg-surface-hover p-3">
-                <div className="flex-1 min-w-0">
-                  <label className="mb-1 block text-[10px] uppercase text-muted">Nome</label>
-                  <input
-                    value={size.name}
-                    onChange={(e) => setForm({ ...form, sizes: form.sizes.map((s, i) => i === index ? { ...s, name: e.target.value } : s) })}
-                    className="w-full rounded-lg border border-border bg-surface px-2 py-2 text-xs text-brand-white focus:border-accent focus:outline-none"
-                    placeholder="Ex: Copo"
-                  />
-                </div>
-                <div className="w-full sm:w-24">
-                  <label className="mb-1 block text-[10px] uppercase text-muted">Preço adicional</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={size.price}
-                    onChange={(e) => setForm({ ...form, sizes: form.sizes.map((s, i) => i === index ? { ...s, price: e.target.value } : s) })}
-                    className="w-full rounded-lg border border-border bg-surface px-2 py-2 text-xs text-brand-white focus:border-accent focus:outline-none"
-                    placeholder="0,00"
-                  />
-                </div>
-                <div className="w-full sm:w-24">
-                  <label className="mb-1 block text-[10px] uppercase text-muted">Máx. sabores</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={size.maxFlavors}
-                    onChange={(e) => setForm({ ...form, sizes: form.sizes.map((s, i) => i === index ? { ...s, maxFlavors: e.target.value } : s) })}
-                    className="w-full rounded-lg border border-border bg-surface px-2 py-2 text-xs text-brand-white focus:border-accent focus:outline-none"
-                    placeholder="1"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeSize(index)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Ingredientes / Sabores */}
+        {/* Sabores / Ingredientes (para sucos) */}
         <div className="pt-4 border-t border-border">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-medium text-brand-white">
@@ -300,7 +208,7 @@ export default function ProductForm() {
               <Plus size={14} /> Adicionar sabor
             </button>
           </div>
-          <p className="text-xs text-muted mb-3">Lista de sabores disponíveis para sucos e jarras.</p>
+          <p className="text-xs text-muted mb-3">Lista de sabores disponíveis para sucos.</p>
           <div className="space-y-2">
             {form.ingredients.map((ing, index) => (
               <div key={ing.id} className="flex flex-col sm:flex-row gap-3 rounded-lg border border-border bg-surface-hover p-3">
