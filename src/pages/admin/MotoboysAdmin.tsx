@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowLeft, Bike, Plus, Trash2, Phone } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { motoboysService } from '@/services'
@@ -14,10 +14,6 @@ export default function MotoboysAdmin() {
   const [saving, setSaving] = useState(false)
   const { showToast } = useToast()
 
-  useState(() => {
-    loadMotoboys()
-  }, [])
-
   const loadMotoboys = async () => {
     setLoading(true)
     try {
@@ -25,6 +21,10 @@ export default function MotoboysAdmin() {
       setMotoboys(list.sort((a, b) => (a.name || '').localeCompare(b.name || '')))
     } catch { setMotoboys([]) } finally { setLoading(false) }
   }
+
+  useEffect(() => {
+    loadMotoboys()
+  }, [])
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
