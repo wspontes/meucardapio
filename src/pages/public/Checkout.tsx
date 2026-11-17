@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
 import { ArrowLeft, CreditCard, Banknote, QrCode, MapPin, User, AlertTriangle, Coins, Hash, Truck, Store } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
@@ -49,6 +49,13 @@ export default function Checkout() {
     reference: '',
   })
   const [cepLoading, setCepLoading] = useState(false)
+
+  // Define o frete padrão ao carregar o checkout para delivery
+  useEffect(() => {
+    if (deliveryType === 'delivery' && settings?.defaultDeliveryFee !== undefined && state.deliveryFee === 0) {
+      setDeliveryFee(settings.defaultDeliveryFee)
+    }
+  }, [deliveryType, settings, state.deliveryFee, setDeliveryFee])
 
   const handleCepLookup = async (cep: string) => {
     const clean = cep.replace(/\D/g, '')
