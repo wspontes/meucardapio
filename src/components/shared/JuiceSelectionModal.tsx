@@ -64,7 +64,7 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
       quantity: 1,
       price: totalPrice,
       flavors: flavorNames,
-      notes: `Copo | Base: ${selectedBase === 'agua' ? 'Água' : 'Leite'} | Sabores: ${flavorNames.join(', ')}`,
+      notes: `Base: ${selectedBase === 'agua' ? 'Água' : 'Leite'} | Sabores: ${flavorNames.join(', ')}`,
     })
     showToast('Adicionado ao carrinho!')
     onClose()
@@ -187,19 +187,6 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
                 })}
               </div>
 
-              {selectedBase === 'leite' && (
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="checkbox"
-                      defaultChecked
-                      className="rounded border-border text-accent focus:ring-accent"
-                    />
-                    <span className="text-xs text-muted">Com leite condensado</span>
-                  </div>
-                </div>
-              )}
-
               <div className="flex justify-between mt-6">
                 <Button variant="ghost" onClick={() => setStep('sabores')} className="w-40">
                   <ArrowLeft size={16} className="mr-1" /> Voltar
@@ -219,10 +206,6 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
               <p className="text-sm font-medium text-brand-white">Resumo</p>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted">Tipo</span>
-                  <span className="text-brand-white font-medium">Copo</span>
-                </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted">Base</span>
                   <span className="text-brand-white font-medium">
