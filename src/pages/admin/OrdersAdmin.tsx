@@ -62,15 +62,15 @@ export default function OrdersAdmin() {
     if (nextStatus === 'received') updateData.paymentStatus = 'paid'
     await ordersService.update(orderId, updateData as Partial<Order>)
     if (nextStatus === 'accepted') {
-      setWhatsappModal({ phone: order.customerPhone, name: order.customerName, message: `Olá ${order.customerName}! Seu pedido foi ACEITO e já está em preparação. Obrigado por escolher! 🍔` })
+      setWhatsappModal({ phone: order.customerPhone, name: order.customerName, message: `Olá ${order.customerName}! Seu pedido foi ACEITO e já está em preparação. Obrigado por escolher!` })
     } else if (nextStatus === 'outForDelivery') {
       const isPickup = order.deliveryType === 'pickup'
       setWhatsappModal({
         phone: order.customerPhone,
         name: order.customerName,
         message: isPickup
-          ? `Olá ${order.customerName}! Seu pedido está PRONTO para retirada! Pode buscar no estabelecimento. 🍔`
-          : `Olá ${order.customerName}! Seu pedido SAIU PARA ENTREGA. Fique atento ao seu celular! 🛵🍔`
+          ? `Olá ${order.customerName}! Seu pedido está PRONTO para retirada! Pode buscar no estabelecimento.`
+          : `Olá ${order.customerName}! Seu pedido SAIU PARA ENTREGA. Fique atento ao seu celular!`
       })
     }
   }
@@ -97,21 +97,21 @@ export default function OrdersAdmin() {
       else payment += ' — valor exato'
     }
     const lines = [
-      '🛵 *Nova entrega — MeuCardapio*',
+      '*Nova entrega — MeuCardapio*',
       '',
       `Pedido #${order.id.slice(0, 8)}`,
-      `👤 ${order.customerName} — ${order.customerPhone}`,
+      `Cliente: ${order.customerName} — ${order.customerPhone}`,
       '',
-      '🍔 Itens:',
+      'Itens:',
       ...order.items.map((item) => `• ${item.quantity}x ${item.productName}`),
       '',
-      `💰 Total: ${formatCurrency(order.total)} (${payment})`,
+      `Total: ${formatCurrency(order.total)} (${payment})`,
       '',
-      '📍 Endereço:',
+      'Endereço:',
       `${addr?.street || ''}, ${addr?.number || ''}${addr?.complement ? ` - ${addr.complement}` : ''}`,
       `${addr?.neighborhood || ''}${addr?.city ? ` - ${addr.city}` : ''}${addr?.reference ? ` (Ref.: ${addr.reference})` : ''}`,
       '',
-      `🗺️ Rota: https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${addr?.street || ''}, ${addr?.number || ''} - ${addr?.neighborhood || ''}${addr?.city ? `, ${addr.city}` : ''}`)}`,
+      `Rota: https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${addr?.street || ''}, ${addr?.number || ''} - ${addr?.neighborhood || ''}${addr?.city ? `, ${addr.city}` : ''}`)}`,
     ]
     return lines.join('\n')
   }
