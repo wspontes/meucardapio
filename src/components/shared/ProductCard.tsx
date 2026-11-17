@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ShoppingCart, Star } from 'lucide-react'
-import { cn, formatCurrency } from '@/utils'
+import { cn, formatCurrency, isJuiceProduct } from '@/utils'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
 import { Button } from '@/components/ui'
 import { useCart } from '@/contexts/CartContext'
@@ -8,6 +8,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { useBusinessStatus } from '@/hooks'
 import { OperatingHoursModal } from './OperatingHoursModal'
 import { ProductModal } from './ProductModal'
+import { JuiceSelectionModal } from './JuiceSelectionModal'
 import type { Product } from '@/types'
 
 interface ProductCardProps {
@@ -17,11 +18,13 @@ interface ProductCardProps {
 
 export function ProductCard({ product, className }: ProductCardProps) {
   const [showModal, setShowModal] = useState(false)
+  const [showJuiceModal, setShowJuiceModal] = useState(false)
   const [showHoursModal, setShowHoursModal] = useState(false)
   const { addItem } = useCart()
   const { showToast } = useToast()
   const { status } = useBusinessStatus()
   const price = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price
+  const isJuice = isJuiceProduct(product.name)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -30,6 +33,12 @@ export function ProductCard({ product, className }: ProductCardProps) {
       setShowHoursModal(true)
       return
     }
+
+    if (isJuice) {
+      setShowJuiceModal(true)
+      return
+    }
+
     addItem({
       productId: product.id,
       productName: product.name,
@@ -46,8 +55,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
         className={cn(
           'group flex flex-col rounded-xl border border-border bg-surface transition-all duration-300 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5 cursor-pointer',
           className
-        )}
-      >
+        )}>
         <div className="block overflow-hidden rounded-t-xl">
           <div className="aspect-square bg-surface-hover">
             {product.image ? (
@@ -86,13 +94,18 @@ export function ProductCard({ product, className }: ProductCardProps) {
             </div>
 
             <Button size="sm" onClick={handleAddToCart} className="shrink-0">
-              <ShoppingCart size={16} />
+              {isJuice ? 'Escolher' : <ShoppingCart size={16} />}
             </Button>
           </div>
         </div>
       </div>
 
-      {showModal && <ProductModal product={product} onClose={() => setShowModal(false)} />}
+      {!isJuice && showModal && (
+        <ProductModal product={product} onClose={() => setShowModal(false)} />
+      )}
+      {isJuice && showJuiceModal && (
+        <JuiceSelectionModal product={product} onClose={() => setShowJuiceModal(false)} />
+      )}
       <OperatingHoursModal isOpen={showHoursModal} onClose={() => setShowHoursModal(false)} message={status.message} />
     </>
   )
