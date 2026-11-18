@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { ChefHat, XCircle, ArrowLeft, MessageSquare, CheckCircle, Search, User as UserIcon, Clock, Banknote, Bell, ChevronDown, ChevronUp } from 'lucide-react'
+import { ChefHat, XCircle, ArrowLeft, MessageSquare, CheckCircle, Search, User as UserIcon, Clock, Banknote, Bell, ChevronDown, ChevronUp, AlertTriangle, Bike, Monitor } from 'lucide-react'
 import { Button } from '@/components/ui'
-import { ordersService } from '@/services'
+import { ordersService, motoboysService } from '@/services'
 import { onSnapshot, collection, query, orderBy } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import type { Order } from '@/types'
+import { useSettings } from '@/hooks'
+import type { Motoboy, Order } from '@/types'
 import { formatCurrency, formatTime } from '@/utils'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -28,8 +29,18 @@ export default function OrdersAdmin() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [whatsappModal, setWhatsappModal] = useState<{ phone: string; name: string; message: string } | null>(null)
+  const [motoboyModalOrder, setMotoboyModalOrder] = useState<Order | null>(null)
+  const [motoboyList, setMotoboyList] = useState<Motoboy[]>([])
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [cancelConfirm, setCancelConfirm] = useState<string | null>(null)
+  const [hasMotoboys, setHasMotoboys] = useState(true)
+  const { settings } = useSettings()
+
+  useEffect(() => {
+    motoboysService.getAll()
+      .then((list) => setHasMotoboys(list.filter((m) => m.active).length > 0))
+      .catch(() => setHasMotoboys(false))
+  }, [])
 
   useEffect(() => {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
@@ -51,21 +62,68 @@ export default function OrdersAdmin() {
     if (nextStatus === 'received') updateData.paymentStatus = 'paid'
     await ordersService.update(orderId, updateData as Partial<Order>)
     if (nextStatus === 'accepted') {
-      setWhatsappModal({ phone: order.customerPhone, name: order.customerName, message: `Olá ${order.customerName}! Seu pedido foi ACEITO e já está em preparação. Obrigado por escolher! 🍔` })
+      setWhatsappModal({ phone: order.customerPhone, name: order.customerName, message: `Olá ${order.customerName}! Seu pedido foi ACEITO e já está em preparação. Obrigado por escolher!` })
     } else if (nextStatus === 'outForDelivery') {
       const isPickup = order.deliveryType === 'pickup'
       setWhatsappModal({
         phone: order.customerPhone,
         name: order.customerName,
         message: isPickup
-          ? `Olá ${order.customerName}! Seu pedido está PRONTO para retirada! Pode buscar no estabelecimento. 🍔`
-          : `Olá ${order.customerName}! Seu pedido SAIU PARA ENTREGA. Fique atento ao seu celular! 🛵🍔`
+          ? `Olá ${order.customerName}! Seu pedido está PRONTO para retirada! Pode buscar no estabelecimento.`
+          : `Olá ${order.customerName}! Seu pedido SAIU PARA ENTREGA. Fique atento ao seu celular!`
       })
     }
   }
 
   const confirmPayment = async (orderId: string) => {
     await ordersService.update(orderId, { status: 'received', paymentStatus: 'paid' } as Partial<Order>)
+  }
+
+  const openMotoboyModal = async (order: Order) => {
+    setMotoboyModalOrder(order)
+    try {
+      const list = await motoboysService.getAll()
+      setMotoboyList(list.filter((m) => m.active).sort((a, b) => (a.name || '').localeCompare(b.name || '')))
+    } catch {
+      setMotoboyList([])
+    }
+  }
+
+  const buildMotoboyMessage = (order: Order) => {
+    const addr = order.deliveryAddress
+    let payment = getPaymentLabel(order.paymentMethod)
+    if (order.paymentMethod === 'cash') {
+      if (order.changeNeeded && order.changeFor) payment += ` — levar troco para ${formatCurrency(order.changeFor)}`
+      else payment += ' — valor exato'
+    }
+    const lines = [
+      '*Nova entrega — MeuCardapio*',
+      '',
+      `Pedido #${order.id.slice(0, 8)}`,
+      `Cliente: ${order.customerName} — ${order.customerPhone}`,
+      '',
+      'Itens:',
+      ...order.items.map((item) => `• ${item.quantity}x ${item.productName}`),
+      '',
+      `Total: ${formatCurrency(order.total)} (${payment})`,
+      '',
+      'Endereço:',
+      `${addr?.street || ''}, ${addr?.number || ''}${addr?.complement ? ` - ${addr.complement}` : ''}`,
+      `${addr?.neighborhood || ''}${addr?.city ? ` - ${addr.city}` : ''}${addr?.reference ? ` (Ref.: ${addr.reference})` : ''}`,
+      '',
+      `Rota: https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${addr?.street || ''}, ${addr?.number || ''} - ${addr?.neighborhood || ''}${addr?.city ? `, ${addr.city}` : ''}`)}`,
+    ]
+    return lines.join('\n')
+  }
+
+  const assignMotoboy = async (motoboy: Motoboy) => {
+    if (!motoboyModalOrder) return
+    const order = motoboyModalOrder
+    await ordersService.update(order.id, { motoboyId: motoboy.id, motoboyName: motoboy.name } as Partial<Order>)
+    setMotoboyModalOrder(null)
+    const digits = motoboy.phone.replace(/\D/g, '')
+    const fullPhone = digits.length <= 11 ? `55${digits}` : digits
+    setWhatsappModal({ phone: fullPhone, name: motoboy.name, message: buildMotoboyMessage(order) })
   }
 
   const backStatus = async (orderId: string) => {
@@ -117,9 +175,15 @@ export default function OrdersAdmin() {
 
   return (
     <div className="pb-20">
-      <div className="mb-5">
-        <h1 className="text-xl md:text-2xl font-bold text-brand-white">Pedidos</h1>
-        <p className="text-xs md:text-sm text-muted mt-0.5">{orders.length} pedidos no total</p>
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold text-brand-white">Pedidos</h1>
+          <p className="text-xs md:text-sm text-muted mt-0.5">{orders.length} pedidos no total</p>
+        </div>
+        <a href="/cozinha" target="_blank" rel="noopener noreferrer" className="flex shrink-0 items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-brand-white transition-colors hover:bg-surface-hover">
+          <Monitor size={16} className="text-accent" />
+          <span className="hidden sm:inline">Tela Cozinha</span>
+        </a>
       </div>
 
       <div className="mb-4">
@@ -144,7 +208,7 @@ export default function OrdersAdmin() {
               </button>
               {!collapsed.has('ativos') && (
                 <div className="space-y-3">
-                  {activeOrders.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, backStatus, cancelOrder: (id: string) => setCancelConfirm(id), setWhatsappModal, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
+                  {activeOrders.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, backStatus, cancelOrder: (id: string) => setCancelConfirm(id), setWhatsappModal, onSendMotoboy: openMotoboyModal, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
                 </div>
               )}
             </div>
@@ -159,7 +223,7 @@ export default function OrdersAdmin() {
               </button>
               {!collapsed.has('entregues') && (
                 <div className="space-y-3">
-                  {doneOnes.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, backStatus, cancelOrder: () => {}, setWhatsappModal, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
+                  {doneOnes.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, backStatus, cancelOrder: () => {}, setWhatsappModal, onSendMotoboy: openMotoboyModal, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
                 </div>
               )}
             </div>
@@ -174,7 +238,7 @@ export default function OrdersAdmin() {
               </button>
               {!collapsed.has('cancelados') && (
                 <div className="space-y-3">
-                  {cancelledOnes.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, backStatus, cancelOrder: () => {}, setWhatsappModal, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
+                  {cancelledOnes.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, backStatus, cancelOrder: () => {}, setWhatsappModal, onSendMotoboy: openMotoboyModal, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
                 </div>
               )}
             </div>
@@ -207,6 +271,44 @@ export default function OrdersAdmin() {
         </div>
       )}
 
+      {motoboyModalOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setMotoboyModalOrder(null)}>
+          <div className="w-full max-w-md rounded-xl border border-border bg-surface p-5 md:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-base md:text-lg font-semibold text-brand-white">
+                <Bike size={18} className="text-accent" />
+                Enviar ao motoboy
+              </h3>
+              <button onClick={() => setMotoboyModalOrder(null)} className="text-muted hover:text-brand-white transition-colors">
+                <XCircle size={18} />
+              </button>
+            </div>
+            <p className="mb-4 text-sm text-muted">Quem vai fazer a entrega para <span className="text-brand-white font-medium">{motoboyModalOrder.customerName}</span>?</p>
+            {motoboyList.length === 0 ? (
+              <div className="rounded-lg bg-surface-hover p-4 text-center">
+                <p className="text-sm text-muted mb-1">Nenhum motoboy ativo encontrado.</p>
+                <p className="text-xs text-muted">Cadastre em Configurações &rsaquo; Motoboys</p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-72 overflow-y-auto scrollbar-thin">
+                {motoboyList.map((m) => (
+                  <button key={m.id} onClick={() => assignMotoboy(m)} className="flex w-full items-center gap-3 rounded-lg border border-border bg-surface-hover px-3 py-2.5 text-left transition-colors hover:border-accent/50">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                      <Bike size={16} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-brand-white">{m.name}</p>
+                      <p className="text-xs text-muted">{m.phone}</p>
+                    </div>
+                    <MessageSquare size={14} className="shrink-0 text-green-500" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {cancelConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setCancelConfirm(null)}>
           <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-5 md:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
@@ -233,13 +335,15 @@ export default function OrdersAdmin() {
   )
 }
 
-function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrder, setWhatsappModal, statusConfig, getPaymentLabel, formatCurrency, formatTime }: {
+function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrder, setWhatsappModal, onSendMotoboy, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }: {
   order: Order
   advanceStatus: (id: string) => void
   confirmPayment: (id: string) => void
   backStatus: (id: string) => void
   cancelOrder: (id: string) => void
   setWhatsappModal: (data: { phone: string; name: string; message: string }) => void
+  onSendMotoboy: (order: Order) => void
+  hasMotoboys: boolean
   statusConfig: Record<string, { label: string; color: string }>
   getPaymentLabel: (method: string) => string
   formatCurrency: (n: number) => string
@@ -267,12 +371,23 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
           </div>
           <div className="mt-2 space-y-0.5">
             {order.items.map((item, idx) => (
-              <p key={idx} className="text-xs text-muted">{item.quantity}x {item.productName}</p>
+              <div key={idx} className="space-y-0.5">
+                <p className="text-xs text-muted">{item.quantity}x {item.productName}</p>
+                {item.flavors?.length && (
+                  <p className="text-[10px] text-accent font-medium">Sabores: {item.flavors.join(', ')}</p>
+                )}
+                {item.notes && (
+                  <p className="text-[10px] text-muted">{item.notes}</p>
+                )}
+              </div>
             ))}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
             <span className="flex items-center gap-1"><Clock size={11} />{formatTime(new Date(order.createdAt))}</span>
             <span className="flex items-center gap-1"><Banknote size={11} />{getPaymentLabel(order.paymentMethod)}</span>
+            {order.motoboyName && (
+              <span className="flex items-center gap-1 text-accent font-medium"><Bike size={11} />{order.motoboyName}</span>
+            )}
             {order.paymentMethod === 'cash' && order.changeNeeded && order.changeFor && (
               <span className="text-green-400">Troco: {formatCurrency(order.changeFor - order.total)}</span>
             )}
@@ -281,7 +396,7 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
         </div>
       </div>
 
-      <div className="mt-3 flex items-center gap-2 border-t border-border pt-3">
+      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
         {order.status === 'waitingPayment' && (
           <Button size="sm" onClick={() => confirmPayment(order.id)} className="bg-green-600 hover:bg-green-700 text-xs">
             <CheckCircle size={13} />
@@ -299,6 +414,12 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
               <ChefHat size={13} />
               Avançar
             </Button>
+            {order.status === 'outForDelivery' && !isPickup && hasMotoboys && (
+              <Button size="sm" variant="outline" onClick={() => onSendMotoboy(order)} className="text-xs">
+                <Bike size={13} />
+                Motoboy
+              </Button>
+            )}
           </>
         )}
         {order.status !== 'delivered' && order.status !== 'cancelled' && (

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSettings } from './useSettings'
-import { getThemeById, DEFAULT_THEME_ID } from '@/config/themes'
+import { getThemeById, DEFAULT_THEME_ID, CUSTOM_THEME_ID, type ThemeColors } from '@/config/themes'
 
 export function useApplyTheme() {
   const { settings, loading } = useSettings()
@@ -9,10 +9,14 @@ export function useApplyTheme() {
     if (loading) return
 
     const themeId = settings?.theme?.themeId || DEFAULT_THEME_ID
-    const theme = getThemeById(themeId)
-    if (!theme) return
 
-    applyThemeVars(theme)
+    if (themeId === CUSTOM_THEME_ID && settings?.theme?.customColors) {
+      applyThemeVars(settings.theme.customColors)
+    } else {
+      const theme = getThemeById(themeId)
+      if (!theme) return
+      applyThemeVars(theme.colors)
+    }
 
     try {
       localStorage.setItem('meucardapio-theme', themeId)
@@ -20,16 +24,16 @@ export function useApplyTheme() {
   }, [settings, loading])
 }
 
-export function applyThemeVars(theme: ReturnType<typeof getThemeById> & object) {
+export function applyThemeVars(colors: ThemeColors) {
   const root = document.documentElement
   const s = root.style
 
-  s.setProperty('--color-brand-black', theme.colors.brandBlack)
-  s.setProperty('--color-brand-white', theme.colors.text)
-  s.setProperty('--color-surface', theme.colors.surface)
-  s.setProperty('--color-surface-hover', theme.colors.surfaceHover)
-  s.setProperty('--color-border', theme.colors.border)
-  s.setProperty('--color-muted', theme.colors.textMuted)
-  s.setProperty('--color-accent', theme.colors.accent)
-  s.setProperty('--color-button', theme.colors.button)
+  s.setProperty('--color-brand-black', colors.brandBlack)
+  s.setProperty('--color-brand-white', colors.text)
+  s.setProperty('--color-surface', colors.surface)
+  s.setProperty('--color-surface-hover', colors.surfaceHover)
+  s.setProperty('--color-border', colors.border)
+  s.setProperty('--color-muted', colors.textMuted)
+  s.setProperty('--color-accent', colors.accent)
+  s.setProperty('--color-button', colors.button)
 }

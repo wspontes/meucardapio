@@ -237,6 +237,8 @@ function OrderItem({ order, prefix }: { order: Order; prefix?: string }) {
         productName: item.productName,
         price: item.price,
         quantity: item.quantity,
+        flavors: item.flavors,
+        notes: item.notes,
       })
     })
     navigate(`${prefix || ''}/carrinho`)
@@ -253,7 +255,15 @@ function OrderItem({ order, prefix }: { order: Order; prefix?: string }) {
       </div>
       <div className="space-y-0.5 mb-2">
         {order.items.map((item, i) => (
-          <p key={i} className="text-sm text-muted">{item.quantity}x {item.productName}</p>
+          <div key={i} className="space-y-0.5">
+            <p className="text-sm text-muted">{item.quantity}x {item.productName}</p>
+            {item.flavors?.length && (
+              <p className="text-[10px] text-accent font-medium">Sabores: {item.flavors.join(', ')}</p>
+            )}
+            {item.notes && (
+              <p className="text-[10px] text-muted">{item.notes}</p>
+            )}
+          </div>
         ))}
       </div>
       <div className="flex items-center gap-3 border-t border-border pt-2 text-xs text-muted">

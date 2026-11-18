@@ -133,8 +133,18 @@ export interface Order {
   deliveryType?: 'delivery' | 'pickup'
   preparationTime?: number
   deliveryTime?: number
+  motoboyId?: string
+  motoboyName?: string
   createdAt: string
   updatedAt: string
+}
+
+export interface Motoboy {
+  id: string
+  name: string
+  phone: string
+  active: boolean
+  createdAt?: string
 }
 
 export interface OrderItem {

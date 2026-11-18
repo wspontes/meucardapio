@@ -1,6 +1,7 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { getCurrentStoreId } from './store-context'
+import type { ThemeColors } from '@/config/themes'
 
 export interface BusinessSettings {
   businessHours: {
@@ -46,6 +47,7 @@ export interface BusinessSettings {
   theme?: {
     logo?: string
     themeId?: string
+    customColors?: ThemeColors
   }
   notificationSettings?: {
     enabled: boolean

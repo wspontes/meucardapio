@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2 } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
-import { ImageUpload, ProductCard } from '@/components/shared'
+import { ImageUpload, ProductCard, ThemeColorPicker } from '@/components/shared'
 import { settingsService, productsService } from '@/services'
 import { type BusinessSettings } from '@/services/settings'
 import type { Product } from '@/types'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
-import { THEMES, DEFAULT_THEME_ID } from '@/config/themes'
+import { THEMES, DEFAULT_THEME_ID, CUSTOM_THEME_ID, getThemeById, type ThemeColors } from '@/config/themes'
 
 export default function Settings() {
   const [saving, setSaving] = useState(false)
@@ -49,6 +49,17 @@ export default function Settings() {
   const [businessHoursEnabled, setBusinessHoursEnabled] = useState(true)
   const [themeLogo, setThemeLogo] = useState('')
   const [selectedThemeId, setSelectedThemeId] = useState(DEFAULT_THEME_ID)
+  const [customColors, setCustomColors] = useState<ThemeColors>({
+    brandBlack: '#0a0a0a',
+    surface: '#1a1a1a',
+    surfaceHover: '#262626',
+    border: 'transparent',
+    muted: '#a3a3a3',
+    accent: '#dc2626',
+    button: '#dc2626',
+    text: '#fafafa',
+    textMuted: '#a3a3a3',
+  })
   const [notifEnabled, setNotifEnabled] = useState(true)
   const [notifSound, setNotifSound] = useState<'bell' | 'chime' | 'buzzer' | 'beep'>('bell')
   const [notifVolume, setNotifVolume] = useState(0.5)
@@ -84,6 +95,7 @@ export default function Settings() {
         if (data.theme) {
           if (data.theme.logo) setThemeLogo(data.theme.logo)
           if (data.theme.themeId) setSelectedThemeId(data.theme.themeId)
+          if (data.theme.customColors) setCustomColors(data.theme.customColors)
         }
         if (data.notificationSettings) {
           const ns = data.notificationSettings
@@ -122,6 +134,7 @@ export default function Settings() {
         theme: {
           logo: themeLogo || undefined,
           themeId: selectedThemeId,
+          ...(selectedThemeId === CUSTOM_THEME_ID ? { customColors } : {}),
         },
         notificationSettings: {
           enabled: notifEnabled,
@@ -574,6 +587,44 @@ export default function Settings() {
                     <p className="text-xs text-muted">{theme.description}</p>
                   </button>
                 ))}
+                <button
+                  type="button"
+                  onClick={() => setSelectedThemeId(CUSTOM_THEME_ID)}
+                  className={`relative rounded-xl border-2 p-4 text-left transition-all ${
+                    selectedThemeId === CUSTOM_THEME_ID
+                      ? 'border-accent ring-1 ring-accent/30 bg-accent/5'
+                      : 'border-border hover:border-muted'
+                  }`}
+                >
+                  {selectedThemeId === CUSTOM_THEME_ID && (
+                    <div className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-white">
+                      <Check size={12} />
+                    </div>
+                  )}
+                  <div className="mb-3 flex gap-1.5">
+                    <div className="h-6 w-6 rounded-full border border-white/10" style={{ backgroundColor: customColors.brandBlack }} />
+                    <div className="h-6 w-6 rounded-full border border-white/10" style={{ backgroundColor: customColors.surface }} />
+                    <div className="h-6 w-6 rounded-full border border-white/10" style={{ backgroundColor: customColors.accent }} />
+                    <div className="h-6 w-6 rounded-full border border-white/10" style={{ backgroundColor: customColors.button }} />
+                  </div>
+                  <p className="text-sm font-medium text-brand-white">Personalizado</p>
+                  <p className="text-xs text-muted">Escolha suas próprias cores</p>
+                </button>
+              </div>
+
+              {/* Preview e seletores de cor */}
+              <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
+                {selectedThemeId === CUSTOM_THEME_ID ? (
+                  <ThemeColorPicker
+                    colors={customColors}
+                    onChange={setCustomColors}
+                    editable
+                  />
+                ) : (
+                  <ThemeColorPicker
+                    colors={getThemeById(selectedThemeId)?.colors ?? customColors}
+                  />
+                )}
               </div>
             </div>
           </div>
