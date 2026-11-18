@@ -1,12 +1,14 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useSettings } from '@/hooks'
 import { useProducts } from '@/hooks'
+import { ProductModal } from './ProductModal'
 import type { Product } from '@/types'
 
 export function HomeBoard() {
   const { settings } = useSettings()
   const { products: allProducts, loading } = useProducts()
   const board = settings?.homeBoard
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   const resolved = useMemo<Product[]>(() => {
     if (!board?.productIds?.length) return []
@@ -29,6 +31,7 @@ export function HomeBoard() {
   const title = board?.title?.trim() || 'Hoje no Pit Stop'
 
   return (
+    <>
     <div className="mx-auto w-full max-w-[760px] px-4 py-5">
       <div
         className="relative"
@@ -75,7 +78,12 @@ export function HomeBoard() {
                   padding: '4px 0',
                 }}
               >
-                <span className="min-w-0 truncate">{p.name}</span>
+                <span
+                  className="min-w-0 flex-1 cursor-pointer break-words hover:underline"
+                  onClick={() => setSelectedProduct(p)}
+                >
+                  {p.name}
+                </span>
                 <span className="shrink-0 whitespace-nowrap" style={{ color: 'var(--board-price)' }}>
                   {formatBoardPrice(price)}
                 </span>
@@ -85,6 +93,10 @@ export function HomeBoard() {
         </ul>
       </div>
     </div>
+    {selectedProduct && (
+      <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+    )}
+    </>
   )
 }
 
