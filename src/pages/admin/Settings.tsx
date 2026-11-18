@@ -2,14 +2,19 @@ import { useState, useEffect } from 'react'
 import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2, Smartphone, History, RotateCcw } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { ImageUpload, ProductCard, ThemeColorPicker } from '@/components/shared'
-import { settingsService, productsService } from '@/services'
+import { settingsService, productsService, setCurrentStoreId } from '@/services'
 import { type BusinessSettings, type SettingsBackup } from '@/services/settings'
+import { useToast } from '@/contexts/ToastContext'
+import { useStore } from '@/contexts/StoreContext'
 import type { Product } from '@/types'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
 import { THEMES, DEFAULT_THEME_ID, CUSTOM_THEME_ID, getThemeById, type ThemeColors } from '@/config/themes'
 
 export default function Settings() {
+  const { showToast } = useToast()
+  const { store } = useStore()
   const [saving, setSaving] = useState(false)
+  const [settingsLoaded, setSettingsLoaded] = useState(false)
   const [hours, setHours] = useState([
     { day: 'Domingo', open: '18:00', close: '22:00', closed: false },
     { day: 'Segunda-feira', open: '18:00', close: '23:00', closed: false },
@@ -68,6 +73,11 @@ export default function Settings() {
   const [backupsLoading, setBackupsLoading] = useState(false)
   const [restoringId, setRestoringId] = useState<string | null>(null)
 
+  // Quadro da Home
+  const [homeBoardTitle, setHomeBoardTitle] = useState('Hoje no Pit Stop')
+  const [homeBoardIds, setHomeBoardIds] = useState<string[]>([])
+  const [homeBoardSearch, setHomeBoardSearch] = useState('')
+
   const loadBackups = async () => {
     setBackupsLoading(true)
     try {
@@ -99,7 +109,13 @@ export default function Settings() {
       : getThemeById(backup.data.theme?.themeId || DEFAULT_THEME_ID)?.name ?? 'Padrão'
 
   useEffect(() => {
+    if (!store?.id) return
+    setCurrentStoreId(store.id)
+    let cancelled = false
+
+    setSettingsLoaded(false)
     settingsService.get().then((data) => {
+      if (cancelled) return
       if (data) {
         if (data.neighborhoods?.length) setNeighborhoods(data.neighborhoods)
         if (data.businessHours?.length) {
@@ -138,13 +154,37 @@ export default function Settings() {
           setNotifVolume(ns.volume)
         }
         if (data.productViewMode) setViewMode(data.productViewMode)
+        if (data.homeBoard) {
+          if (data.homeBoard.title) setHomeBoardTitle(data.homeBoard.title)
+          if (Array.isArray(data.homeBoard.productIds)) setHomeBoardIds(data.homeBoard.productIds)
+        }
       }
+      if (!cancelled) setSettingsLoaded(true)
+    }).catch(() => {
+      if (!cancelled) {
+        showToast('Não foi possível carregar as configurações.')
+        setSettingsLoaded(false)
+      }
+    })
+    productsService.getActiveProducts().then((p) => {
+      if (!cancelled) setProducts(p)
     }).catch(() => {})
-    productsService.getActiveProducts().then(setProducts).catch(() => {})
     loadBackups()
-  }, [])
+    return () => { cancelled = true }
+  }, [store?.id])
 
   const handleSave = async () => {
+    if (!store?.id || !settingsLoaded) {
+      showToast('Aguarde o carregamento das configurações antes de salvar.')
+      return
+    }
+    setCurrentStoreId(store.id)
+    const hbValidation = settingsService.validateHomeBoard(homeBoardIds)
+    if (!hbValidation.ok) {
+      showToast(hbValidation.error || 'Configuração do quadro inválida')
+      return
+    }
+
     setSaving(true)
     try {
       const data: BusinessSettings = {
@@ -173,6 +213,10 @@ export default function Settings() {
           ...(selectedThemeId === CUSTOM_THEME_ID ? { customColors } : {}),
         },
         productViewMode: viewMode,
+        homeBoard: {
+          title: homeBoardTitle.trim() || 'Hoje no Pit Stop',
+          productIds: homeBoardIds,
+        },
         notificationSettings: {
           enabled: notifEnabled,
           sound: notifSound,
@@ -181,10 +225,12 @@ export default function Settings() {
       }
       await settingsService.save(JSON.parse(JSON.stringify(data)))
       await loadBackups()
+      showToast('Configurações salvas com sucesso!')
     } catch (err) {
-      alert('Erro ao salvar: ' + (err instanceof Error ? err.message : 'Erro desconhecido'))
+      showToast('Erro ao salvar: ' + (err instanceof Error ? err.message : 'Erro desconhecido'))
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   const toggleDay = (index: number) => {
@@ -765,6 +811,120 @@ export default function Settings() {
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
+            <Sparkles size={18} className="text-accent" />
+            Quadro da Home
+          </h2>
+          <p className="mb-4 text-xs text-muted">
+            Escolha até 4 produtos para exibir no quadro "Hoje no Pit Stop" da home do cliente. A ordem aqui é a ordem de exibição.
+          </p>
+
+          <div className="mb-4">
+            <Input
+              label="Título do quadro"
+              value={homeBoardTitle}
+              onChange={(e) => setHomeBoardTitle(e.target.value)}
+              placeholder="Hoje no Pit Stop"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="mb-1.5 block text-sm font-medium text-brand-white">Adicionar produto</label>
+            <Input
+              placeholder="Buscar produto ativo..."
+              value={homeBoardSearch}
+              onChange={(e) => setHomeBoardSearch(e.target.value)}
+              disabled={homeBoardIds.length >= 4}
+            />
+            {homeBoardIds.length >= 4 && (
+              <p className="mt-1 text-xs text-amber-400">Máximo de 4 produtos.</p>
+            )}
+            {homeBoardIds.length < 4 && (
+              <div className="mt-2 max-h-44 overflow-y-auto rounded-lg border border-border bg-surface-hover">
+                {products
+                  .filter((p) => p.active && !homeBoardIds.includes(p.id))
+                  .filter((p) => p.name.toLowerCase().includes(homeBoardSearch.toLowerCase()))
+                  .slice(0, 20)
+                  .map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => { setHomeBoardIds((prev) => [...prev, p.id]); setHomeBoardSearch('') }}
+                      className="flex w-full items-center justify-between gap-3 border-b border-border/50 px-3 py-2 text-left text-sm transition-colors last:border-0 hover:bg-surface"
+                    >
+                      <span className="truncate text-brand-white">{p.name}</span>
+                      <span className="shrink-0 text-xs text-muted">
+                        R$ {(p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price).toFixed(2).replace('.', ',')}
+                      </span>
+                    </button>
+                  ))}
+                {products.filter((p) => p.active && !homeBoardIds.includes(p.id) && p.name.toLowerCase().includes(homeBoardSearch.toLowerCase())).length === 0 && (
+                  <p className="px-3 py-2 text-xs text-muted">Nenhum produto encontrado.</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-brand-white">Produtos selecionados ({homeBoardIds.length}/4)</label>
+            {homeBoardIds.length === 0 ? (
+              <p className="rounded-lg bg-surface-hover px-3 py-2 text-xs text-muted">Nenhum produto selecionado.</p>
+            ) : (
+              <div className="space-y-1">
+                {homeBoardIds.map((id, idx) => {
+                  const p = products.find((x) => x.id === id)
+                  return (
+                    <div key={id} className="flex items-center justify-between gap-2 rounded-lg bg-surface-hover px-3 py-2">
+                      <span className="truncate text-sm text-brand-white">
+                        {idx + 1}. {p?.name || id}
+                      </span>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (idx === 0) return
+                            const next = [...homeBoardIds]
+                            ;[next[idx - 1], next[idx]] = [next[idx], next[idx - 1]]
+                            setHomeBoardIds(next)
+                          }}
+                          disabled={idx === 0}
+                          className="rounded px-2 py-1 text-xs text-muted transition-colors hover:text-brand-white disabled:opacity-30"
+                          aria-label="Subir"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (idx === homeBoardIds.length - 1) return
+                            const next = [...homeBoardIds]
+                            ;[next[idx], next[idx + 1]] = [next[idx + 1], next[idx]]
+                            setHomeBoardIds(next)
+                          }}
+                          disabled={idx === homeBoardIds.length - 1}
+                          className="rounded px-2 py-1 text-xs text-muted transition-colors hover:text-brand-white disabled:opacity-30"
+                          aria-label="Descer"
+                        >
+                          ↓
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setHomeBoardIds((prev) => prev.filter((x) => x !== id))}
+                          className="rounded px-2 py-1 text-xs text-red-400 transition-colors hover:text-red-300"
+                          aria-label="Remover"
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
               <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-white">
@@ -821,7 +981,7 @@ export default function Settings() {
         </div>
 
         <div className="flex justify-end">
-          <Button onClick={handleSave} loading={saving}>Salvar Configurações</Button>
+          <Button onClick={handleSave} loading={saving} disabled={!settingsLoaded}>Salvar Configurações</Button>
         </div>
       </div>
     </div>
