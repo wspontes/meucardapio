@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, Copy, Search, Percent, DollarSign } from 'lucide-
 import { Button } from '@/components/ui'
 import { productsService, categoriesService } from '@/services'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
+import { useStoreGuard } from '@/components/shared/StoreGuard'
 import { useToast } from '@/contexts/ToastContext'
 import type { Product, Category } from '@/types'
 import { formatCurrency } from '@/utils'
@@ -26,13 +27,17 @@ export default function Products() {
   const [bulkApplying, setBulkApplying] = useState(false)
   const [showBulkConfirm, setShowBulkConfirm] = useState(false)
 
+  const { store } = useStoreGuard()
+
   const load = async () => {
     try {
       const [prods, cats] = await Promise.all([
         productsService.getActiveProducts(),
         categoriesService.getAllOrdered(),
       ])
-      setProducts(prods)
+      // Filter products by current store if available
+      const filteredProds = store ? prods.filter((p) => p.storeId === store.id) : prods
+      setProducts(filteredProds)
       setCategories(cats)
     } catch {
       setProducts([])
