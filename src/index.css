@@ -24,6 +24,11 @@
   --status-open: #3fbf6b;
   --status-closed: #e5483a;
   --status-text: #f4ede0;
+  /* Dashboard admin — cores dos gráficos (seguem o tema escuro) */
+  --color-chart-grid: #333333;
+  --color-chart-label: #a3a3a3;
+  --color-chart-bar: rgba(220, 38, 38, 0.35);
+  --color-chart-cursor: rgba(220, 38, 38, 0.12);
   --animate-fade-in: fade-in 0.3s ease-out;
 }
 
