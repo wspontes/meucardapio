@@ -28,11 +28,10 @@ export function StoreGuard({ children }: StoreGuardProps) {
     let cancelled = false
 
     async function load() {
-      const storeId = user?.storeId
-
-      if (storeId) {
+      // PRIMEIRO: Tentar carregar pela slug da URL (white label isolation)
+      if (slug) {
         try {
-          const s = await storesService.getById(storeId)
+          const s = await storesService.getBySlug(slug)
           if (cancelled) return
           if (s) {
             setStore(s)
@@ -41,14 +40,14 @@ export function StoreGuard({ children }: StoreGuardProps) {
             return
           }
         } catch {
-          // fall through to fallback
+          // ignore
         }
       }
 
-      // Fallback: try loading by slug from URL
-      if (slug) {
+      // SEGUIR CARREGAR pelo storeId da auth (apenas se não conseguiu pela slug)
+      if (!store && user?.storeId && !cancelled) {
         try {
-          const s = await storesService.getBySlug(slug)
+          const s = await storesService.getById(user.storeId)
           if (cancelled) return
           if (s) {
             setStore(s)
@@ -66,12 +65,12 @@ export function StoreGuard({ children }: StoreGuardProps) {
       }
     }
 
-    if (!authLoading) {
+    if (slug) {
       load()
     }
 
     return () => { cancelled = true; setCurrentStoreId(null) }
-  }, [user?.storeId, slug, authLoading])
+  }, [slug, user?.storeId, authLoading])
 
   if (authLoading || loading) {
     return (
@@ -94,7 +93,11 @@ export function StoreGuard({ children }: StoreGuardProps) {
     )
   }
 
+  // Se houver slug na URL e o store tiver slug diferente, redirect
+  // Isso evita que o slug da URL seja ignorado permanentemente
   if (slug && store.slug !== slug) {
+    // Apenas redirect se a slug da URL for diferente do store slug
+    // Isso permite que a primeira visita funcione, mas proteja contra uso indevido
     return <Navigate to={`/${store.slug}/admin`} replace />
   }
 
