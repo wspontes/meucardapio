@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { createBrowserRouter, Navigate, useRouteError } from 'react-router-dom'
-import { AuthLayout, AdminLayout, KitchenLayout, StoreLayout } from '@/layouts'
+import { AuthLayout, AdminLayout, KitchenLayout, StoreLayout, MasterLayout } from '@/layouts'
 import { ProtectedRoute } from '@/components/shared'
 import { StoreGuard } from '@/components/shared/StoreGuard'
 
@@ -22,6 +22,10 @@ const AdminSettings = lazy(() => import('@/pages/admin/Settings'))
 const AdminCoupons = lazy(() => import('@/pages/admin/CouponsAdmin'))
 const AdminMotoboys = lazy(() => import('@/pages/admin/MotoboysAdmin'))
 const KitchenDashboard = lazy(() => import('@/pages/kitchen/Dashboard'))
+const MasterDashboard = lazy(() => import('@/pages/master/Dashboard'))
+const MasterStoreDetail = lazy(() => import('@/pages/master/StoreDetail'))
+const MasterStoreEdit = lazy(() => import('@/pages/master/StoreEdit'))
+const MasterStoreUsers = lazy(() => import('@/pages/master/StoreUsers'))
 const Seed = lazy(() => import('@/pages/dev/Seed'))
 
 function PageLoader() {
@@ -141,6 +145,17 @@ export const router = createBrowserRouter([
     errorElement: <ChunkError />,
     children: [
       { index: true, element: <Suspense fallback={<PageLoader />}><KitchenDashboard /></Suspense> },
+    ],
+  },
+  {
+    path: '/master',
+    element: <ProtectedRoute roles={['master']}><MasterLayout /></ProtectedRoute>,
+    errorElement: <ChunkError />,
+    children: [
+      { index: true, element: <Suspense fallback={<PageLoader />}><MasterDashboard /></Suspense> },
+      { path: 'lojas/:id', element: <Suspense fallback={<PageLoader />}><MasterStoreDetail /></Suspense> },
+      { path: 'lojas/:id/editar', element: <Suspense fallback={<PageLoader />}><MasterStoreEdit /></Suspense> },
+      { path: 'lojas/:id/usuarios', element: <Suspense fallback={<PageLoader />}><MasterStoreUsers /></Suspense> },
     ],
   },
   {

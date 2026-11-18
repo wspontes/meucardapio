@@ -13,6 +13,35 @@ export function MasterLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const [collapsed, setCollapsed] = useState(false)
+  const [pwdOpen, setPwdOpen] = useState(false)
+  const [newPwd, setNewPwd] = useState('')
+  const [confirmPwd, setConfirmPwd] = useState('')
+  const [pwdLoading, setPwdLoading] = useState(false)
+  const [pwdMsg, setPwdMsg] = useState<string | null>(null)
+
+  const handleChangePassword = async () => {
+    setPwdMsg(null)
+    if (newPwd.length < 6) { setPwdMsg('A senha deve ter pelo menos 6 caracteres.'); return }
+    if (newPwd !== confirmPwd) { setPwdMsg('As senhas não conferem.'); return }
+    if (!user?.id) { setPwdMsg('Usuário não identificado.'); return }
+    setPwdLoading(true)
+    try {
+      const res = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: user.id, password: newPwd }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data?.error || 'Erro ao alterar senha')
+      setPwdMsg('Senha alterada com sucesso!')
+      setNewPwd('')
+      setConfirmPwd('')
+    } catch (err) {
+      setPwdMsg(err instanceof Error ? err.message : 'Erro ao alterar senha')
+    } finally {
+      setPwdLoading(false)
+    }
+  }
 
   const handleLogout = async () => {
     await logout()
@@ -70,6 +99,14 @@ export function MasterLayout() {
             </div>
           )}
           <button
+            onClick={() => { setPwdOpen(true); setPwdMsg(null) }}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted hover:bg-surface-hover hover:text-brand-white transition-colors"
+            title="Alterar senha"
+          >
+            <Shield size={18} className="shrink-0" />
+            {!collapsed && <span>Alterar senha</span>}
+          </button>
+          <button
             onClick={handleLogout}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted hover:bg-surface-hover hover:text-brand-white transition-colors"
             title="Sair"
@@ -85,6 +122,41 @@ export function MasterLayout() {
           <Outlet />
         </div>
       </main>
+
+      {pwdOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setPwdOpen(false)}>
+          <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="mb-4 text-base font-semibold text-brand-white">Alterar senha</h3>
+            <div className="space-y-3">
+              <input
+                type="password"
+                value={newPwd}
+                onChange={(e) => setNewPwd(e.target.value)}
+                placeholder="Nova senha (mín. 6 caracteres)"
+                className="w-full rounded-lg border border-border bg-surface-hover px-3 py-2.5 text-sm text-brand-white"
+              />
+              <input
+                type="password"
+                value={confirmPwd}
+                onChange={(e) => setConfirmPwd(e.target.value)}
+                placeholder="Confirmar nova senha"
+                className="w-full rounded-lg border border-border bg-surface-hover px-3 py-2.5 text-sm text-brand-white"
+              />
+            </div>
+            {pwdMsg && (
+              <p className={`mt-3 text-xs ${pwdMsg.includes('sucesso') ? 'text-green-400' : 'text-red-400'}`}>{pwdMsg}</p>
+            )}
+            <div className="mt-4 flex gap-2">
+              <button onClick={() => setPwdOpen(false)} className="flex-1 rounded-lg border border-border px-3 py-2 text-sm text-muted hover:text-brand-white">
+                Cancelar
+              </button>
+              <button onClick={handleChangePassword} disabled={pwdLoading} className="flex-1 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white disabled:opacity-50">
+                {pwdLoading ? 'Salvando...' : 'Salvar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

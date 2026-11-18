@@ -15,9 +15,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { uid } = req.body
+  const { uid, password } = req.body || {}
   if (!uid) {
     return res.status(400).json({ error: 'uid is required' })
+  }
+
+  let newPassword = password
+  if (newPassword) {
+    if (typeof newPassword !== 'string' || newPassword.length < 6) {
+      return res.status(400).json({ error: 'A senha deve ter pelo menos 6 caracteres' })
+    }
+  } else {
+    newPassword = generatePassword()
   }
 
   try {
@@ -36,7 +45,6 @@ export default async function handler(req, res) {
       })
     }
 
-    const newPassword = generatePassword()
     await getAuth().updateUser(uid, { password: newPassword })
     return res.status(200).json({ password: newPassword })
   } catch (err) {
