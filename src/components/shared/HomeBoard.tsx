@@ -54,10 +54,10 @@ export function HomeBoard() {
             padding: '4px 10px',
             borderRadius: 3,
             transform: 'rotate(-2deg)',
-            textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
           }}
         >
-          {title}
+          {title.toUpperCase()}
         </span>
         <ul className="list-none">
           {resolved.map((p, i) => {
