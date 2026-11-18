@@ -14,9 +14,10 @@ import type { Product } from '@/types'
 interface ProductCardProps {
   product: Product
   className?: string
+  viewMode?: 'grid' | 'list'
 }
 
-export function ProductCard({ product, className }: ProductCardProps) {
+export function ProductCard({ product, className, viewMode = 'grid' }: ProductCardProps) {
   const [showModal, setShowModal] = useState(false)
   const [showJuiceModal, setShowJuiceModal] = useState(false)
   const [showHoursModal, setShowHoursModal] = useState(false)
@@ -48,6 +49,30 @@ export function ProductCard({ product, className }: ProductCardProps) {
     showToast('Adicionado no carrinho!')
   }
 
+  // Determine classes based on view mode
+  const gridClasses = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'
+  const listClasses = 'space-y-4'
+
+  const itemClasses = cn(
+    'group flex flex-col rounded-xl border border-border bg-surface transition-all duration-300 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5 cursor-pointer',
+    viewMode === 'list' ? 'flex-col' : 'grid-col'
+  )
+
+  const imageClasses = cn(
+    'group relative aspect-square bg-surface-hover',
+    viewMode === 'list' ? 'aspect-auto' : 'aspect-square'
+  )
+
+  const titleClasses = cn(
+    'text-base font-semibold text-brand-white transition-colors group-hover:text-accent',
+    viewMode === 'list' ? 'text-sm' : 'text-base'
+  )
+
+  const priceClasses = cn(
+    'mt-4 flex items-center justify-between',
+    viewMode === 'list' ? 'mt-3' : 'mt-4'
+  )
+
   return (
     <>
       <div
@@ -57,7 +82,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           className
         )}>
         <div className="block overflow-hidden rounded-t-xl">
-          <div className="aspect-square bg-surface-hover">
+          <div className={imageClasses}>
             {product.image ? (
               <img
                 src={resolveImageUrl(product.image)}
@@ -74,29 +99,27 @@ export function ProductCard({ product, className }: ProductCardProps) {
         </div>
 
         <div className="flex flex-1 flex-col p-4">
-          <h3 className="text-base font-semibold text-brand-white transition-colors group-hover:text-accent">
+          <h3 className={titleClasses}>
             {product.name}
           </h3>
-          <p className="mt-1 line-clamp-2 text-sm text-muted flex-1">
+          <p className={cn('mt-1 line-clamp-2 text-sm text-muted flex-1', viewMode === 'list' ? 'line-clamp-3' : 'line-clamp-2')}>
             {product.description}
           </p>
 
-          <div className="mt-4 flex items-center justify-between">
-            <div className="flex flex-col">
-              {(product.discountPrice ?? 0) > 0 && (
-                <span className="text-xs text-muted line-through">
-                  {formatCurrency(product.price)}
-                </span>
-              )}
-              <span className="text-lg font-bold text-accent">
-                {formatCurrency(price)}
+          <div className={priceClasses}>
+            {(product.discountPrice ?? 0) > 0 && (
+              <span className="text-xs text-muted line-through">
+                {formatCurrency(product.price)}
               </span>
-            </div>
-
-            <Button size="sm" onClick={handleAddToCart} className="shrink-0">
-              {isJuice ? 'Escolher' : <ShoppingCart size={16} />}
-            </Button>
+            )}
+            <span className="text-lg font-bold text-accent">
+              {formatCurrency(price)}
+            </span>
           </div>
+
+          <Button size="sm" onClick={handleAddToCart} className="shrink-0">
+            {isJuice ? 'Escolher' : <ShoppingCart size={16} />}
+          </Button>
         </div>
       </div>
 

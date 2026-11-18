@@ -24,9 +24,15 @@ export default function Home() {
   const [linkedProduct, setLinkedProduct] = useState<Product | null>(null)
   const [showProductModal, setShowProductModal] = useState(false)
   const [showHoursModal, setShowHoursModal] = useState(false)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   useEffect(() => {
     productsService.getActiveProducts().then(setAllProducts).catch(() => {})
+    // Restore saved view mode or default to 'grid'
+    const savedMode = localStorage.getItem('productViewMode') as 'grid' | 'list' | null
+    if (savedMode) {
+      setViewMode(savedMode)
+    }
   }, [])
 
   const banners = settings?.banners
@@ -183,15 +189,15 @@ export default function Home() {
         </div>
 
         {featuredLoading ? (
-          <div className="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className={viewMode === 'grid' ? 'grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4' : 'space-y-4'>
             {Array.from({ length: 4 }).map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))}
           </div>
         ) : featured.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className={viewMode === 'grid' ? 'grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4' : 'space-y-4'>
             {featured.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} viewMode={viewMode} />
             ))}
           </div>
         ) : (
@@ -201,7 +207,62 @@ export default function Home() {
         )}
       </section>
 
-      {newProducts.length > 0 && (
+      {/* View mode toggle */}
+      <div className="mb-6 flex items-center gap-2">
+        <label className="text-xs text-muted uppercase">Exibição</label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode('grid')}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              viewMode === 'grid' ? 'bg-accent text-white' : 'bg-surface-hover text-brand-white'
+          }`}
+          aria-label="Grade"
+          title="Exibir em grade"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <line x1="3" y9="15" x2="21" y9="15"/>
+            <line x1="9" y3="15" x2="9" y21/>
+          </svg>
+        </button>
+        <button
+          onClick={() => setViewMode('list')}
+          className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+            viewMode === 'list' ? 'bg-accent text-white' : 'bg-surface-hover text-brand-white'
+          }`}
+          aria-label="Lista"
+          title="Exibir em lista"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="8" y1="6" x2="21" y2="6"/>
+            <line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y6="6" x2="3" y6="21"/>
+            <line x1="15" y6="6" x2="15" y6="21"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    {newProducts.length > 0 && (
       <section className="mb-12">
         <div className="sticky top-16 z-30 -mx-4 bg-brand-black px-4 py-4 border-b border-border/50">
           <div className="flex items-center justify-between">
