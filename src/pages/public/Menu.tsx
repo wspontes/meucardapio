@@ -94,8 +94,8 @@ export default function Menu() {
   }
 
   const handleCategoryClick = (categoryId: string) => {
+    // Mantém a posição de rolagem atual ao trocar de categoria.
     setActiveCategory(categoryId)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const itemCount = state.items.reduce((acc, item) => acc + item.quantity, 0)
