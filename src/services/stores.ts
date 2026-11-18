@@ -36,7 +36,8 @@ export const storesService = {
   },
 
   async update(id: string, data: Partial<Store>): Promise<void> {
-    await setDoc(doc(db, COLLECTION, id), { ...data, updatedAt: new Date().toISOString() }, { merge: true })
+    const clean = JSON.parse(JSON.stringify({ ...data, updatedAt: new Date().toISOString() }))
+    await setDoc(doc(db, COLLECTION, id), clean, { merge: true })
   },
 
   async listAll(): Promise<Store[]> {

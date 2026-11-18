@@ -35,7 +35,7 @@ export default function StoreEdit() {
         name: form.name,
         slug: form.slug,
         whatsapp: form.whatsapp,
-        instagram: form.instagram || undefined,
+        instagram: form.instagram,
       })
       navigate('/master')
     } catch (err) {
