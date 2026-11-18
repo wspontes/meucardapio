@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import { Store, Building2, LogOut, ChevronLeft, ChevronRight, Users, ExternalLink, Shield, BarChart3 } from 'lucide-react'
+import { Building2, LogOut, ChevronLeft, ChevronRight, Shield, BarChart3, Menu, X } from 'lucide-react'
+import { cn } from '@/utils'
 
 const navItems = [
   { path: '/master', icon: BarChart3, label: 'Painel' },
@@ -13,6 +14,7 @@ export function MasterLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [pwdOpen, setPwdOpen] = useState(false)
   const [newPwd, setNewPwd] = useState('')
   const [confirmPwd, setConfirmPwd] = useState('')
@@ -53,75 +55,110 @@ export function MasterLayout() {
     return location.pathname.startsWith(path)
   }
 
+  const closeMobile = () => setMobileOpen(false)
+
   return (
     <div className="flex min-h-screen bg-brand-black">
-      <aside className={`flex flex-col border-r border-border bg-surface transition-all duration-200 ${
-        collapsed ? 'w-16' : 'w-56'
-      }`}>
-        <div className="flex items-center justify-between border-b border-border px-4 py-4">
-          {!collapsed && (
-            <Link to="/master" className="flex items-center gap-2 text-sm font-bold text-brand-white">
-              <Shield size={18} className="text-accent" />
-              Master
-            </Link>
-          )}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 bg-black/60 md:hidden" onClick={closeMobile} />
+      )}
+
+      <aside
+        className={cn(
+          'fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-border bg-surface transition-all duration-200',
+          'md:static md:z-auto md:h-auto md:w-56 md:translate-x-0',
+          collapsed ? 'md:w-16' : 'md:w-56',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-4">
+          <Link
+            to="/master"
+            onClick={closeMobile}
+            className="flex min-w-0 items-center gap-2 text-sm font-bold text-brand-white"
+          >
+            <Shield size={18} className="shrink-0 text-accent" />
+            <span className={cn(collapsed && 'md:hidden')}>Master</span>
+          </Link>
+          <button
+            onClick={closeMobile}
+            aria-label="Fechar menu"
+            className="text-muted transition-colors hover:text-brand-white md:hidden"
+          >
+            <X size={20} />
+          </button>
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors"
+            aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
+            className="hidden h-7 w-7 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-hover hover:text-brand-white md:flex"
           >
             {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 px-2 py-4">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              onClick={closeMobile}
+              className={cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                 isActive(item.path)
                   ? 'bg-accent/10 text-accent'
                   : 'text-muted hover:bg-surface-hover hover:text-brand-white'
-              }`}
+              )}
               title={collapsed ? item.label : undefined}
             >
               <item.icon size={18} className="shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
+              <span className={cn('truncate', collapsed && 'md:hidden')}>{item.label}</span>
             </Link>
           ))}
         </nav>
 
         <div className="border-t border-border px-3 py-3">
-          {!collapsed && (
-            <div className="mb-2 px-1">
-              <p className="truncate text-xs text-muted">{user?.name}</p>
-              <p className="truncate text-[10px] text-muted/60">Master</p>
-            </div>
-          )}
+          <div className={cn('mb-2 px-1', collapsed && 'md:hidden')}>
+            <p className="truncate text-xs text-muted">{user?.name}</p>
+            <p className="truncate text-[10px] text-muted/60">Master</p>
+          </div>
           <button
-            onClick={() => { setPwdOpen(true); setPwdMsg(null) }}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted hover:bg-surface-hover hover:text-brand-white transition-colors"
+            onClick={() => { setPwdOpen(true); setPwdMsg(null); closeMobile() }}
             title="Alterar senha"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-hover hover:text-brand-white"
           >
             <Shield size={18} className="shrink-0" />
-            {!collapsed && <span>Alterar senha</span>}
+            <span className={cn(collapsed && 'md:hidden')}>Alterar senha</span>
           </button>
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted hover:bg-surface-hover hover:text-brand-white transition-colors"
             title="Sair"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-hover hover:text-brand-white"
           >
             <LogOut size={18} className="shrink-0" />
-            {!collapsed && <span>Sair</span>}
+            <span className={cn(collapsed && 'md:hidden')}>Sair</span>
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto">
-        <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6">
-          <Outlet />
-        </div>
-      </main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4 md:hidden">
+          <button
+            onClick={() => setMobileOpen(true)}
+            aria-label="Abrir menu"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-brand-white hover:bg-surface-hover"
+          >
+            <Menu size={20} />
+          </button>
+          <span className="text-sm font-bold text-brand-white">Master</span>
+          <span className="ml-auto truncate text-xs text-muted">{user?.name}</span>
+        </header>
+
+        <main className="min-w-0 flex-1 overflow-auto">
+          <div className="mx-auto w-full max-w-6xl px-4 py-5 md:px-6 md:py-6">
+            <Outlet />
+          </div>
+        </main>
+      </div>
 
       {pwdOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setPwdOpen(false)}>
