@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2, Smartphone } from 'lucide-react'
+import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2, Smartphone, History, RotateCcw } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { ImageUpload, ProductCard, ThemeColorPicker } from '@/components/shared'
 import { settingsService, productsService } from '@/services'
-import { type BusinessSettings } from '@/services/settings'
+import { type BusinessSettings, type SettingsBackup } from '@/services/settings'
 import type { Product } from '@/types'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
 import { THEMES, DEFAULT_THEME_ID, CUSTOM_THEME_ID, getThemeById, type ThemeColors } from '@/config/themes'
@@ -64,6 +64,39 @@ export default function Settings() {
   const [notifSound, setNotifSound] = useState<'bell' | 'chime' | 'buzzer' | 'beep'>('bell')
   const [notifVolume, setNotifVolume] = useState(0.5)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [backups, setBackups] = useState<SettingsBackup[]>([])
+  const [backupsLoading, setBackupsLoading] = useState(false)
+  const [restoringId, setRestoringId] = useState<string | null>(null)
+
+  const loadBackups = async () => {
+    setBackupsLoading(true)
+    try {
+      setBackups(await settingsService.listBackups(undefined, 10))
+    } catch {
+      // Histórico é opcional: falha na leitura não deve travar a tela.
+    } finally {
+      setBackupsLoading(false)
+    }
+  }
+
+  const handleRestore = async (backup: SettingsBackup) => {
+    const when = new Date(backup.createdAt).toLocaleString('pt-BR')
+    if (!window.confirm(`Restaurar as configurações de ${when}?\n\nO estado atual será salvo como backup antes da restauração.`)) return
+
+    setRestoringId(backup.id)
+    try {
+      await settingsService.restoreBackup(backup.id)
+      window.location.reload()
+    } catch (err) {
+      alert('Erro ao restaurar: ' + (err instanceof Error ? err.message : 'Erro desconhecido'))
+      setRestoringId(null)
+    }
+  }
+
+  const backupLabel = (backup: SettingsBackup) =>
+    backup.data.theme?.themeId === CUSTOM_THEME_ID
+      ? 'Personalizado'
+      : getThemeById(backup.data.theme?.themeId || DEFAULT_THEME_ID)?.name ?? 'Padrão'
 
   useEffect(() => {
     settingsService.get().then((data) => {
@@ -108,6 +141,7 @@ export default function Settings() {
       }
     }).catch(() => {})
     productsService.getActiveProducts().then(setProducts).catch(() => {})
+    loadBackups()
   }, [])
 
   const handleSave = async () => {
@@ -146,6 +180,7 @@ export default function Settings() {
         },
       }
       await settingsService.save(JSON.parse(JSON.stringify(data)))
+      await loadBackups()
     } catch (err) {
       alert('Erro ao salvar: ' + (err instanceof Error ? err.message : 'Erro desconhecido'))
     }
@@ -727,6 +762,62 @@ export default function Settings() {
               <p className="text-[10px] text-muted">Produtos em linhas, foto à esquerda e preço à direita</p>
             </button>
           </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div>
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-white">
+                <History size={18} className="text-accent" />
+                Backups
+              </h2>
+              <p className="mt-1 text-xs text-muted">
+                Um backup é criado automaticamente antes de cada salvamento. Guardamos os 30 últimos.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={loadBackups}
+              disabled={backupsLoading}
+              className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:text-brand-white disabled:opacity-50"
+            >
+              {backupsLoading ? 'Carregando...' : 'Atualizar'}
+            </button>
+          </div>
+
+          {backups.length === 0 ? (
+            <p className="rounded-lg bg-surface-hover px-4 py-3 text-xs text-muted">
+              Nenhum backup ainda. O primeiro será criado no próximo salvamento.
+            </p>
+          ) : (
+            <div className="space-y-1">
+              {backups.map((backup) => (
+                <div
+                  key={backup.id}
+                  className="flex items-center justify-between gap-3 rounded-lg bg-surface-hover px-3 py-2.5"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm text-brand-white">
+                      {new Date(backup.createdAt).toLocaleString('pt-BR')}
+                    </p>
+                    <p className="truncate text-[11px] text-muted">
+                      Tema: {backupLabel(backup)}
+                      {backup.data.productViewMode === 'list' ? ' · Lista' : ' · Grade'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRestore(backup)}
+                    disabled={restoringId !== null}
+                    className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-brand-white transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+                  >
+                    <RotateCcw size={13} />
+                    {restoringId === backup.id ? 'Restaurando...' : 'Restaurar'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end">
