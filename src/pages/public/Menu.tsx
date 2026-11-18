@@ -23,11 +23,15 @@ export default function Menu() {
   const [showProductModal, setShowProductModal] = useState(false)
   const [showHoursModal, setShowHoursModal] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarLogoFailed, setSidebarLogoFailed] = useState(false)
 
   const { categories, loading: catLoading } = useCategories()
   const { settings, loading: settingsLoading } = useSettings()
   const { status } = useBusinessStatus()
   const { products: allProducts, loading: prodLoading } = useProducts()
+
+  const sidebarLogo = settings?.theme?.logo || store?.logo || null
+  useEffect(() => setSidebarLogoFailed(false), [sidebarLogo])
 
   // O modo de visualização é definido pelo administrador nas configurações.
   const viewMode: 'grid' | 'list' = settings?.productViewMode === 'list' ? 'list' : 'grid'
@@ -290,7 +294,16 @@ export default function Menu() {
           <aside className="fixed left-0 top-0 z-50 flex h-full w-72 max-w-[85vw] flex-col border-r border-border bg-surface p-5 shadow-2xl">
             <div className="mb-6 flex items-center justify-between">
               <div className="flex min-w-0 items-center gap-2">
-                <UtensilsCrossed className="shrink-0 text-accent" size={20} />
+                {sidebarLogo && !sidebarLogoFailed ? (
+                  <img
+                    src={resolveImageUrl(sidebarLogo)}
+                    alt=""
+                    className="h-6 w-6 shrink-0 rounded object-contain"
+                    onError={() => setSidebarLogoFailed(true)}
+                  />
+                ) : (
+                  <UtensilsCrossed className="shrink-0 text-accent" size={20} />
+                )}
                 <span className="truncate text-base font-bold text-brand-white">
                   {store?.name || 'Cardápio'}
                 </span>

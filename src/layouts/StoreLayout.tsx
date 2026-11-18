@@ -5,12 +5,13 @@ import { Header } from '@/components/layout'
 import { Footer } from '@/components/layout'
 import { UpdateToast } from '@/components/shared/UpdateToast'
 import { trackVisit } from '@/utils/analytics'
-import { useApplyTheme } from '@/hooks'
+import { useApplyTheme, useStoreFavicon } from '@/hooks'
 
 function StoreContent() {
   const { store, loading, error } = useStore()
   const { pathname } = useLocation()
   useApplyTheme()
+  useStoreFavicon()
 
   // O cardápio tem tela limpa: sem cabeçalho, com ícones flutuantes sobre o banner.
   const segments = pathname.split('/').filter(Boolean)
