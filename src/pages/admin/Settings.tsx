@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2 } from 'lucide-react'
+import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2, Smartphone } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { ImageUpload, ProductCard, ThemeColorPicker } from '@/components/shared'
 import { settingsService, productsService } from '@/services'
@@ -63,6 +63,7 @@ export default function Settings() {
   const [notifEnabled, setNotifEnabled] = useState(true)
   const [notifSound, setNotifSound] = useState<'bell' | 'chime' | 'buzzer' | 'beep'>('bell')
   const [notifVolume, setNotifVolume] = useState(0.5)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   useEffect(() => {
     settingsService.get().then((data) => {
@@ -103,6 +104,7 @@ export default function Settings() {
           setNotifSound(ns.sound)
           setNotifVolume(ns.volume)
         }
+        if (data.productViewMode) setViewMode(data.productViewMode)
       }
     }).catch(() => {})
     productsService.getActiveProducts().then(setProducts).catch(() => {})
@@ -136,6 +138,7 @@ export default function Settings() {
           themeId: selectedThemeId,
           ...(selectedThemeId === CUSTOM_THEME_ID ? { customColors } : {}),
         },
+        productViewMode: viewMode,
         notificationSettings: {
           enabled: notifEnabled,
           sound: notifSound,
@@ -687,6 +690,42 @@ export default function Settings() {
                 <span className="text-sm text-brand-white w-8 shrink-0 tabular-nums">{Math.round(notifVolume * 100)}%</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
+            <Smartphone size={18} className="text-accent" />
+            Visualização de Produtos
+          </h2>
+          <p className="mb-4 text-xs text-muted">
+            Escolha como os produtos serão exibidos aos clientes no cardápio.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`rounded-xl border p-6 text-left transition-all ${viewMode === 'grid' ? 'border-accent bg-accent/10 ring-1 ring-accent/30' : 'border-border hover:border-muted'}`}
+            >
+              <div className="mb-3 flex gap-2">
+                <div className="h-8 w-8 rounded border border-white/10" style={{ backgroundColor: '#f4ede0' }} />
+                <div className="h-8 w-8 rounded border border-white/10" style={{ backgroundColor: '#f4ede0' }} />
+              </div>
+              <p className="text-sm font-medium text-brand-white">Grade</p>
+              <p className="text-[10px] text-muted">Produtos em cartões lado a lado</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              className={`rounded-xl border p-6 text-left transition-all ${viewMode === 'list' ? 'border-accent bg-accent/10 ring-1 ring-accent/30' : 'border-border hover:border-muted'}`}
+            >
+              <div className="mb-3 flex gap-2">
+                <div className="h-8 w-8 rounded border border-white/10" style={{ backgroundColor: '#f4ede0' }} />
+                <div className="h-4 w-24 rounded border border-white/10 mt-1" style={{ backgroundColor: '#f4ede0' }} />
+              </div>
+              <p className="text-sm font-medium text-brand-white">Lista</p>
+              <p className="text-[10px] text-muted">Produtos em linhas, foto à esquerda e preço à direita</p>
+            </button>
           </div>
         </div>
 

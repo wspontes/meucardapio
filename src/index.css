@@ -11,6 +11,10 @@
   --color-muted: #a3a3a3;
   --color-accent: #dc2626;
   --color-button: #dc2626;
+  --color-price-color: #b5301e;
+  --color-separator: #ddd3c2;
+  --color-mustard-bg: #ebb43f;
+  --color-title-color: #2a5d3b;
   --animate-fade-in: fade-in 0.3s ease-out;
 }
 

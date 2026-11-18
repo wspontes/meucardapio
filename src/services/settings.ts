@@ -31,6 +31,7 @@ export interface BusinessSettings {
   instagram?: string
   phone?: string
   address?: string
+  productViewMode?: 'grid' | 'list'
   banners?: {
     items: {
       title: string

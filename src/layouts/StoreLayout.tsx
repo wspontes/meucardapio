@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Outlet, useParams, Link } from 'react-router-dom'
+import { Outlet, useParams, Link, useLocation } from 'react-router-dom'
 import { StoreProvider, useStore } from '@/contexts/StoreContext'
 import { Header } from '@/components/layout'
 import { Footer } from '@/components/layout'
@@ -9,7 +9,12 @@ import { useApplyTheme } from '@/hooks'
 
 function StoreContent() {
   const { store, loading, error } = useStore()
+  const { pathname } = useLocation()
   useApplyTheme()
+
+  // O cardápio tem tela limpa: sem cabeçalho, com ícones flutuantes sobre o banner.
+  const segments = pathname.split('/').filter(Boolean)
+  const isMenuPage = segments.length === 1 || (segments.length === 2 && segments[1] === 'cardapio')
 
   useEffect(() => { if (store) trackVisit() }, [store])
 
@@ -41,7 +46,7 @@ function StoreContent() {
 
   return (
     <div className="flex min-h-screen flex-col bg-brand-black">
-      <Header />
+      {!isMenuPage && <Header />}
       <main className="flex-1">
         <Outlet />
       </main>
