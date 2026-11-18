@@ -169,7 +169,7 @@ export default function MasterDashboard() {
                         className="flex items-center gap-1.5 rounded-lg border border-border bg-surface-hover px-2.5 py-1.5 text-xs font-medium text-muted hover:text-brand-white transition-colors"
                       >
                         <Settings size={13} />
-                        Admin
+                        Dashboard
                       </a>
                       <Link
                         to={`/master/lojas/${store.id}/editar`}
