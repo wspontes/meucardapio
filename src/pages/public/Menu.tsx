@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { ArrowRight, ChevronLeft, ChevronRight, ClipboardList, Menu as MenuIcon, ShoppingCart, UtensilsCrossed, X } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { CategoryCard, ProductCard, ProductCardSkeleton, CategorySkeleton } from '@/components/shared'
+import { HomeBoard } from '@/components/shared/HomeBoard'
 import { ProductModal } from '@/components/shared/ProductModal'
 import { OperatingHoursModal } from '@/components/shared/OperatingHoursModal'
 import { useCategories, useProducts, useSettings, useBusinessStatus } from '@/hooks'
@@ -235,6 +236,8 @@ export default function Menu() {
             </section>
         </div>
       )}
+
+      <HomeBoard />
 
       <div className="container mx-auto px-4 pb-10 pt-4">
         <div className="mb-6">

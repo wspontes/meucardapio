@@ -15,6 +15,12 @@
   --color-separator: #ddd3c2;
   --color-mustard-bg: #ebb43f;
   --color-title-color: #2a5d3b;
+  --board-frame: #4a3222;
+  --board-bg: #12241c;
+  --board-label: #e8b23d;
+  --board-text: #f4efe1;
+  --board-price: #e8b23d;
+  --board-separator: rgba(244, 239, 225, 0.25);
   --animate-fade-in: fade-in 0.3s ease-out;
 }
 
