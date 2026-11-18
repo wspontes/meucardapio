@@ -21,6 +21,9 @@
   --board-text: #f4efe1;
   --board-price: #e8b23d;
   --board-separator: rgba(244, 239, 225, 0.25);
+  --status-open: #3fbf6b;
+  --status-closed: #e5483a;
+  --status-text: #f4ede0;
   --animate-fade-in: fade-in 0.3s ease-out;
 }
 

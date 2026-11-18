@@ -4,6 +4,7 @@ import { ArrowRight, ChevronLeft, ChevronRight, ClipboardList, Menu as MenuIcon,
 import { Button } from '@/components/ui'
 import { CategoryCard, ProductCard, ProductCardSkeleton, CategorySkeleton } from '@/components/shared'
 import { HomeBoard } from '@/components/shared/HomeBoard'
+import { StoreStatusLine } from '@/components/shared/StoreStatusLine'
 import { ProductModal } from '@/components/shared/ProductModal'
 import { OperatingHoursModal } from '@/components/shared/OperatingHoursModal'
 import { useCategories, useProducts, useSettings, useBusinessStatus } from '@/hooks'
@@ -233,6 +234,10 @@ export default function Menu() {
                   )}
                 </div>
               )}
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 to-transparent" />
+              <div className="absolute inset-x-0 bottom-4 z-20 px-4">
+                <StoreStatusLine />
+              </div>
             </section>
         </div>
       )}
