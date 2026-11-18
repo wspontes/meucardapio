@@ -47,14 +47,17 @@ export default function OrdersAdmin() {
   }, [])
 
   useEffect(() => {
+    const storeId = store?.id
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
     const unsub = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Order))
-      setOrders(data)
+      // Isola por loja: evita vazamento de pedidos entre estabelecimentos.
+      const scoped = storeId ? data.filter((o) => o.storeId === storeId) : data
+      setOrders(scoped)
       setLoading(false)
     })
     return () => unsub()
-  }, [])
+  }, [store?.id])
 
   const advanceStatus = async (orderId: string) => {
     const order = orders.find((o) => o.id === orderId)

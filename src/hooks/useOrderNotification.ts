@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { onSnapshot, collection, query, orderBy } from 'firebase/firestore'
 import { db } from '@/firebase/config'
+import { getCurrentStoreId } from '@/services'
 import { useToast } from '@/contexts/ToastContext'
 import { useSettings } from './useSettings'
 import type { Order } from '@/types'
@@ -12,14 +13,16 @@ export function useOrderNotification() {
   const notifSettings = settings?.notificationSettings || { enabled: true, sound: 'bell' as const, volume: 0.5 }
 
   useEffect(() => {
+    const storeId = getCurrentStoreId()
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
     const unsub = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Order))
-      const currentIds = new Set(data.map((o) => o.id))
+      const scoped = storeId ? data.filter((o) => o.storeId === storeId) : data
+      const currentIds = new Set(scoped.map((o) => o.id))
       const newIds = [...currentIds].filter((id) => !prevIds.current.has(id))
       if (prevIds.current.size > 0 && newIds.length > 0 && notifSettings.enabled) {
         playNotificationSound(notifSettings.sound, notifSettings.volume)
-        const newOrders = data.filter((o) => newIds.includes(o.id))
+        const newOrders = scoped.filter((o) => newIds.includes(o.id))
         newOrders.forEach((o) => {
           showToast(`Novo pedido de ${o.customerName}!`, 'success')
         })
