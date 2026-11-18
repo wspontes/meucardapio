@@ -1,7 +1,9 @@
 import { doc, getDoc, setDoc, collection, getDocs, deleteDoc, query, orderBy, limit } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { getCurrentStoreId } from './store-context'
+import { productsService } from './products'
 import type { ThemeColors } from '@/config/themes'
+import type { Product } from '@/types'
 
 export interface BusinessSettings {
   businessHours: {
@@ -54,6 +56,10 @@ export interface BusinessSettings {
     enabled: boolean
     sound: 'bell' | 'chime' | 'buzzer' | 'beep'
     volume: number
+  }
+  homeBoard?: {
+    title: string
+    productIds: string[]
   }
 }
 
@@ -135,5 +141,40 @@ export const settingsService = {
     const data = (snapshot.data() as { data?: BusinessSettings }).data
     if (!data) throw new Error('Backup inválido')
     await saveSettings(data, sid)
+  },
+
+  validateHomeBoard(productIds: string[]): { ok: boolean; error?: string } {
+    if (productIds.length > 4) {
+      return { ok: false, error: 'Máximo de 4 produtos no quadro.' }
+    }
+    const unique = new Set(productIds)
+    if (unique.size !== productIds.length) {
+      return { ok: false, error: 'Não é permitido repetir produtos.' }
+    }
+    return { ok: true }
+  },
+
+  async resolveHomeBoard(storeId?: string): Promise<{ title: string; products: { id: string; name: string; price: number }[] }> {
+    const sid = getStoreId(storeId)
+    const settings = await this.get(sid)
+    const title = settings?.homeBoard?.title?.trim() || 'Hoje no Pit Stop'
+    const ids = settings?.homeBoard?.productIds ?? []
+
+    const active = await productsService.getActiveProducts()
+    const byId = new Map(active.map((p) => [p.id, p]))
+
+    const resolved: { id: string; name: string; price: number }[] = []
+    const seen = new Set<string>()
+    for (const id of ids) {
+      if (seen.has(id)) continue
+      seen.add(id)
+      const p = byId.get(id)
+      if (!p) continue
+      const price = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price
+      resolved.push({ id: p.id, name: p.name, price })
+      if (resolved.length >= 4) break
+    }
+
+    return { title, products: resolved }
   },
 }

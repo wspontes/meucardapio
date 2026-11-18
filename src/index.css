@@ -45,6 +45,72 @@
   }
 }
 
+/* ---------- Impressão de comanda (isolado, não afeta a tela normal) ---------- */
+.print-portal {
+  --print-cols: 26;
+  display: none;
+  font-family: 'Courier New', Courier, ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.3px;
+  font-weight: 700;
+  line-height: 1.18;
+  color: #000;
+}
+
+.print-coupon {
+  width: calc(var(--print-cols) * 1ch);
+  margin: 0;
+  white-space: pre;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: #000;
+  background: #fff;
+}
+
+.print-cut {
+  width: calc(var(--print-cols) * 1ch);
+  margin: 3mm 0;
+  border-top: 1px dashed #000;
+}
+
+@media print {
+  @page {
+    size: 58mm auto;
+    margin: 0;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  body > *:not(.print-portal) {
+    display: none !important;
+  }
+
+  .print-portal {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .print-coupon {
+    max-height: none !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+}
+
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
