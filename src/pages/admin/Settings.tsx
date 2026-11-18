@@ -839,11 +839,11 @@ export default function Settings() {
             {homeBoardIds.length >= 4 && (
               <p className="mt-1 text-xs text-amber-400">Máximo de 4 produtos.</p>
             )}
-            {homeBoardIds.length < 4 && (
+            {homeBoardIds.length < 4 && homeBoardSearch.trim().length > 0 && (
               <div className="mt-2 max-h-44 overflow-y-auto rounded-lg border border-border bg-surface-hover">
                 {products
                   .filter((p) => p.active && !homeBoardIds.includes(p.id))
-                  .filter((p) => p.name.toLowerCase().includes(homeBoardSearch.toLowerCase()))
+                  .filter((p) => p.name.toLowerCase().includes(homeBoardSearch.trim().toLowerCase()))
                   .slice(0, 20)
                   .map((p) => (
                     <button
@@ -858,7 +858,7 @@ export default function Settings() {
                       </span>
                     </button>
                   ))}
-                {products.filter((p) => p.active && !homeBoardIds.includes(p.id) && p.name.toLowerCase().includes(homeBoardSearch.toLowerCase())).length === 0 && (
+                {products.filter((p) => p.active && !homeBoardIds.includes(p.id) && p.name.toLowerCase().includes(homeBoardSearch.trim().toLowerCase())).length === 0 && (
                   <p className="px-3 py-2 text-xs text-muted">Nenhum produto encontrado.</p>
                 )}
               </div>
