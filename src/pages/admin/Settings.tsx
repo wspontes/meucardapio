@@ -5,14 +5,14 @@ import { ImageUpload, ProductCard, ThemeColorPicker } from '@/components/shared'
 import { settingsService, productsService, setCurrentStoreId } from '@/services'
 import { type BusinessSettings, type SettingsBackup } from '@/services/settings'
 import { useToast } from '@/contexts/ToastContext'
-import { useStore } from '@/contexts/StoreContext'
+import { useStoreGuard } from '@/components/shared/StoreGuard'
 import type { Product } from '@/types'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
 import { THEMES, DEFAULT_THEME_ID, CUSTOM_THEME_ID, getThemeById, type ThemeColors } from '@/config/themes'
 
 export default function Settings() {
   const { showToast } = useToast()
-  const { store } = useStore()
+  const { store } = useStoreGuard()
   const [saving, setSaving] = useState(false)
   const [settingsLoaded, setSettingsLoaded] = useState(false)
   const [hours, setHours] = useState([
