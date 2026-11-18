@@ -152,45 +152,45 @@ export default function MasterDashboard() {
                   <td className="px-4 py-3 text-center text-muted">{store.productCount || 0}</td>
                   <td className="px-4 py-3 text-center text-muted">{store.orderCount || 0}</td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex flex-wrap items-center justify-center gap-1.5">
                       <a
                         href={`/${store.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors"
-                        title="Ver site"
+                        className="flex items-center gap-1.5 rounded-lg border border-border bg-surface-hover px-2.5 py-1.5 text-xs font-medium text-muted hover:text-brand-white transition-colors"
                       >
-                        <ExternalLink size={14} />
+                        <ExternalLink size={13} />
+                        Ver site
                       </a>
                       <a
                         href={`/${store.slug}/admin`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors"
-                        title="Acessar admin"
+                        className="flex items-center gap-1.5 rounded-lg border border-border bg-surface-hover px-2.5 py-1.5 text-xs font-medium text-muted hover:text-brand-white transition-colors"
                       >
-                        <Settings size={14} />
+                        <Settings size={13} />
+                        Admin
                       </a>
                       <Link
                         to={`/master/lojas/${store.id}/editar`}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors"
-                        title="Editar loja"
+                        className="flex items-center gap-1.5 rounded-lg border border-border bg-surface-hover px-2.5 py-1.5 text-xs font-medium text-muted hover:text-brand-white transition-colors"
                       >
-                        <Settings size={14} />
+                        <Settings size={13} />
+                        Editar
                       </Link>
                       <Link
                         to={`/master/lojas/${store.id}/usuarios`}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-surface-hover hover:text-brand-white transition-colors"
-                        title="Gerenciar usuários"
+                        className="flex items-center gap-1.5 rounded-lg border border-border bg-surface-hover px-2.5 py-1.5 text-xs font-medium text-muted hover:text-brand-white transition-colors"
                       >
-                        <Users size={14} />
+                        <Users size={13} />
+                        Usuários
                       </Link>
                       <button
                         onClick={() => removeStore(store)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-red-500/10 hover:text-red-400 transition-colors"
-                        title="Desativar loja"
+                        className="flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={13} />
+                        Desativar
                       </button>
                     </div>
                   </td>

@@ -85,7 +85,7 @@ function ChunkError() {
 }
 
 function ProtectedAdmin({ children }: { children: React.ReactNode }) {
-  return <ProtectedRoute roles={['admin', 'manager', 'attendant']}>{children}</ProtectedRoute>
+  return <ProtectedRoute roles={['admin', 'manager', 'attendant', 'master']}>{children}</ProtectedRoute>
 }
 
 function ProtectedKitchen({ children }: { children: React.ReactNode }) {
