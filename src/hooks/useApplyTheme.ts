@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useSettings } from './useSettings'
 import { getThemeById, DEFAULT_THEME_ID, CUSTOM_THEME_ID, type ThemeColors } from '@/config/themes'
+import { hideAppSplash } from '@/utils/splash'
 
 export function useApplyTheme() {
   const { settings, loading } = useSettings()
@@ -9,19 +10,40 @@ export function useApplyTheme() {
     if (loading) return
 
     const themeId = settings?.theme?.themeId || DEFAULT_THEME_ID
+    const colors: ThemeColors | null =
+      themeId === CUSTOM_THEME_ID && settings?.theme?.customColors
+        ? settings.theme.customColors
+        : (getThemeById(themeId)?.colors ?? null)
 
-    if (themeId === CUSTOM_THEME_ID && settings?.theme?.customColors) {
-      applyThemeVars(settings.theme.customColors)
-    } else {
-      const theme = getThemeById(themeId)
-      if (!theme) return
-      applyThemeVars(theme.colors)
-    }
+    if (!colors) return
+    applyThemeVars(colors)
 
     try {
       localStorage.setItem('meucardapio-theme', themeId)
+      cacheThemeColors(colors)
     } catch { /* silent */ }
+
+    hideAppSplash()
   }, [settings, loading])
+}
+
+/** Guarda as cores resolvidas para o index.html aplicar antes do primeiro paint. */
+function cacheThemeColors(colors: ThemeColors) {
+  const snapshot = {
+    bb: colors.brandBlack,
+    bw: colors.text,
+    sf: colors.surface,
+    sh: colors.surfaceHover,
+    bd: colors.border,
+    mt: colors.textMuted,
+    ac: colors.accent,
+    bt: colors.button,
+  }
+  const json = JSON.stringify(snapshot)
+  const slug = window.location.pathname.split('/').filter(Boolean)[0] || ''
+
+  localStorage.setItem('meucardapio-theme-colors', json)
+  if (slug) localStorage.setItem(`meucardapio-theme-colors:${slug}`, json)
 }
 
 export function applyThemeVars(colors: ThemeColors) {

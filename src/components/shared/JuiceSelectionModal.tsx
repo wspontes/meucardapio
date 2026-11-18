@@ -34,7 +34,9 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
   const ingredients = product.ingredients ?? []
 
   const totalPrice = price
-  const canAdd = selectedFlavors.length > 0
+  const hasFlavors = ingredients.length > 0
+  // Produto sem sabores cadastrados ainda pode ser adicionado diretamente.
+  const canAdd = hasFlavors ? selectedFlavors.length > 0 : true
 
   const toggleFlavor = (ingredientId: string) => {
     setSelectedFlavors((prev) => {
@@ -64,7 +66,7 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
       quantity: 1,
       price: totalPrice,
       flavors: flavorNames,
-      notes: `Base: ${selectedBase === 'agua' ? 'Água' : 'Leite'} | Sabores: ${flavorNames.join(', ')}`,
+      notes: `Base: ${selectedBase === 'agua' ? 'Água' : 'Leite'} | Sabores: ${flavorNames.length > 0 ? flavorNames.join(', ') : 'Natural'}`,
     })
     showToast('Adicionado ao carrinho!')
     onClose()
@@ -114,6 +116,12 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
                 </span>
               </div>
 
+              {!hasFlavors && (
+                <p className="rounded-lg border border-border bg-surface-hover p-3 text-xs text-muted">
+                  Nenhum sabor cadastrado para este produto. Você pode adicioná-lo diretamente.
+                </p>
+              )}
+
               <div className="grid gap-2">
                 {ingredients.map((ingredient) => {
                   const isSelected = isFlavorSelected(ingredient.ingredientId)
@@ -149,7 +157,7 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
               <div className="mt-6 flex justify-end">
                 <Button
                   onClick={() => {
-                    if (selectedFlavors.length === 0) return
+                    if (!canAdd) return
                     setStep('base')
                   }}
                   disabled={!canAdd}
@@ -215,9 +223,11 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted">Sabores</span>
                   <span className="text-brand-white font-medium truncate">
-                    {selectedFlavors
-                      .map((id) => ingredients.find((i) => i.ingredientId === id)?.name ?? id)
-                      .join(', ')}
+                    {selectedFlavors.length > 0
+                      ? selectedFlavors
+                          .map((id) => ingredients.find((i) => i.ingredientId === id)?.name ?? id)
+                          .join(', ')
+                      : 'Natural'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm font-bold pt-2 border-t border-border/50">

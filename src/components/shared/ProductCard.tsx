@@ -27,6 +27,18 @@ export function ProductCard({ product, className, viewMode = 'grid' }: ProductCa
   const price = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price
   const isJuice = isJuiceProduct(product.name)
 
+  const modals = (
+    <>
+      {showModal && <ProductModal product={product} onClose={() => setShowModal(false)} />}
+      {showJuiceModal && <JuiceSelectionModal product={product} onClose={() => setShowJuiceModal(false)} />}
+      <OperatingHoursModal
+        isOpen={showHoursModal}
+        onClose={() => setShowHoursModal(false)}
+        message={status.message}
+      />
+    </>
+  )
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -100,55 +112,59 @@ export function ProductCard({ product, className, viewMode = 'grid' }: ProductCa
             {isJuice ? 'Escolher' : 'ADICIONAR'}
           </Button>
         </div>
+        {modals}
       </>
     )
   }
 
   // List mode: horizontal line item layout
   return (
-    <div className="border-b border-separator py-3 last:border-0">
-      <div
-        className="flex cursor-pointer items-start gap-3 md:gap-4"
-        onClick={() => setShowModal(true)}
-      >
-        <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl bg-surface-hover md:h-[90px] md:w-[90px]">
-          {product.image ? (
-            <img
-              src={resolveImageUrl(product.image)}
-              alt={product.name}
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-muted">
-              <Star size={24} />
-            </div>
-          )}
-        </div>
+    <>
+      <div className="border-b border-separator py-3 last:border-0">
+        <div
+          className="flex cursor-pointer items-start gap-3 md:gap-4"
+          onClick={() => setShowModal(true)}
+        >
+          <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl bg-surface-hover md:h-[90px] md:w-[90px]">
+            {product.image ? (
+              <img
+                src={resolveImageUrl(product.image)}
+                alt={product.name}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-muted">
+                <Star size={24} />
+              </div>
+            )}
+          </div>
 
-        <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-bold leading-tight text-brand-white md:text-lg">
-            {product.name}
-          </h3>
-          <p className="mt-1 line-clamp-2 text-xs text-muted md:text-sm">
-            {product.description}
-          </p>
-        </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm font-bold leading-tight text-brand-white md:text-lg">
+              {product.name}
+            </h3>
+            <p className="mt-1 line-clamp-2 text-xs text-muted md:text-sm">
+              {product.description}
+            </p>
+          </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          {(product.discountPrice ?? 0) > 0 && (
-            <span className="text-[10px] text-muted line-through md:text-xs">
-              {formatCurrency(product.price)}
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            {(product.discountPrice ?? 0) > 0 && (
+              <span className="text-[10px] text-muted line-through md:text-xs">
+                {formatCurrency(product.price)}
+              </span>
+            )}
+            <span className="text-right text-sm font-bold text-price-color md:text-lg">
+              {formatCurrency(price)}
             </span>
-          )}
-          <span className="text-right text-sm font-bold text-price-color md:text-lg">
-            {formatCurrency(price)}
-          </span>
-          <Button size="sm" onClick={handleAddToCart} className="h-7 px-3 text-[11px]">
-            {isJuice ? 'ESCOLHER' : 'ADICIONAR'}
-          </Button>
+            <Button size="sm" onClick={handleAddToCart} className="h-7 px-3 text-[11px]">
+              {isJuice ? 'ESCOLHER' : 'ADICIONAR'}
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+      {modals}
+    </>
   )
 }
