@@ -21,7 +21,9 @@ export function compressImage(
         const ctx = canvas.getContext('2d')
         if (!ctx) { reject(new Error('Canvas not supported')); return }
         ctx.drawImage(img, 0, 0, width, height)
-        const dataUrl = canvas.toDataURL('image/jpeg', quality)
+        // PNG suporta transparência, JPEG não. Preserva PNG para não fundo preto.
+        const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
+        const dataUrl = canvas.toDataURL(mimeType, quality)
         resolve(dataUrl)
       }
       img.onerror = () => reject(new Error('Failed to load image'))
