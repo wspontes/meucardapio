@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2, Smartphone, History, RotateCcw } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { ImageUpload, ProductCard, ThemeColorPicker } from '@/components/shared'
@@ -68,6 +68,66 @@ export default function Settings() {
   const [notifEnabled, setNotifEnabled] = useState(true)
   const [notifSound, setNotifSound] = useState<'bell' | 'chime' | 'buzzer' | 'beep'>('bell')
   const [notifVolume, setNotifVolume] = useState(0.5)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+
+  const createAudio = () => {
+    if (audioCtxRef.current) return
+    try {
+      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      audioCtxRef.current = new Ctx()
+    } catch {
+      // Áudio indisponível
+    }
+  }
+
+  const playTestSound = () => {
+    if (!audioCtxRef.current) createAudio()
+    if (!audioCtxRef.current) return
+    try {
+      const gain = audioCtxRef.current.createGain()
+      gain.connect(audioCtxRef.current.destination)
+      gain.gain.setValueAtTime(notifVolume, audioCtxRef.current.currentTime)
+
+      if (notifSound === 'bell') {
+        const osc = audioCtxRef.current.createOscillator()
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(1200, audioCtxRef.current.currentTime)
+        osc.frequency.setValueAtTime(800, audioCtxRef.current.currentTime + 0.1)
+        osc.connect(gain)
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtxRef.current.currentTime + 0.3)
+        osc.start(audioCtxRef.current.currentTime)
+        osc.stop(audioCtxRef.current.currentTime + 0.3)
+      } else if (notifSound === 'chime') {
+        const osc = audioCtxRef.current.createOscillator()
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(880, audioCtxRef.current.currentTime)
+        osc.frequency.setValueAtTime(1100, audioCtxRef.current.currentTime + 0.12)
+        osc.connect(gain)
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtxRef.current.currentTime + 0.5)
+        osc.start(audioCtxRef.current.currentTime)
+        osc.stop(audioCtxRef.current.currentTime + 0.5)
+      } else if (notifSound === 'buzzer') {
+        const osc = audioCtxRef.current.createOscillator()
+        osc.type = 'square'
+        osc.frequency.value = 220
+        osc.connect(gain)
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtxRef.current.currentTime + 0.6)
+        osc.start(audioCtxRef.current.currentTime)
+        osc.stop(audioCtxRef.current.currentTime + 0.6)
+      } else {
+        const osc = audioCtxRef.current.createOscillator()
+        osc.type = 'sine'
+        osc.frequency.value = 800
+        osc.connect(gain)
+        gain.gain.setValueAtTime(notifVolume, audioCtxRef.current.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtxRef.current.currentTime + 0.4)
+        osc.start(audioCtxRef.current.currentTime)
+        osc.stop(audioCtxRef.current.currentTime + 0.4)
+      }
+    } catch {
+      //
+    }
+  }
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [backups, setBackups] = useState<SettingsBackup[]>([])
   const [backupsLoading, setBackupsLoading] = useState(false)
@@ -750,6 +810,13 @@ export default function Settings() {
                     {s === 'bell' ? 'Campainha' : s === 'chime' ? 'Chime' : s === 'buzzer' ? 'Buzina' : 'Beep'}
                   </button>
                 ))}
+                <button
+                  type="button"
+                  onClick={playTestSound}
+                  className="col-span-2 sm:col-span-4 rounded-lg border border-accent bg-accent/10 px-3 py-2 text-left transition-colors hover:bg-accent/20 flex items-center gap-2 text-accent font-medium"
+                >
+                  <Volume2 size={14} /> Ouvir prévia
+                </button>
               </div>
             </div>
 

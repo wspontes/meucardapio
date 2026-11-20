@@ -30,9 +30,8 @@ function timeLabel(dateStr: string): string {
   return `${minutes} min`
 }
 
-function playBeep() {
+function playBeep(ctx: AudioContext) {
   try {
-    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
     void ctx.resume()
     const beepAt = (freq: number, start: number, duration: number) => {
       const osc = ctx.createOscillator()
@@ -56,18 +55,29 @@ export default function KitchenDashboard() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [now, setNow] = useState(() => new Date())
-  const audioWarmedRef = useRef(false)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+
+  const createAudio = () => {
+    if (audioCtxRef.current) return
+    try {
+      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      audioCtxRef.current = new Ctx()
+    } catch {
+      // Áudio indisponível
+    }
+  }
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 15000)
     return () => clearInterval(t)
   }, [])
 
+  // Aquece áudio na primeira interação do usuário
   useEffect(() => {
-    const warm = () => { audioWarmedRef.current = true }
+    const warm = () => createAudio()
     window.addEventListener('pointerdown', warm, { once: true })
     return () => window.removeEventListener('pointerdown', warm)
-  }, [])
+  }, [createAudio])
 
   useEffect(() => {
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
@@ -87,9 +97,14 @@ export default function KitchenDashboard() {
   useEffect(() => {
     document.title = newCount > 0 ? `(${newCount}) Novo pedido! - Cozinha` : 'Cozinha - MeuCardapio'
     if (newCount === 0) return
-    if (audioWarmedRef.current) playBeep()
+
+    // Tenta criar áudio se ainda não existe
+    if (!audioCtxRef.current) createAudio()
+    if (audioCtxRef.current) playBeep(audioCtxRef.current)
+
     const t = setInterval(() => {
-      if (audioWarmedRef.current) playBeep()
+      if (!audioCtxRef.current) createAudio()
+      if (audioCtxRef.current) playBeep(audioCtxRef.current)
     }, 8000)
     return () => clearInterval(t)
   }, [newCount])
