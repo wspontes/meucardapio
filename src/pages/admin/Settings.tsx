@@ -80,49 +80,50 @@ export default function Settings() {
     }
   }
 
-  const playTestSound = () => {
+  const playSound = (sound: 'bell' | 'chime' | 'buzzer' | 'beep') => {
     if (!audioCtxRef.current) createAudio()
     if (!audioCtxRef.current) return
     try {
-      const gain = audioCtxRef.current.createGain()
-      gain.connect(audioCtxRef.current.destination)
-      gain.gain.setValueAtTime(notifVolume, audioCtxRef.current.currentTime)
+      const ctx = audioCtxRef.current
+      const gain = ctx.createGain()
+      gain.connect(ctx.destination)
+      gain.gain.setValueAtTime(notifVolume, ctx.currentTime)
 
-      if (notifSound === 'bell') {
-        const osc = audioCtxRef.current.createOscillator()
+      if (sound === 'bell') {
+        const osc = ctx.createOscillator()
         osc.type = 'sine'
-        osc.frequency.setValueAtTime(1200, audioCtxRef.current.currentTime)
-        osc.frequency.setValueAtTime(800, audioCtxRef.current.currentTime + 0.1)
+        osc.frequency.setValueAtTime(1200, ctx.currentTime)
+        osc.frequency.setValueAtTime(800, ctx.currentTime + 0.1)
         osc.connect(gain)
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtxRef.current.currentTime + 0.3)
-        osc.start(audioCtxRef.current.currentTime)
-        osc.stop(audioCtxRef.current.currentTime + 0.3)
-      } else if (notifSound === 'chime') {
-        const osc = audioCtxRef.current.createOscillator()
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+        osc.start(ctx.currentTime)
+        osc.stop(ctx.currentTime + 0.3)
+      } else if (sound === 'chime') {
+        const osc = ctx.createOscillator()
         osc.type = 'sine'
-        osc.frequency.setValueAtTime(880, audioCtxRef.current.currentTime)
-        osc.frequency.setValueAtTime(1100, audioCtxRef.current.currentTime + 0.12)
+        osc.frequency.setValueAtTime(880, ctx.currentTime)
+        osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.12)
         osc.connect(gain)
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtxRef.current.currentTime + 0.5)
-        osc.start(audioCtxRef.current.currentTime)
-        osc.stop(audioCtxRef.current.currentTime + 0.5)
-      } else if (notifSound === 'buzzer') {
-        const osc = audioCtxRef.current.createOscillator()
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5)
+        osc.start(ctx.currentTime)
+        osc.stop(ctx.currentTime + 0.5)
+      } else if (sound === 'buzzer') {
+        const osc = ctx.createOscillator()
         osc.type = 'square'
         osc.frequency.value = 220
         osc.connect(gain)
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtxRef.current.currentTime + 0.6)
-        osc.start(audioCtxRef.current.currentTime)
-        osc.stop(audioCtxRef.current.currentTime + 0.6)
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6)
+        osc.start(ctx.currentTime)
+        osc.stop(ctx.currentTime + 0.6)
       } else {
-        const osc = audioCtxRef.current.createOscillator()
+        const osc = ctx.createOscillator()
         osc.type = 'sine'
         osc.frequency.value = 800
         osc.connect(gain)
-        gain.gain.setValueAtTime(notifVolume, audioCtxRef.current.currentTime)
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtxRef.current.currentTime + 0.4)
-        osc.start(audioCtxRef.current.currentTime)
-        osc.stop(audioCtxRef.current.currentTime + 0.4)
+        gain.gain.setValueAtTime(notifVolume, ctx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4)
+        osc.start(ctx.currentTime)
+        osc.stop(ctx.currentTime + 0.4)
       }
     } catch {
       //
@@ -800,7 +801,10 @@ export default function Settings() {
                   <button
                     key={s}
                     type="button"
-                    onClick={() => setNotifSound(s)}
+                    onClick={() => {
+                      setNotifSound(s)
+                      playSound(s)
+                    }}
                     className={`rounded-lg border px-3 py-2 text-xs font-medium text-left transition-colors ${
                       notifSound === s
                         ? 'border-accent bg-accent/10 text-accent'
@@ -810,13 +814,6 @@ export default function Settings() {
                     {s === 'bell' ? 'Campainha' : s === 'chime' ? 'Chime' : s === 'buzzer' ? 'Buzina' : 'Beep'}
                   </button>
                 ))}
-                <button
-                  type="button"
-                  onClick={playTestSound}
-                  className="col-span-2 sm:col-span-4 rounded-lg border border-accent bg-accent/10 px-3 py-2 text-left transition-colors hover:bg-accent/20 flex items-center gap-2 text-accent font-medium"
-                >
-                  <Volume2 size={14} /> Ouvir prévia
-                </button>
               </div>
             </div>
 

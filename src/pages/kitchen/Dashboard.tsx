@@ -33,19 +33,28 @@ function timeLabel(dateStr: string): string {
 function playBeep(ctx: AudioContext) {
   try {
     void ctx.resume()
-    const beepAt = (freq: number, start: number, duration: number) => {
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.connect(gain)
-      osc.frequency.value = freq
-      osc.type = 'sine'
-      gain.gain.setValueAtTime(0.35, ctx.currentTime + start)
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + duration)
-      osc.start(ctx.currentTime + start)
-      osc.stop(ctx.currentTime + start + duration)
-    }
-    beepAt(880, 0, 0.18)
-    beepAt(880, 0.28, 0.18)
+    const now = ctx.currentTime
+    const osc1 = ctx.createOscillator()
+    const gain1 = ctx.createGain()
+    osc1.connect(gain1)
+    gain1.connect(ctx.destination)
+    osc1.frequency.value = 880
+    osc1.type = 'sine'
+    gain1.gain.setValueAtTime(0.35, now)
+    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.18)
+    osc1.start(now)
+    osc1.stop(now + 0.18)
+
+    const osc2 = ctx.createOscillator()
+    const gain2 = ctx.createGain()
+    osc2.connect(gain2)
+    gain2.connect(ctx.destination)
+    osc2.frequency.value = 880
+    osc2.type = 'sine'
+    gain2.gain.setValueAtTime(0.35, now + 0.28)
+    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.46)
+    osc2.start(now + 0.28)
+    osc2.stop(now + 0.46)
   } catch {
     // Áudio indisponível
   }
@@ -58,12 +67,13 @@ export default function KitchenDashboard() {
   const audioCtxRef = useRef<AudioContext | null>(null)
 
   const createAudio = () => {
-    if (audioCtxRef.current) return
+    if (audioCtxRef.current) return audioCtxRef.current
     try {
       const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
       audioCtxRef.current = new Ctx()
+      return audioCtxRef.current
     } catch {
-      // Áudio indisponível
+      return null
     }
   }
 
@@ -98,13 +108,12 @@ export default function KitchenDashboard() {
     document.title = newCount > 0 ? `(${newCount}) Novo pedido! - Cozinha` : 'Cozinha - MeuCardapio'
     if (newCount === 0) return
 
-    // Tenta criar áudio se ainda não existe
-    if (!audioCtxRef.current) createAudio()
-    if (audioCtxRef.current) playBeep(audioCtxRef.current)
+    const ctx = createAudio()
+    if (ctx) playBeep(ctx)
 
     const t = setInterval(() => {
-      if (!audioCtxRef.current) createAudio()
-      if (audioCtxRef.current) playBeep(audioCtxRef.current)
+      const c = createAudio()
+      if (c) playBeep(c)
     }, 8000)
     return () => clearInterval(t)
   }, [newCount])
