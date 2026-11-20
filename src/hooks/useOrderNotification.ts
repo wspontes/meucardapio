@@ -8,28 +8,28 @@ import type { Order } from '@/types'
 
 export function useOrderNotification() {
   const prevIds = useRef<Set<string>>(new Set())
+  const initialized = useRef(false)
   const { showToast } = useToast()
   const { settings } = useSettings()
   const notifSettings = settings?.notificationSettings || { enabled: true, sound: 'bell' as const, volume: 0.5 }
   const audioCtxRef = useRef<AudioContext | null>(null)
 
-  const ensureAudio = useRef(false)
-
-  useEffect(() => {
-    const warm = () => {
-      if (!ensureAudio.current) {
-        try {
-          const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-          audioCtxRef.current = ctx
-          ensureAudio.current = true
-        } catch {
-          // Áudio indisponível
-        }
-      }
+  const createAudio = () => {
+    if (audioCtxRef.current) return
+    try {
+      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      audioCtxRef.current = new Ctx()
+    } catch {
+      // Áudio indisponível
     }
+  }
+
+  // Aquece áudio na primeira interação do usuário
+  useEffect(() => {
+    const warm = () => createAudio()
     window.addEventListener('pointerdown', warm, { once: true })
     return () => window.removeEventListener('pointerdown', warm)
-  }, [])
+  }, [createAudio])
 
   useEffect(() => {
     const storeId = getCurrentStoreId()
@@ -39,7 +39,17 @@ export function useOrderNotification() {
       const scoped = storeId ? data.filter((o) => o.storeId === storeId) : data
       const currentIds = new Set(scoped.map((o) => o.id))
       const newIds = [...currentIds].filter((id) => !prevIds.current.has(id))
-      if (prevIds.current.size > 0 && newIds.length > 0 && notifSettings.enabled) {
+
+      // Primeira carga: apenas popula o prevIds, não toca som
+      if (!initialized.current) {
+        initialized.current = true
+        prevIds.current = currentIds
+        return
+      }
+
+      if (newIds.length > 0 && notifSettings.enabled) {
+        // Tenta criar áudio se ainda não existe (fallback para quem não clicou)
+        if (!audioCtxRef.current) createAudio()
         playNotificationSound(audioCtxRef.current, notifSettings.sound, notifSettings.volume)
         const newOrders = scoped.filter((o) => newIds.includes(o.id))
         newOrders.forEach((o) => {
