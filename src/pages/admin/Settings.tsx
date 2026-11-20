@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react'
-import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2 } from 'lucide-react'
+import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2, Smartphone, History, RotateCcw } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { ImageUpload, ProductCard, ThemeColorPicker } from '@/components/shared'
-import { settingsService, productsService } from '@/services'
-import { type BusinessSettings } from '@/services/settings'
+import { settingsService, productsService, setCurrentStoreId } from '@/services'
+import { type BusinessSettings, type SettingsBackup } from '@/services/settings'
+import { useToast } from '@/contexts/ToastContext'
+import { useStoreGuard } from '@/components/shared/StoreGuard'
 import type { Product } from '@/types'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
 import { THEMES, DEFAULT_THEME_ID, CUSTOM_THEME_ID, getThemeById, type ThemeColors } from '@/config/themes'
 
 export default function Settings() {
+  const { showToast } = useToast()
+  const { store } = useStoreGuard()
   const [saving, setSaving] = useState(false)
+  const [settingsLoaded, setSettingsLoaded] = useState(false)
   const [hours, setHours] = useState([
     { day: 'Domingo', open: '18:00', close: '22:00', closed: false },
     { day: 'Segunda-feira', open: '18:00', close: '23:00', closed: false },
@@ -63,9 +68,54 @@ export default function Settings() {
   const [notifEnabled, setNotifEnabled] = useState(true)
   const [notifSound, setNotifSound] = useState<'bell' | 'chime' | 'buzzer' | 'beep'>('bell')
   const [notifVolume, setNotifVolume] = useState(0.5)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [backups, setBackups] = useState<SettingsBackup[]>([])
+  const [backupsLoading, setBackupsLoading] = useState(false)
+  const [restoringId, setRestoringId] = useState<string | null>(null)
+
+  // Quadro da Home
+  const [homeBoardTitle, setHomeBoardTitle] = useState('Hoje no Pit Stop')
+  const [homeBoardIds, setHomeBoardIds] = useState<string[]>([])
+  const [homeBoardSearch, setHomeBoardSearch] = useState('')
+
+  const loadBackups = async () => {
+    setBackupsLoading(true)
+    try {
+      setBackups(await settingsService.listBackups(undefined, 10))
+    } catch {
+      // Histórico é opcional: falha na leitura não deve travar a tela.
+    } finally {
+      setBackupsLoading(false)
+    }
+  }
+
+  const handleRestore = async (backup: SettingsBackup) => {
+    const when = new Date(backup.createdAt).toLocaleString('pt-BR')
+    if (!window.confirm(`Restaurar as configurações de ${when}?\n\nO estado atual será salvo como backup antes da restauração.`)) return
+
+    setRestoringId(backup.id)
+    try {
+      await settingsService.restoreBackup(backup.id)
+      window.location.reload()
+    } catch (err) {
+      alert('Erro ao restaurar: ' + (err instanceof Error ? err.message : 'Erro desconhecido'))
+      setRestoringId(null)
+    }
+  }
+
+  const backupLabel = (backup: SettingsBackup) =>
+    backup.data.theme?.themeId === CUSTOM_THEME_ID
+      ? 'Personalizado'
+      : getThemeById(backup.data.theme?.themeId || DEFAULT_THEME_ID)?.name ?? 'Padrão'
 
   useEffect(() => {
+    if (!store?.id) return
+    setCurrentStoreId(store.id)
+    let cancelled = false
+
+    setSettingsLoaded(false)
     settingsService.get().then((data) => {
+      if (cancelled) return
       if (data) {
         if (data.neighborhoods?.length) setNeighborhoods(data.neighborhoods)
         if (data.businessHours?.length) {
@@ -103,12 +153,38 @@ export default function Settings() {
           setNotifSound(ns.sound)
           setNotifVolume(ns.volume)
         }
+        if (data.productViewMode) setViewMode(data.productViewMode)
+        if (data.homeBoard) {
+          if (data.homeBoard.title) setHomeBoardTitle(data.homeBoard.title)
+          if (Array.isArray(data.homeBoard.productIds)) setHomeBoardIds(data.homeBoard.productIds)
+        }
       }
+      if (!cancelled) setSettingsLoaded(true)
+    }).catch(() => {
+      if (!cancelled) {
+        showToast('Não foi possível carregar as configurações.')
+        setSettingsLoaded(false)
+      }
+    })
+    productsService.getActiveProducts().then((p) => {
+      if (!cancelled) setProducts(p)
     }).catch(() => {})
-    productsService.getActiveProducts().then(setProducts).catch(() => {})
-  }, [])
+    loadBackups()
+    return () => { cancelled = true }
+  }, [store?.id])
 
   const handleSave = async () => {
+    if (!store?.id || !settingsLoaded) {
+      showToast('Aguarde o carregamento das configurações antes de salvar.')
+      return
+    }
+    setCurrentStoreId(store.id)
+    const hbValidation = settingsService.validateHomeBoard(homeBoardIds)
+    if (!hbValidation.ok) {
+      showToast(hbValidation.error || 'Configuração do quadro inválida')
+      return
+    }
+
     setSaving(true)
     try {
       const data: BusinessSettings = {
@@ -136,6 +212,11 @@ export default function Settings() {
           themeId: selectedThemeId,
           ...(selectedThemeId === CUSTOM_THEME_ID ? { customColors } : {}),
         },
+        productViewMode: viewMode,
+        homeBoard: {
+          title: homeBoardTitle.trim() || 'Hoje no Pit Stop',
+          productIds: homeBoardIds,
+        },
         notificationSettings: {
           enabled: notifEnabled,
           sound: notifSound,
@@ -143,10 +224,13 @@ export default function Settings() {
         },
       }
       await settingsService.save(JSON.parse(JSON.stringify(data)))
+      await loadBackups()
+      showToast('Configurações salvas com sucesso!')
     } catch (err) {
-      alert('Erro ao salvar: ' + (err instanceof Error ? err.message : 'Erro desconhecido'))
+      showToast('Erro ao salvar: ' + (err instanceof Error ? err.message : 'Erro desconhecido'))
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   const toggleDay = (index: number) => {
@@ -690,8 +774,214 @@ export default function Settings() {
           </div>
         </div>
 
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
+            <Smartphone size={18} className="text-accent" />
+            Visualização de Produtos
+          </h2>
+          <p className="mb-4 text-xs text-muted">
+            Escolha como os produtos serão exibidos aos clientes no cardápio.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`rounded-xl border p-6 text-left transition-all ${viewMode === 'grid' ? 'border-accent bg-accent/10 ring-1 ring-accent/30' : 'border-border hover:border-muted'}`}
+            >
+              <div className="mb-3 flex gap-2">
+                <div className="h-8 w-8 rounded border border-white/10" style={{ backgroundColor: '#f4ede0' }} />
+                <div className="h-8 w-8 rounded border border-white/10" style={{ backgroundColor: '#f4ede0' }} />
+              </div>
+              <p className="text-sm font-medium text-brand-white">Grade</p>
+              <p className="text-[10px] text-muted">Produtos em cartões lado a lado</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              className={`rounded-xl border p-6 text-left transition-all ${viewMode === 'list' ? 'border-accent bg-accent/10 ring-1 ring-accent/30' : 'border-border hover:border-muted'}`}
+            >
+              <div className="mb-3 flex gap-2">
+                <div className="h-8 w-8 rounded border border-white/10" style={{ backgroundColor: '#f4ede0' }} />
+                <div className="h-4 w-24 rounded border border-white/10 mt-1" style={{ backgroundColor: '#f4ede0' }} />
+              </div>
+              <p className="text-sm font-medium text-brand-white">Lista</p>
+              <p className="text-[10px] text-muted">Produtos em linhas, foto à esquerda e preço à direita</p>
+            </button>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
+            <Sparkles size={18} className="text-accent" />
+            Quadro da Home
+          </h2>
+          <p className="mb-4 text-xs text-muted">
+            Escolha até 4 produtos para exibir no quadro "Hoje no Pit Stop" da home do cliente. A ordem aqui é a ordem de exibição.
+          </p>
+
+          <div className="mb-4">
+            <Input
+              label="Título do quadro"
+              value={homeBoardTitle}
+              onChange={(e) => setHomeBoardTitle(e.target.value)}
+              placeholder="Hoje no Pit Stop"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="mb-1.5 block text-sm font-medium text-brand-white">Adicionar produto</label>
+            <Input
+              placeholder="Buscar produto ativo..."
+              value={homeBoardSearch}
+              onChange={(e) => setHomeBoardSearch(e.target.value)}
+              disabled={homeBoardIds.length >= 4}
+            />
+            {homeBoardIds.length >= 4 && (
+              <p className="mt-1 text-xs text-amber-400">Máximo de 4 produtos.</p>
+            )}
+            {homeBoardIds.length < 4 && homeBoardSearch.trim().length > 0 && (
+              <div className="mt-2 max-h-44 overflow-y-auto rounded-lg border border-border bg-surface-hover">
+                {products
+                  .filter((p) => p.active && !homeBoardIds.includes(p.id))
+                  .filter((p) => p.name.toLowerCase().includes(homeBoardSearch.trim().toLowerCase()))
+                  .slice(0, 20)
+                  .map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => { setHomeBoardIds((prev) => [...prev, p.id]); setHomeBoardSearch('') }}
+                      className="flex w-full items-center justify-between gap-3 border-b border-border/50 px-3 py-2 text-left text-sm transition-colors last:border-0 hover:bg-surface"
+                    >
+                      <span className="truncate text-brand-white">{p.name}</span>
+                      <span className="shrink-0 text-xs text-muted">
+                        R$ {(p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price).toFixed(2).replace('.', ',')}
+                      </span>
+                    </button>
+                  ))}
+                {products.filter((p) => p.active && !homeBoardIds.includes(p.id) && p.name.toLowerCase().includes(homeBoardSearch.trim().toLowerCase())).length === 0 && (
+                  <p className="px-3 py-2 text-xs text-muted">Nenhum produto encontrado.</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-brand-white">Produtos selecionados ({homeBoardIds.length}/4)</label>
+            {homeBoardIds.length === 0 ? (
+              <p className="rounded-lg bg-surface-hover px-3 py-2 text-xs text-muted">Nenhum produto selecionado.</p>
+            ) : (
+              <div className="space-y-1">
+                {homeBoardIds.map((id, idx) => {
+                  const p = products.find((x) => x.id === id)
+                  return (
+                    <div key={id} className="flex items-center justify-between gap-2 rounded-lg bg-surface-hover px-3 py-2">
+                      <span className="truncate text-sm text-brand-white">
+                        {idx + 1}. {p?.name || id}
+                      </span>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (idx === 0) return
+                            const next = [...homeBoardIds]
+                            ;[next[idx - 1], next[idx]] = [next[idx], next[idx - 1]]
+                            setHomeBoardIds(next)
+                          }}
+                          disabled={idx === 0}
+                          className="rounded px-2 py-1 text-xs text-muted transition-colors hover:text-brand-white disabled:opacity-30"
+                          aria-label="Subir"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (idx === homeBoardIds.length - 1) return
+                            const next = [...homeBoardIds]
+                            ;[next[idx], next[idx + 1]] = [next[idx + 1], next[idx]]
+                            setHomeBoardIds(next)
+                          }}
+                          disabled={idx === homeBoardIds.length - 1}
+                          className="rounded px-2 py-1 text-xs text-muted transition-colors hover:text-brand-white disabled:opacity-30"
+                          aria-label="Descer"
+                        >
+                          ↓
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setHomeBoardIds((prev) => prev.filter((x) => x !== id))}
+                          className="rounded px-2 py-1 text-xs text-red-400 transition-colors hover:text-red-300"
+                          aria-label="Remover"
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div>
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-white">
+                <History size={18} className="text-accent" />
+                Backups
+              </h2>
+              <p className="mt-1 text-xs text-muted">
+                Um backup é criado automaticamente antes de cada salvamento. Guardamos os 30 últimos.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={loadBackups}
+              disabled={backupsLoading}
+              className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:text-brand-white disabled:opacity-50"
+            >
+              {backupsLoading ? 'Carregando...' : 'Atualizar'}
+            </button>
+          </div>
+
+          {backups.length === 0 ? (
+            <p className="rounded-lg bg-surface-hover px-4 py-3 text-xs text-muted">
+              Nenhum backup ainda. O primeiro será criado no próximo salvamento.
+            </p>
+          ) : (
+            <div className="space-y-1">
+              {backups.map((backup) => (
+                <div
+                  key={backup.id}
+                  className="flex items-center justify-between gap-3 rounded-lg bg-surface-hover px-3 py-2.5"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm text-brand-white">
+                      {new Date(backup.createdAt).toLocaleString('pt-BR')}
+                    </p>
+                    <p className="truncate text-[11px] text-muted">
+                      Tema: {backupLabel(backup)}
+                      {backup.data.productViewMode === 'list' ? ' · Lista' : ' · Grade'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRestore(backup)}
+                    disabled={restoringId !== null}
+                    className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-brand-white transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+                  >
+                    <RotateCcw size={13} />
+                    {restoringId === backup.id ? 'Restaurando...' : 'Restaurar'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="flex justify-end">
-          <Button onClick={handleSave} loading={saving}>Salvar Configurações</Button>
+          <Button onClick={handleSave} loading={saving} disabled={!settingsLoaded}>Salvar Configurações</Button>
         </div>
       </div>
     </div>

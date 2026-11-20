@@ -36,7 +36,24 @@ export const storesService = {
   },
 
   async update(id: string, data: Partial<Store>): Promise<void> {
-    await setDoc(doc(db, COLLECTION, id), { ...data, updatedAt: new Date().toISOString() }, { merge: true })
+    const clean = JSON.parse(JSON.stringify({ ...data, updatedAt: new Date().toISOString() }))
+    await setDoc(doc(db, COLLECTION, id), clean, { merge: true })
+  },
+
+  async listAll(): Promise<Store[]> {
+    const snapshot = await getDocs(collection(db, COLLECTION))
+    return snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() } as Store))
+  },
+
+  async toggleActive(id: string): Promise<void> {
+    const store = await storesService.getById(id)
+    if (!store) return
+    await storesService.update(id, { active: !store.active })
+  },
+
+  async remove(id: string): Promise<void> {
+    // A exclusão é lógica: mantém o documento e apenas desativa a loja.
+    await storesService.update(id, { active: false })
   },
 
   async slugExists(slug: string): Promise<boolean> {

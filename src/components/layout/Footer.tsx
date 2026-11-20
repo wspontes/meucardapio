@@ -6,15 +6,19 @@ import { resolveImageUrl } from '@/utils/resolveImageUrl'
 const dayLabels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
 function formatHourRange(hours: { dayOfWeek: number; open: string; close: string; closed: boolean }[]) {
-  const open = hours.filter((h) => !h.closed && h.open && h.close)
-  if (open.length === 0) return ['Horário não disponível']
+  if (!hours || hours.length === 0) return ['Horário não disponível']
 
+  const sorted = [...hours].sort((a, b) => a.dayOfWeek - b.dayOfWeek)
+
+  // Agrupa dias consecutivos com o mesmo horário (aberto ou fechado).
   const groups: { dayOfWeek: number; open: string; close: string; closed: boolean }[][] = []
-  let current = [open[0]]
-  for (let i = 1; i < open.length; i++) {
-    const prev = open[i - 1]
-    const curr = open[i]
-    if (prev.close === curr.open && curr.dayOfWeek === prev.dayOfWeek + 1) {
+  let current = [sorted[0]]
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = current[current.length - 1]
+    const curr = sorted[i]
+    const sameHours = prev.closed === curr.closed && prev.open === curr.open && prev.close === curr.close
+    const consecutive = curr.dayOfWeek === prev.dayOfWeek + 1
+    if (sameHours && consecutive) {
       current.push(curr)
     } else {
       groups.push(current)
@@ -23,11 +27,22 @@ function formatHourRange(hours: { dayOfWeek: number; open: string; close: string
   }
   groups.push(current)
 
+  // Caso especial: todos os 7 dias com o mesmo horário.
+  if (groups.length === 1 && sorted.length === 7) {
+    const g = groups[0]
+    const range = 'Todos os dias'
+    if (g[0].closed) return [`${range}: fechado`]
+    return [`${range}: ${g[0].open.slice(0, 5)} às ${g[0].close.slice(0, 5)}`]
+  }
+
   return groups.map((g) => {
     const first = g[0]
     const last = g[g.length - 1]
-    const prefix = first.dayOfWeek === last.dayOfWeek ? dayLabels[first.dayOfWeek] : `${dayLabels[first.dayOfWeek]} - ${dayLabels[last.dayOfWeek]}`
-    return `${prefix}: ${first.open.slice(0, 5)} às ${last.close.slice(0, 5)}`
+    const range = first.dayOfWeek === last.dayOfWeek
+      ? dayLabels[first.dayOfWeek]
+      : `${dayLabels[first.dayOfWeek]}–${dayLabels[last.dayOfWeek]}`
+    if (first.closed) return `${range}: fechado`
+    return `${range}: ${first.open.slice(0, 5)} às ${last.close.slice(0, 5)}`
   })
 }
 

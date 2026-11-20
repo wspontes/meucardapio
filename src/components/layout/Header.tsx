@@ -31,7 +31,6 @@ export function Header() {
   const logoUrl = settings?.theme?.logo || store?.logo
   const navLinks = slug
     ? [
-        { to: `${prefix}/`, label: 'Início' },
         { to: `${prefix}/cardapio`, label: 'Cardápio' },
       ]
     : []

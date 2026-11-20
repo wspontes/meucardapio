@@ -1,3 +1,5 @@
 export { cn } from './cn'
 export { formatCurrency, formatPhone, formatDate, formatTime, formatDateTime } from './format'
 export { isJuiceProduct } from './is-juice-product'
+export { printOrder } from './printOrder'
+export { buildKitchenText, buildDeliveryText, buildBothText, buildReceiptText, buildBothAscii, buildBothEscPosBase64, printBothViaRawBt, buildEscPosBase64, buildRawBtUrl, printViaRawBt, RECEIPT_COLS, PRINT_COLS } from './receipt'

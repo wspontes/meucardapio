@@ -11,6 +11,24 @@
   --color-muted: #a3a3a3;
   --color-accent: #dc2626;
   --color-button: #dc2626;
+  --color-price-color: #b5301e;
+  --color-separator: #ddd3c2;
+  --color-mustard-bg: #ebb43f;
+  --color-title-color: #2a5d3b;
+  --board-frame: #4a3222;
+  --board-bg: #12241c;
+  --board-label: #e8b23d;
+  --board-text: #f4efe1;
+  --board-price: #e8b23d;
+  --board-separator: rgba(244, 239, 225, 0.25);
+  --status-open: #3fbf6b;
+  --status-closed: #e5483a;
+  --status-text: #f4ede0;
+  /* Dashboard admin — cores dos gráficos (seguem o tema escuro) */
+  --color-chart-grid: #333333;
+  --color-chart-label: #a3a3a3;
+  --color-chart-bar: rgba(220, 38, 38, 0.35);
+  --color-chart-cursor: rgba(220, 38, 38, 0.12);
   --animate-fade-in: fade-in 0.3s ease-out;
 }
 
@@ -29,6 +47,72 @@
   }
   .admin-borders * {
     border-color: var(--color-border);
+  }
+}
+
+/* ---------- Impressão de comanda (isolado, não afeta a tela normal) ---------- */
+.print-portal {
+  --print-cols: 26;
+  display: none;
+  font-family: 'Courier New', Courier, ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.3px;
+  font-weight: 700;
+  line-height: 1.18;
+  color: #000;
+}
+
+.print-coupon {
+  width: calc(var(--print-cols) * 1ch);
+  margin: 0;
+  white-space: pre;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: #000;
+  background: #fff;
+}
+
+.print-cut {
+  width: calc(var(--print-cols) * 1ch);
+  margin: 3mm 0;
+  border-top: 1px dashed #000;
+}
+
+@media print {
+  @page {
+    size: 58mm auto;
+    margin: 0;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  body > *:not(.print-portal) {
+    display: none !important;
+  }
+
+  .print-portal {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .print-coupon {
+    max-height: none !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
   }
 }
 

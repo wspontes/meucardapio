@@ -18,7 +18,7 @@ export default function Login() {
 
   useEffect(() => {
     if (user && !loading) {
-      const redirect = searchParams.get('redirect') || (user.storeId ? undefined : '/cadastro')
+      const redirect = searchParams.get('redirect') || (user.role === 'master' ? '/master' : (user.storeId ? undefined : '/cadastro'))
       if (redirect) {
         navigate(redirect, { replace: true })
       } else if (user.storeId) {

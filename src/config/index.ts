@@ -45,6 +45,7 @@ export const userRoles = {
   kitchen: 'Cozinha',
   delivery: 'Entregador',
   customer: 'Cliente',
+  master: 'Master',
 } as const
 
 export type UserRole = keyof typeof userRoles

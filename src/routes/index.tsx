@@ -1,6 +1,6 @@
-import { lazy, Suspense } from 'react'
-import { createBrowserRouter, Navigate } from 'react-router-dom'
-import { AuthLayout, AdminLayout, KitchenLayout, StoreLayout } from '@/layouts'
+import { lazy, Suspense, useEffect } from 'react'
+import { createBrowserRouter, Navigate, useRouteError } from 'react-router-dom'
+import { AuthLayout, AdminLayout, KitchenLayout, StoreLayout, MasterLayout } from '@/layouts'
 import { ProtectedRoute } from '@/components/shared'
 import { StoreGuard } from '@/components/shared/StoreGuard'
 
@@ -8,7 +8,6 @@ const Landing = lazy(() => import('@/pages/public/Landing'))
 const RegisterStore = lazy(() => import('@/pages/public/RegisterStore'))
 const Login = lazy(() => import('@/pages/public/Login'))
 const Register = lazy(() => import('@/pages/public/Register'))
-const Home = lazy(() => import('@/pages/public/Home'))
 const Menu = lazy(() => import('@/pages/public/Menu'))
 const Cart = lazy(() => import('@/pages/public/Cart'))
 const Checkout = lazy(() => import('@/pages/public/Checkout'))
@@ -23,6 +22,10 @@ const AdminSettings = lazy(() => import('@/pages/admin/Settings'))
 const AdminCoupons = lazy(() => import('@/pages/admin/CouponsAdmin'))
 const AdminMotoboys = lazy(() => import('@/pages/admin/MotoboysAdmin'))
 const KitchenDashboard = lazy(() => import('@/pages/kitchen/Dashboard'))
+const MasterDashboard = lazy(() => import('@/pages/master/Dashboard'))
+const MasterStoreDetail = lazy(() => import('@/pages/master/StoreDetail'))
+const MasterStoreEdit = lazy(() => import('@/pages/master/StoreEdit'))
+const MasterStoreUsers = lazy(() => import('@/pages/master/StoreUsers'))
 const Seed = lazy(() => import('@/pages/dev/Seed'))
 
 function PageLoader() {
@@ -33,18 +36,56 @@ function PageLoader() {
   )
 }
 
+const CHUNK_RELOAD_KEY = 'meucardapio:chunk-reload-at'
+const CHUNK_RELOAD_COOLDOWN = 15000
+
+function isChunkLoadError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error ?? '')
+  return /dynamically imported module|Importing a module script failed|Loading chunk|ChunkLoadError|Failed to fetch/i.test(message)
+}
+
 function ChunkError() {
-  setTimeout(() => window.location.reload(), 2000)
+  const error = useRouteError()
+  const chunkError = isChunkLoadError(error)
+
+  useEffect(() => {
+    // Só recarrega quando o problema é realmente um chunk antigo após deploy.
+    // Erros de renderização NÃO devem recarregar a página (isso causava loop infinito).
+    if (!chunkError) return
+
+    try {
+      const lastReload = Number(sessionStorage.getItem(CHUNK_RELOAD_KEY) || 0)
+      if (Date.now() - lastReload < CHUNK_RELOAD_COOLDOWN) return
+      sessionStorage.setItem(CHUNK_RELOAD_KEY, String(Date.now()))
+    } catch {
+      // sessionStorage indisponível: não recarrega automaticamente
+      return
+    }
+
+    const timer = setTimeout(() => window.location.reload(), 1500)
+    return () => clearTimeout(timer)
+  }, [chunkError])
+
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
       <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-      <p className="text-sm text-muted">Atualizando... Nova versão disponível</p>
+      <p className="text-sm text-muted">
+        {chunkError ? 'Atualizando para a versão mais recente...' : 'Algo deu errado ao carregar esta página'}
+      </p>
+      {!chunkError && (
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 rounded-lg bg-accent px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-accent/90"
+        >
+          Recarregar
+        </button>
+      )}
     </div>
   )
 }
 
 function ProtectedAdmin({ children }: { children: React.ReactNode }) {
-  return <ProtectedRoute roles={['admin', 'manager', 'attendant']}>{children}</ProtectedRoute>
+  return <ProtectedRoute roles={['admin', 'manager', 'attendant', 'master']}>{children}</ProtectedRoute>
 }
 
 function ProtectedKitchen({ children }: { children: React.ReactNode }) {
@@ -74,7 +115,7 @@ export const router = createBrowserRouter([
     element: <StoreLayout />,
     errorElement: <ChunkError />,
     children: [
-      { index: true, element: <Suspense fallback={<PageLoader />}><Home /></Suspense> },
+      { index: true, element: <Suspense fallback={<PageLoader />}><Menu /></Suspense> },
       { path: 'cardapio', element: <Suspense fallback={<PageLoader />}><Menu /></Suspense> },
       { path: 'carrinho', element: <Suspense fallback={<PageLoader />}><Cart /></Suspense> },
       { path: 'checkout', element: <Suspense fallback={<PageLoader />}><Checkout /></Suspense> },
@@ -104,6 +145,17 @@ export const router = createBrowserRouter([
     errorElement: <ChunkError />,
     children: [
       { index: true, element: <Suspense fallback={<PageLoader />}><KitchenDashboard /></Suspense> },
+    ],
+  },
+  {
+    path: '/master',
+    element: <ProtectedRoute roles={['master']}><MasterLayout /></ProtectedRoute>,
+    errorElement: <ChunkError />,
+    children: [
+      { index: true, element: <Suspense fallback={<PageLoader />}><MasterDashboard /></Suspense> },
+      { path: 'lojas/:id', element: <Suspense fallback={<PageLoader />}><MasterStoreDetail /></Suspense> },
+      { path: 'lojas/:id/editar', element: <Suspense fallback={<PageLoader />}><MasterStoreEdit /></Suspense> },
+      { path: 'lojas/:id/usuarios', element: <Suspense fallback={<PageLoader />}><MasterStoreUsers /></Suspense> },
     ],
   },
   {

@@ -7,6 +7,15 @@ class OrdersService extends FirestoreService<Order> {
     super('orders')
   }
 
+  /** Pedidos da loja atual criados dentro de [startISO, endISO). */
+  async getByDateRange(startISO: string, endISO: string) {
+    return this.getAll([
+      where('createdAt', '>=', startISO),
+      where('createdAt', '<', endISO),
+      orderBy('createdAt', 'asc'),
+    ])
+  }
+
   async getByCustomer(customerId: string) {
     return this.getAll([
       where('customerId', '==', customerId),
