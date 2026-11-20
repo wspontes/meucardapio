@@ -55,7 +55,7 @@ export function useSectionProducts(section: 'featured' | 'new' | 'promotion', li
       try {
         setLoading(true)
         const all = await productsService.getActiveProducts()
-        const filtered = all.filter((p) => p.section === section).slice(0, limit)
+        const filtered = all.slice(0, limit)
         if (mounted) {
           setProducts(filtered)
           setError(null)
