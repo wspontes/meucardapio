@@ -23,7 +23,6 @@ interface ProductFormData {
   image: string
   order: string
   active: boolean
-  section: '' | 'featured' | 'new' | 'promotion'
   ingredients: IngredientForm[]
   customizable: boolean
 }
@@ -46,7 +45,6 @@ export default function ProductForm() {
     image: '',
     order: '',
     active: true,
-    section: '',
     ingredients: [EMPTY_INGREDIENT],
     customizable: false,
   })
@@ -65,7 +63,6 @@ export default function ProductForm() {
             image: product.image || '',
             order: product.order ? String(product.order) : '',
             active: product.active,
-            section: product.section ?? '',
             ingredients: (product.ingredients ?? []).map((ing) => ({
               id: ing.ingredientId,
               name: ing.name,
@@ -127,7 +124,6 @@ export default function ProductForm() {
       image: form.image || '',
       order: newOrder || 0,
       active: form.active,
-      section: form.section || undefined,
       sizes: [],
       ingredients: cleanIngredients,
       customizable: form.customizable,
@@ -188,13 +184,7 @@ export default function ProductForm() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-brand-white">Seção na Home</label>
-            <select className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-brand-white transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" value={form.section} onChange={(e) => setForm({ ...form, section: e.target.value as typeof form.section })}>
-              <option value="">Nenhuma</option>
-              <option value="featured">Mais Pedidos</option>
-              <option value="new">Novidades</option>
-              <option value="promotion">Promoções</option>
-            </select>
+            <label className="mb-1.5 block text-sm font-medium text-brand-white">Sabores / Ingredientes</label>
           </div>
         </div>
 
