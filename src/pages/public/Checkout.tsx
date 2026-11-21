@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import QRCode from 'qrcode'
-import { gerarPixCopiaECola, validatePixKey, normalizePixKey, normalizePixName, normalizePixCity } from '@/utils/pix'
+import { validatePixKey, normalizePixName, normalizePixCity } from '@/utils/pix'
 import { useNavigate, Link, useParams } from 'react-router-dom'
 import { ArrowLeft, CreditCard, Banknote, QrCode, MapPin, User, AlertTriangle, Coins, Hash, Truck, Store } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
@@ -60,10 +59,6 @@ export default function Checkout() {
     reference: '',
   })
   const [cepLoading, setCepLoading] = useState(false)
-  const [pixPayload, setPixPayload] = useState('')
-  const [pixQrDataUrl, setPixQrDataUrl] = useState('')
-  const [pixError, setPixError] = useState('')
-  const [copied, setCopied] = useState(false)
 
   // Define o frete padrão ao carregar o checkout para delivery
   useEffect(() => {
@@ -72,40 +67,7 @@ export default function Checkout() {
     }
   }, [deliveryType, settings, state.deliveryFee, setDeliveryFee])
 
-  // Gera Pix copia-e-cola com valor exato do pedido
-  useEffect(() => {
-    if (paymentMethod !== 'pix' || !pixConfigured) {
-      setPixPayload('')
-      setPixQrDataUrl('')
-      setPixError('')
-      return
-    }
-    const total = Math.round(orderTotal * 100) / 100
-    if (total <= 0) {
-      setPixError('Valor inválido para Pix')
-      setPixPayload('')
-      setPixQrDataUrl('')
-      return
-    }
-    const txid = '' // código exibido usa txid anônimo (***); txid salvo no pedido = id do pedido
-    try {
-      const key = normalizePixKey(pixKey, pixType)
-      const payload = gerarPixCopiaECola({
-        chave: key,
-        nome: pixName,
-        cidade: pixCity,
-        valor: total,
-        txid: txid || undefined,
-      })
-      setPixPayload(payload)
-      setPixError('')
-      QRCode.toDataURL(payload, { width: 256, margin: 2 }).then((url) => setPixQrDataUrl(url)).catch(() => setPixQrDataUrl(''))
-    } catch (e) {
-      setPixError(e instanceof Error ? e.message : 'Erro ao gerar Pix')
-      setPixPayload('')
-      setPixQrDataUrl('')
-    }
-  }, [paymentMethod, pixConfigured, orderTotal, pixKey, pixType, pixName, pixCity])
+  // Pix: código é exibido na tela de confirmação do pedido (OrderConfirmed)
 
   const handleCepLookup = async (cep: string) => {
     const clean = cep.replace(/\D/g, '')
@@ -391,49 +353,10 @@ export default function Checkout() {
             </div>
 
             {paymentMethod === 'pix' && pixConfigured && (
-              <div className="rounded-xl border border-green-500/30 bg-green-500/5 p-4 space-y-3">
-                <h4 className="flex items-center gap-2 text-sm font-semibold text-green-400"><QrCode size={16} />Pagamento PIX</h4>
-                <p className="text-xs text-muted">Pague no app do seu banco. O valor já vem preenchido.</p>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-brand-white">{formatCurrency(orderTotal)}</p>
-                  <p className="text-xs text-muted">Beneficiário: {normalizePixName(pixName)}</p>
-                </div>
-                {pixQrDataUrl && (
-                  <div className="flex justify-center">
-                    <img src={pixQrDataUrl} alt="QR Code Pix" className="h-48 w-48 rounded-xl border border-border bg-white p-2" />
-                  </div>
-                )}
-                {pixPayload && (
-                  <div className="space-y-2">
-                    <p className="text-xs text-muted">Código copia e cola:</p>
-                    <div className="rounded-lg bg-surface-hover px-3 py-2">
-                      <p className="text-xs font-mono text-brand-white break-all select-all">{pixPayload}</p>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full text-sm"
-                      onClick={async () => {
-                        try { await navigator.clipboard.writeText(pixPayload); setCopied(true); setTimeout(() => setCopied(false), 2000) } catch {
-                          const ta = document.createElement('textarea'); ta.value = pixPayload; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); setCopied(true); setTimeout(() => setCopied(false), 2000)
-                        }
-                      }}
-                    >
-                      {copied ? 'Copiado!' : 'Copiar código'}
-                    </Button>
-                  </div>
-                )}
-                {pixError && <p className="text-xs text-red-400">{pixError}</p>}
-                {settings?.whatsapp && (
-                  <a
-                    href={`https://wa.me/${settings.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Comprovante do pedido. Total: ${formatCurrency(orderTotal)}`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block"
-                  >
-                    <Button type="button" variant="ghost" className="w-full text-sm text-green-400">Enviar comprovante ao WhatsApp</Button>
-                  </a>
-                )}
+              <div className="rounded-xl border border-green-500/30 bg-green-500/5 p-4">
+                <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold text-green-400"><QrCode size={16} />Pagamento PIX</h4>
+                <p className="text-xs text-muted">Após confirmar o pedido, você verá o QR Code e o código copia e cola com o valor exato.</p>
+                <p className="mt-2 text-xs text-muted">Beneficiário: {normalizePixName(pixName)} — {normalizePixCity(pixCity)}</p>
               </div>
             )}
             {error && (

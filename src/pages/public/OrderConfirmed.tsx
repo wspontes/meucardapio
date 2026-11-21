@@ -8,6 +8,8 @@ import { useSettings } from '@/hooks'
 import { useStore } from '@/contexts/StoreContext'
 import { formatCurrency } from '@/utils'
 import { resolveImageUrl } from '@/utils/resolveImageUrl'
+import QRCode from 'qrcode'
+import { gerarPixCopiaECola, validatePixKey, normalizePixKey, normalizePixName, normalizePixCity } from '@/utils/pix'
 
 const stepOrder = ['waitingPayment', 'received', 'preparing', 'outForDelivery', 'delivered']
 
@@ -39,6 +41,9 @@ export default function OrderConfirmed() {
   const initialOrder = (location.state as { order?: Record<string, unknown> })?.order
   const [order, setOrder] = useState<Record<string, unknown> | null>(initialOrder || null)
   const [toast, setToast] = useState<{ msg: string; link?: string; type?: 'info' | 'success' | 'rating' } | null>(null)
+  const [pixPayload, setPixPayload] = useState('')
+  const [pixQrDataUrl, setPixQrDataUrl] = useState('')
+  const [copied, setCopied] = useState(false)
   const prevStatus = useRef<string>((initialOrder?.status as string) || '')
   const orderIdRef = useRef<string>((initialOrder?.id as string) || sessionStorage.getItem(ORDER_ID_KEY) || '')
   const storeNameRef = useRef(storeName)
@@ -107,6 +112,34 @@ export default function OrderConfirmed() {
       }).catch(() => {})
     }
   }, [order])
+
+  // Gera Pix copia-e-cola com valor exato do pedido
+  useEffect(() => {
+    if (!order) return
+    if ((order.paymentMethod as string) !== 'pix') return
+    if ((order.status as string) !== 'waitingPayment') return
+    const pixCfg = settings?.paymentMethods?.pix
+    const pixKey = pixCfg?.key || ''
+    const pixType = (pixCfg?.type || 'cpf') as 'cpf' | 'cnpj' | 'email' | 'telefone' | 'aleatoria'
+    if (!pixKey || !validatePixKey(pixKey, pixType)) return
+    const total = Math.round((order.total as number) * 100) / 100
+    if (total <= 0) return
+    const txid = (order.pixTxid as string) || String(order.id).replace(/[^A-Za-z0-9]/g, '').slice(0, 25) || 'PIX'
+    try {
+      const payload = gerarPixCopiaECola({
+        chave: normalizePixKey(pixKey, pixType),
+        nome: pixCfg?.name || '',
+        cidade: pixCfg?.city || '',
+        valor: total,
+        txid,
+      })
+      setPixPayload(payload)
+      QRCode.toDataURL(payload, { width: 256, margin: 2 }).then((url) => setPixQrDataUrl(url)).catch(() => setPixQrDataUrl(''))
+    } catch {
+      setPixPayload('')
+      setPixQrDataUrl('')
+    }
+  }, [order, settings])
 
   if (!order) {
     return (
@@ -260,6 +293,50 @@ export default function OrderConfirmed() {
             })}
           </div>
         </div>
+
+        {(order.paymentMethod as string) === 'pix' && (order.status as string) === 'waitingPayment' && pixPayload && (
+          <div className="mt-6 rounded-xl border border-green-500/30 bg-green-500/5 p-4 space-y-3">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-green-400"><QrCode size={16} />Pagamento PIX</h3>
+            <p className="text-xs text-muted">Pague no app do seu banco. O valor já vem preenchido.</p>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-brand-white">{formatCurrency(order.total as number)}</p>
+              <p className="text-xs text-muted">Beneficiário: {normalizePixName(settings?.paymentMethods?.pix?.name || '')}</p>
+            </div>
+            {pixQrDataUrl && (
+              <div className="flex justify-center">
+                <img src={pixQrDataUrl} alt="QR Code Pix" className="h-48 w-48 rounded-xl border border-border bg-white p-2" />
+              </div>
+            )}
+            <div className="space-y-2">
+              <p className="text-xs text-muted">Código copia e cola:</p>
+              <div className="rounded-lg bg-surface-hover px-3 py-2">
+                <p className="text-xs font-mono text-brand-white break-all select-all">{pixPayload}</p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full text-sm"
+                onClick={async () => {
+                  try { await navigator.clipboard.writeText(pixPayload); setCopied(true); setTimeout(() => setCopied(false), 2000) } catch {
+                    const ta = document.createElement('textarea'); ta.value = pixPayload; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); setCopied(true); setTimeout(() => setCopied(false), 2000)
+                  }
+                }}
+              >
+                {copied ? 'Copiado!' : 'Copiar código'}
+              </Button>
+            </div>
+            {settings?.whatsapp && (
+              <a
+                href={`https://wa.me/${settings.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Comprovante do pedido #${(order.id as string).slice(0, 8)}. Total: ${formatCurrency(order.total as number)}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button type="button" variant="ghost" className="w-full text-sm text-green-400">Enviar comprovante ao WhatsApp</Button>
+              </a>
+            )}
+          </div>
+        )}
 
         <div className="mt-6 rounded-xl border border-border bg-surface p-4">
           <h3 className="mb-3 font-semibold text-brand-white text-sm">Detalhes do Pedido</h3>
