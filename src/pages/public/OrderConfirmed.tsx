@@ -38,15 +38,15 @@ export default function OrderConfirmed() {
   const { settings } = useSettings()
   const initialOrder = (location.state as { order?: Record<string, unknown> })?.order
   const [order, setOrder] = useState<Record<string, unknown> | null>(initialOrder || null)
-  const [toast, setToast] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ msg: string; link?: string; type?: 'info' | 'success' | 'rating' } | null>(null)
   const prevStatus = useRef<string>((initialOrder?.status as string) || '')
   const orderIdRef = useRef<string>((initialOrder?.id as string) || sessionStorage.getItem(ORDER_ID_KEY) || '')
   const storeNameRef = useRef(storeName)
 
-  const showToast = useCallback((msg: string) => {
-    setToast(msg)
+  const showToast = useCallback((msg: string, opts?: { link?: string; type?: 'info' | 'success' | 'rating'; duration?: number }) => {
+    setToast({ msg, link: opts?.link, type: opts?.type || 'info' })
     playStatusBeep()
-    setTimeout(() => setToast(null), 5000)
+    setTimeout(() => setToast(null), opts?.duration || 8000)
   }, [])
 
   useEffect(() => {
@@ -72,7 +72,16 @@ export default function OrderConfirmed() {
     delivered: isPickup ? 'Retirado' : 'Entregue',
     cancelled: 'Cancelado',
   }
-          showToast(statusLabels[newStatus] || newStatus)
+          if (newStatus === 'delivered') {
+            const oid = (data.id as string) || orderIdRef.current
+            showToast(isPickup ? 'Pronto para retirada!' : 'Pedido entregue!', {
+              type: 'rating',
+              link: `${prefix}/avaliar/${oid}`,
+              duration: 15000,
+            })
+          } else {
+            showToast(statusLabels[newStatus] || newStatus)
+          }
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(storeNameRef.current, { body: `Seu pedido: ${statusLabels[newStatus] || newStatus}` })
           }
@@ -141,10 +150,35 @@ export default function OrderConfirmed() {
   return (
     <div className="container mx-auto px-4 py-6">
       {toast && (
-        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 animate-[fadeIn_0.2s_ease-out]">
-          <div className="flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 shadow-lg backdrop-blur-sm">
-            <Bell size={16} className="text-accent shrink-0" />
-            <span className="text-sm font-medium text-brand-white">{toast}</span>
+        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 animate-[fadeIn_0.2s_ease-out] w-[90vw] max-w-md">
+          <div className={`flex items-center gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-sm ${
+            toast.type === 'rating'
+              ? 'border-yellow-500/40 bg-yellow-500/10'
+              : 'border-accent/30 bg-accent/10'
+          }`}>
+            {toast.type === 'rating' ? (
+              <Star size={20} className="text-yellow-400 shrink-0" />
+            ) : (
+              <Bell size={16} className="text-accent shrink-0" />
+            )}
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-medium text-brand-white">{toast.msg}</span>
+              {toast.type === 'rating' && (
+                <p className="text-xs text-muted mt-0.5">Gostou? Avalie sua experiência!</p>
+              )}
+            </div>
+            {toast.link && (
+              <Link
+                to={toast.link}
+                className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
+                  toast.type === 'rating'
+                    ? 'bg-yellow-500 text-black hover:bg-yellow-400'
+                    : 'bg-accent text-white hover:bg-accent/90'
+                }`}
+              >
+                {toast.type === 'rating' ? '⭐ Avaliar' : 'Ver'}
+              </Link>
+            )}
           </div>
         </div>
       )}
