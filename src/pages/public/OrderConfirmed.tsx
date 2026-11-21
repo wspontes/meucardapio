@@ -116,8 +116,8 @@ export default function OrderConfirmed() {
   // Gera Pix copia-e-cola com valor exato do pedido
   useEffect(() => {
     if (!order) return
-    if ((order.paymentMethod as string) !== 'pix') return
-    if ((order.status as string) !== 'waitingPayment') return
+    if ((order.paymentMethod as string) !== 'pix') { setPixPayload(''); setPixQrDataUrl(''); return }
+    if ((order.status as string) !== 'waitingPayment') { setPixPayload(''); setPixQrDataUrl(''); return }
     const pixCfg = settings?.paymentMethods?.pix
     const pixKey = pixCfg?.key || ''
     const pixType = (pixCfg?.type || 'cpf') as 'cpf' | 'cnpj' | 'email' | 'telefone' | 'aleatoria'
@@ -237,34 +237,13 @@ export default function OrderConfirmed() {
           </div>
         )}
 
-        {isPix && currentStatus === 'waitingPayment' && settings?.paymentMethods?.pix && (
+        {isPix && currentStatus === 'waitingPayment' && !pixPayload && (
           <div className="mt-4 rounded-xl border border-green-500/30 bg-green-500/5 p-4 text-left">
             <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold text-green-400">
               <QrCode size={16} />
               Pagamento PIX
             </h4>
-            {settings.paymentMethods.pix.qrCode && (
-              <div className="mb-3 flex justify-center">
-                <img
-                  src={resolveImageUrl(settings.paymentMethods.pix.qrCode)}
-                  alt="QR Code PIX"
-                  className="h-48 w-48 rounded-xl border border-border object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                />
-              </div>
-            )}
-            <p className="mb-2 text-xs text-muted">Faça o PIX para a chave abaixo:</p>
-            <div className="flex items-center gap-2 rounded-lg bg-surface-hover px-3 py-2">
-              <p className="flex-1 text-sm font-mono text-brand-white select-all break-all">{settings?.paymentMethods?.pix?.key}</p>
-              <button
-                onClick={() => navigator.clipboard.writeText(settings?.paymentMethods?.pix?.key || '')}
-                className="shrink-0 rounded-lg p-2 text-muted hover:bg-surface hover:text-brand-white transition-colors"
-                title="Copiar chave"
-              >
-                <Copy size={14} />
-              </button>
-            </div>
-            <p className="mt-2 text-xs text-muted">O pedido será processado assim que o pagamento for confirmado.</p>
+            <p className="text-xs text-muted">Gerando código Pix...</p>
           </div>
         )}
 
