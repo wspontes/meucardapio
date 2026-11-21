@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { Printer, Copy, Check, XCircle } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { PrintArea } from '@/components/shared/PrintArea'
+import { useSettings } from '@/hooks'
 import type { Order } from '@/types'
 import {
   buildKitchenText,
   buildDeliveryText,
-  printBothViaRawBt,
+  buildChurrasqueiraText,
+  printAllViaRawBt,
   PRINT_COLS,
 } from '@/utils/receipt'
 
@@ -17,22 +19,56 @@ interface Props {
   onClose: () => void
 }
 
-type Tab = 'both' | 'kitchen' | 'delivery'
+type Target = 'kitchen' | 'churrasqueira' | 'delivery'
+
+const TARGET_LABELS: Record<Target, string> = {
+  kitchen: 'Cozinha',
+  churrasqueira: 'Churrasqueira',
+  delivery: 'Entrega',
+}
 
 /** RawBT é um app Android: no PC o botão não faz sentido. */
 const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)
 
 export function PrintOrderModal({ order, storeName = 'MeuCardapio', initialMotoboy = '', onClose }: Props) {
+  const { settings } = useSettings()
   const [copied, setCopied] = useState(false)
   const [motoboy, setMotoboy] = useState(initialMotoboy)
-  const [tab, setTab] = useState<Tab>('both')
 
   if (!order) return null
 
-  const kitchen = buildKitchenText(order, storeName, PRINT_COLS)
-  const delivery = buildDeliveryText(order, storeName, motoboy, PRINT_COLS)
-  const tickets = tab === 'kitchen' ? [kitchen] : tab === 'delivery' ? [delivery] : [kitchen, delivery]
-  const text = tickets.join('')
+  // Targets habilitados nas configurações (default: kitchen + delivery)
+  const printTargets = settings?.printTargets ?? {}
+  const enabledTargets: Target[] = (['kitchen', 'churrasqueira', 'delivery'] as Target[]).filter((t) => {
+    if (t === 'kitchen') return printTargets.kitchen !== false
+    if (t === 'churrasqueira') return printTargets.churrasqueira === true
+    if (t === 'delivery') return printTargets.delivery !== false
+    return false
+  })
+
+  // Se nenhum target habilitado, habilita kitchen por padrão
+  if (enabledTargets.length === 0) enabledTargets.push('kitchen')
+
+  const [tab, setTab] = useState<string>(enabledTargets[0])
+
+  const buildText = (target: Target): string => {
+    if (target === 'kitchen') return buildKitchenText(order, storeName, PRINT_COLS)
+    if (target === 'churrasqueira') return buildChurrasqueiraText(order, storeName, PRINT_COLS)
+    return buildDeliveryText(order, storeName, motoboy, PRINT_COLS)
+  }
+
+  const allTickets = enabledTargets.map((t) => buildText(t))
+  const allText = allTickets.join('')
+
+  let tickets: string[] = []
+  let text = ''
+  if (tab === 'all') {
+    tickets = allTickets
+    text = allText
+  } else {
+    tickets = [buildText(tab as Target)]
+    text = tickets[0]
+  }
 
   const copyText = async () => {
     try {
@@ -49,6 +85,8 @@ export function PrintOrderModal({ order, storeName = 'MeuCardapio', initialMotob
     setTimeout(() => setCopied(false), 1500)
   }
 
+  const showAllTab = enabledTargets.length > 1
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-w-md rounded-xl border border-border bg-surface p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
@@ -63,7 +101,7 @@ export function PrintOrderModal({ order, storeName = 'MeuCardapio', initialMotob
         </div>
 
         <div className="mb-3 flex gap-2">
-          {(['both', 'kitchen', 'delivery'] as Tab[]).map((t) => (
+          {enabledTargets.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -71,9 +109,19 @@ export function PrintOrderModal({ order, storeName = 'MeuCardapio', initialMotob
                 tab === t ? 'bg-accent text-white' : 'bg-surface-hover text-muted hover:text-white'
               }`}
             >
-              {t === 'both' ? 'Os 2' : t === 'kitchen' ? 'Cozinha' : 'Entrega'}
+              {TARGET_LABELS[t]}
             </button>
           ))}
+          {showAllTab && (
+            <button
+              onClick={() => setTab('all')}
+              className={`flex-1 rounded-lg px-2 py-2 text-xs font-medium transition-colors ${
+                tab === 'all' ? 'bg-accent text-white' : 'bg-surface-hover text-muted hover:text-white'
+              }`}
+            >
+              Todos
+            </button>
+          )}
         </div>
 
         {order.deliveryType !== 'pickup' && (
@@ -91,7 +139,7 @@ export function PrintOrderModal({ order, storeName = 'MeuCardapio', initialMotob
         <div className="flex flex-col gap-2">
           {isAndroid ? (
             <>
-              <Button onClick={() => printBothViaRawBt(order, storeName, motoboy)} className="w-full text-sm">
+              <Button onClick={() => printAllViaRawBt(order, storeName, motoboy, enabledTargets)} className="w-full text-sm">
                 <Printer size={16} />
                 Imprimir via RawBT
               </Button>

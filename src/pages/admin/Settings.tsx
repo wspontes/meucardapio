@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2, Smartphone, History, RotateCcw } from 'lucide-react'
+import { Clock, MapPin, CreditCard, Image, Plus, Phone, Trash2, Sparkles, Eye, EyeOff, Palette, GripVertical, ChevronLeft, ChevronRight, Check, Bell, Volume2, Smartphone, History, RotateCcw, Printer } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { ImageUpload, ProductCard, ThemeColorPicker } from '@/components/shared'
 import { settingsService, productsService, setCurrentStoreId } from '@/services'
@@ -68,6 +68,9 @@ export default function Settings() {
   const [notifEnabled, setNotifEnabled] = useState(true)
   const [notifSound, setNotifSound] = useState<'bell' | 'chime' | 'buzzer' | 'beep'>('bell')
   const [notifVolume, setNotifVolume] = useState(0.5)
+  const [printKitchen, setPrintKitchen] = useState(true)
+  const [printChurrasqueira, setPrintChurrasqueira] = useState(false)
+  const [printDelivery, setPrintDelivery] = useState(true)
   const audioCtxRef = useRef<AudioContext | null>(null)
 
   const createAudio = () => {
@@ -214,6 +217,12 @@ export default function Settings() {
           setNotifSound(ns.sound)
           setNotifVolume(ns.volume)
         }
+        if (data.printTargets) {
+          const pt = data.printTargets
+          if (pt.kitchen !== undefined) setPrintKitchen(pt.kitchen)
+          if (pt.churrasqueira !== undefined) setPrintChurrasqueira(pt.churrasqueira)
+          if (pt.delivery !== undefined) setPrintDelivery(pt.delivery)
+        }
         if (data.productViewMode) setViewMode(data.productViewMode)
         if (data.homeBoard) {
           if (data.homeBoard.title) setHomeBoardTitle(data.homeBoard.title)
@@ -282,6 +291,11 @@ export default function Settings() {
           enabled: notifEnabled,
           sound: notifSound,
           volume: notifVolume,
+        },
+        printTargets: {
+          kitchen: printKitchen,
+          churrasqueira: printChurrasqueira,
+          delivery: printDelivery,
         },
       }
       await settingsService.save(JSON.parse(JSON.stringify(data)))
@@ -835,6 +849,39 @@ export default function Settings() {
                 <span className="text-sm text-brand-white w-8 shrink-0 tabular-nums">{Math.round(notifVolume * 100)}%</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-surface p-4 md:p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-brand-white">
+            <Printer size={18} className="text-accent" />
+            Impressão de Comandas
+          </h2>
+          <p className="mb-4 text-xs text-muted">
+            Escolha quem recebe impressão ao imprimir um pedido. Útil para estabelecimentos com setores diferentes (cozinha, churrasqueira, entrega).
+          </p>
+          <div className="space-y-2">
+            <label className="flex items-center gap-3 rounded-lg bg-surface-hover px-4 py-3 cursor-pointer">
+              <input type="checkbox" checked={printKitchen} onChange={(e) => setPrintKitchen(e.target.checked)} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
+              <div>
+                <p className="text-sm font-medium text-brand-white">Cozinha</p>
+                <p className="text-xs text-muted">Imprime cupom com itens e observações para preparo</p>
+              </div>
+            </label>
+            <label className="flex items-center gap-3 rounded-lg bg-surface-hover px-4 py-3 cursor-pointer">
+              <input type="checkbox" checked={printChurrasqueira} onChange={(e) => setPrintChurrasqueira(e.target.checked)} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
+              <div>
+                <p className="text-sm font-medium text-brand-white">Churrasqueira</p>
+                <p className="text-xs text-muted">Imprime cupom para o setor de churrasqueira</p>
+              </div>
+            </label>
+            <label className="flex items-center gap-3 rounded-lg bg-surface-hover px-4 py-3 cursor-pointer">
+              <input type="checkbox" checked={printDelivery} onChange={(e) => setPrintDelivery(e.target.checked)} className="h-4 w-4 rounded border-border bg-surface text-accent focus:ring-accent" />
+              <div>
+                <p className="text-sm font-medium text-brand-white">Entrega</p>
+                <p className="text-xs text-muted">Imprime cupom com endereço, pagamento e total</p>
+              </div>
+            </label>
           </div>
         </div>
 

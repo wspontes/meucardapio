@@ -113,6 +113,29 @@ export function buildKitchenText(order: Order, storeName = 'MeuCardapio', cols =
   return out
 }
 
+/** Cupom da churrasqueira: igual à cozinha (sem endereço/valores, foco no preparo). */
+export function buildChurrasqueiraText(order: Order, storeName = 'MeuCardapio', cols = RECEIPT_COLS): string {
+  const dt = new Date(order.createdAt)
+  const kind = order.deliveryType === 'pickup' ? 'RETIRADA' : 'ENTREGA'
+  const count = order.items.reduce((n, i) => n + i.quantity, 0)
+  let out = ''
+  out += center(storeName.toUpperCase(), cols)
+  out += sep('-', cols)
+  out += center(`CUPOM CHURRASQUEIRA - ${kind}`, cols)
+  out += sep('-', cols)
+  out += line(`Pedido #${order.id.slice(0, 8)}`, cols)
+  out += line(formatShortDate(dt), cols)
+  out += line(`Cliente: ${order.customerName}`.slice(0, cols), cols)
+  out += sep('-', cols)
+  out += itemsBlock(order, true, false, cols)
+  if (order.notes?.trim()) out += wrap(`Obs: ${order.notes.trim()}`, '', cols)
+  out += sep('-', cols)
+  out += center(`*** ${count} ${count === 1 ? 'item' : 'itens'} ***`, cols)
+  out += line('', cols)
+  out += line('', cols)
+  return out
+}
+
 /** Cupom 2 — entrega/motoboy: endereço, pagamento e total. */
 export function buildDeliveryText(order: Order, storeName = 'MeuCardapio', motoboy = '', cols = RECEIPT_COLS): string {
   const dt = new Date(order.createdAt)
@@ -195,6 +218,21 @@ export function printViaRawBt(order: Order, storeName = 'MeuCardapio'): string {
 /** Imprime os dois cupons via RawBT. */
 export function printBothViaRawBt(order: Order, storeName = 'MeuCardapio', motoboy = ''): string {
   const url = `rawbt:base64,${buildBothEscPosBase64(order, storeName, motoboy)}`
+  window.location.href = url
+  return url
+}
+
+/** Imprime todos os targets habilitados via RawBT. */
+export function printAllViaRawBt(order: Order, storeName = 'MeuCardapio', motoboy = '', targets: ('kitchen' | 'churrasqueira' | 'delivery')[] = ['kitchen', 'delivery']): string {
+  const texts = targets.map((t) => {
+    if (t === 'kitchen') return buildKitchenText(order, storeName)
+    if (t === 'churrasqueira') return buildChurrasqueiraText(order, storeName)
+    return buildDeliveryText(order, storeName, motoboy)
+  })
+  const text = texts.join('')
+  const ascii = stripAccents(text).replace(/[^ -~\n]/g, '')
+  const bytes = [0x1b, 0x40, ...asciiBytes(ascii), 0x0a, 0x0a, 0x0a, 0x1d, 0x56, 0x00]
+  const url = `rawbt:base64,${bytesToBase64(bytes)}`
   window.location.href = url
   return url
 }

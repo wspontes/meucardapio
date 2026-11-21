@@ -57,6 +57,11 @@ export interface BusinessSettings {
     sound: 'bell' | 'chime' | 'buzzer' | 'beep'
     volume: number
   }
+  printTargets?: {
+    kitchen?: boolean
+    churrasqueira?: boolean
+    delivery?: boolean
+  }
   homeBoard?: {
     title: string
     productIds: string[]
