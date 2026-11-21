@@ -23,7 +23,14 @@ export interface BusinessSettings {
   }[]
   defaultDeliveryFee?: number
   paymentMethods?: {
-    pix?: { enabled: boolean; key?: string; qrCode?: string }
+    pix?: {
+      enabled: boolean
+      key?: string
+      qrCode?: string
+      type?: 'cpf' | 'cnpj' | 'email' | 'telefone' | 'aleatoria'
+      name?: string
+      city?: string
+    }
     credit?: { enabled: boolean; installments?: number }
     debit?: { enabled: boolean }
     cash?: { enabled: boolean }

@@ -127,6 +127,7 @@ export interface Order {
   status: OrderStatus
   notes?: string
   couponCode?: string
+  pixTxid?: string
   changeNeeded?: boolean
   changeFor?: number
   deliveryType?: 'delivery' | 'pickup'

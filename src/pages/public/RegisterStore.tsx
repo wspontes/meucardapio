@@ -22,6 +22,10 @@ export default function RegisterStore() {
   const { refreshUser } = useAuth()
   const [storeName, setStoreName] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
+  const [pixKey, setPixKey] = useState('')
+  const [pixType, setPixType] = useState<'cpf' | 'cnpj' | 'email' | 'telefone' | 'aleatoria'>('cpf')
+  const [pixName, setPixName] = useState('')
+  const [pixCity, setPixCity] = useState('')
   const [slug, setSlug] = useState('')
   const [slugEdited, setSlugEdited] = useState(false)
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null)
@@ -93,6 +97,11 @@ export default function RegisterStore() {
         businessHours: [],
         neighborhoods: [],
         whatsapp,
+        paymentMethods: pixKey ? {
+          pix: { enabled: true, key: pixKey, type: pixType, name: pixName, city: pixCity },
+          credit: { enabled: false },
+          cash: { enabled: false },
+        } : undefined,
       }, store.id)
 
       setCurrentStoreId(store.id)
@@ -173,7 +182,27 @@ export default function RegisterStore() {
           <hr className="border-border" />
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-brand-white">Seu nome</label>
+            <p className="text-xs text-muted">Pix (opcional — pode configurar depois)</p>
+           <div className="space-y-2">
+             <label className="text-sm font-medium text-brand-white">Tipo da chave Pix</label>
+             <select value={pixType} onChange={(e) => setPixType(e.target.value as typeof pixType)} className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-brand-white">
+               <option value="cpf">CPF</option><option value="cnpj">CNPJ</option><option value="email">E-mail</option><option value="telefone">Telefone</option><option value="aleatoria">Aleatória</option>
+             </select>
+           </div>
+           <div className="space-y-2">
+             <label className="text-sm font-medium text-brand-white">Chave Pix</label>
+             <input type="text" value={pixKey} onChange={(e) => setPixKey(e.target.value)} placeholder="Sua chave Pix" className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-brand-white placeholder:text-muted focus:border-accent focus:outline-none" />
+           </div>
+           <div className="space-y-2">
+             <label className="text-sm font-medium text-brand-white">Nome do beneficiário</label>
+             <input type="text" value={pixName} onChange={(e) => setPixName(e.target.value)} placeholder="Ex: João da Silva" className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-brand-white placeholder:text-muted focus:border-accent focus:outline-none" />
+           </div>
+           <div className="space-y-2">
+             <label className="text-sm font-medium text-brand-white">Cidade</label>
+             <input type="text" value={pixCity} onChange={(e) => setPixCity(e.target.value)} placeholder="Ex: São Paulo" className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-brand-white placeholder:text-muted focus:border-accent focus:outline-none" />
+           </div>
+           <hr className="border-border" />
+           <label className="text-sm font-medium text-brand-white">Seu nome</label>
             <input
               type="text"
               value={name}

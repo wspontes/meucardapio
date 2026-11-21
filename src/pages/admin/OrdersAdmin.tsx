@@ -405,6 +405,14 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
             <span className="flex items-center gap-1"><Clock size={11} />{formatTime(new Date(order.createdAt))}</span>
             <span className="flex items-center gap-1"><Banknote size={11} />{getPaymentLabel(order.paymentMethod)}</span>
+            {order.paymentMethod === 'pix' && order.pixTxid && (
+              <span className="text-[10px] text-muted font-mono">txid: {order.pixTxid}</span>
+            )}
+            {order.paymentMethod === 'pix' && (
+              <span className={`text-[10px] font-medium ${order.paymentStatus === 'paid' ? 'text-green-400' : 'text-yellow-400'}`}>
+                {order.paymentStatus === 'paid' ? 'Pago' : 'Aguardando confirmação'}
+              </span>
+            )}
             {order.motoboyName && (
               <span className="flex items-center gap-1 text-accent font-medium"><Bike size={11} />{order.motoboyName}</span>
             )}

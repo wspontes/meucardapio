@@ -36,6 +36,9 @@ export default function Settings() {
   const [defaultDeliveryFee, setDefaultDeliveryFee] = useState('')
   const [pixKey, setPixKey] = useState('')
   const [pixQrCode, setPixQrCode] = useState('')
+  const [pixType, setPixType] = useState<'cpf' | 'cnpj' | 'email' | 'telefone' | 'aleatoria'>('cpf')
+  const [pixName, setPixName] = useState('')
+  const [pixCity, setPixCity] = useState('')
   const [acceptCard, setAcceptCard] = useState(true)
   const [acceptCash, setAcceptCash] = useState(true)
   const [banners, setBanners] = useState<NonNullable<BusinessSettings['banners']>>({
@@ -194,7 +197,13 @@ export default function Settings() {
         if (data.businessHoursEnabled !== undefined) setBusinessHoursEnabled(data.businessHoursEnabled)
         if (data.paymentMethods) {
           const pm = data.paymentMethods
-          if (pm.pix) { setPixKey(pm.pix.key || ''); setPixQrCode(pm.pix.qrCode || '') }
+          if (pm.pix) {
+            setPixKey(pm.pix.key || '')
+            setPixQrCode(pm.pix.qrCode || '')
+            if (pm.pix.type) setPixType(pm.pix.type)
+            if (pm.pix.name) setPixName(pm.pix.name)
+            if (pm.pix.city) setPixCity(pm.pix.city)
+          }
           if (pm.credit) setAcceptCard(pm.credit.enabled)
           if (pm.cash) setAcceptCash(pm.cash.enabled)
         }
@@ -268,7 +277,7 @@ export default function Settings() {
         neighborhoods,
         defaultDeliveryFee: defaultDeliveryFee !== '' ? Number(defaultDeliveryFee) : undefined,
         paymentMethods: {
-          pix: { enabled: true, key: pixKey, qrCode: pixQrCode },
+          pix: { enabled: true, key: pixKey, qrCode: pixQrCode, type: pixType, name: pixName, city: pixCity },
           credit: { enabled: acceptCard },
           cash: { enabled: acceptCash },
         },
@@ -584,7 +593,23 @@ export default function Settings() {
           </h2>
           <div className="space-y-4">
             <div className="space-y-3">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-brand-white">Tipo da chave Pix</label>
+                <select
+                  value={pixType}
+                  onChange={(e) => setPixType(e.target.value as 'cpf' | 'cnpj' | 'email' | 'telefone' | 'aleatoria')}
+                  className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-brand-white"
+                >
+                  <option value="cpf">CPF</option>
+                  <option value="cnpj">CNPJ</option>
+                  <option value="email">E-mail</option>
+                  <option value="telefone">Telefone</option>
+                  <option value="aleatoria">Chave aleatória (UUID)</option>
+                </select>
+              </div>
               <Input label="Chave PIX" placeholder="CNPJ, CPF, email ou telefone" value={pixKey} onChange={(e) => setPixKey(e.target.value)} />
+              <Input label="Nome do beneficiário (até 25)" placeholder="Ex: João da Silva" value={pixName} onChange={(e) => setPixName(e.target.value)} />
+              <Input label="Cidade (até 15)" placeholder="Ex: São Paulo" value={pixCity} onChange={(e) => setPixCity(e.target.value)} />
               <ImageUpload value={pixQrCode} onChange={setPixQrCode} label="QR Code PIX (opcional)" />
               <Input label="Ou cole uma URL" placeholder="Google Drive ou outro link" value={pixQrCode.startsWith('data:') ? '' : pixQrCode} onChange={(e) => setPixQrCode(e.target.value)} />
             </div>
