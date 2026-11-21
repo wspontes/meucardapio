@@ -39,6 +39,7 @@ export default function Checkout() {
   const [error, setError] = useState('')
   const [form, setForm] = useState({
     name: customer?.name || '',
+    lastName: '',
     whatsappDigits: customer?.phone ? customer.phone.replace(/^\+?55/, '') : '',
     zipCode: '',
     street: '',
@@ -120,7 +121,7 @@ export default function Checkout() {
     setSubmitted(true)
     try {
       const orderData = {
-        customerName: form.name,
+        customerName: form.lastName ? `${form.name} ${form.lastName}` : form.name,
         customerPhone: '+55' + form.whatsappDigits,
         deliveryType,
         deliveryAddress: deliveryType === 'delivery' ? {
@@ -167,7 +168,7 @@ export default function Checkout() {
       const saved = await ordersService.create(cleanUndefined(firestoreData))
 
       if (!isLoggedIn && form.name && form.whatsappDigits) {
-        login(form.name, form.whatsappDigits)
+        login(form.lastName ? `${form.name} ${form.lastName}` : form.name, form.whatsappDigits)
       }
 
       if (state.couponCode) {
@@ -207,8 +208,9 @@ export default function Checkout() {
                 Seus Dados
               </h2>
               <div className="grid gap-4">
-                <Input label="Nome completo" name="name" placeholder="Seu nome" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-                <Input label="WhatsApp" name="whatsapp" placeholder="11999999999" value={form.whatsappDigits} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setForm({ ...form, whatsappDigits: v }) }} required />
+                <Input label="Nome *" name="name" placeholder="Seu nome" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                <Input label="Sobrenome *" name="lastName" placeholder="Seu sobrenome" value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} required />
+                <Input label="WhatsApp *" name="whatsapp" placeholder="11999999999" value={form.whatsappDigits} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setForm({ ...form, whatsappDigits: v }) }} required />
               </div>
             </div>
 
@@ -247,8 +249,8 @@ export default function Checkout() {
                     {cepLoading && <span className="absolute right-3 top-9 text-xs text-amber-400 animate-pulse">Buscando...</span>}
                   </div>
                   <div className="grid gap-4">
-                    <Input label="Rua" name="street" placeholder="Nome da rua" value={form.street} onChange={(e) => setForm({ ...form, street: e.target.value })} required />
-                    <Input label="Número" name="number" placeholder="N°" value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} required />
+                    <Input label="Rua *" name="street" placeholder="Nome da rua" value={form.street} onChange={(e) => setForm({ ...form, street: e.target.value })} required />
+                    <Input label="Número *" name="number" placeholder="N°" value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} required />
                   </div>
                   <div className="grid gap-4">
                     <Input label="Complemento" name="complement" placeholder="Apto, Bloco..." value={form.complement} onChange={(e) => setForm({ ...form, complement: e.target.value })} />
@@ -354,7 +356,7 @@ export default function Checkout() {
                 <span>{error}</span>
               </div>
             )}
-            <Button type="submit" className="w-full" size="lg" disabled={!status.isOpen || !paymentMethod || !form.name || form.whatsappDigits.length < 10 || (deliveryType === 'delivery' && (!form.street || !form.number || !form.neighborhood))} loading={submitting}>
+            <Button type="submit" className="w-full" size="lg" disabled={!status.isOpen || !paymentMethod || !form.name || !form.lastName || form.whatsappDigits.length < 10 || (deliveryType === 'delivery' && (!form.street || !form.number || !form.neighborhood))} loading={submitting}>
               {submitting ? 'Finalizando...' : `Confirmar Pedido - ${formatCurrency(orderTotal)}`}
             </Button>
           </div>
