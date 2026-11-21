@@ -267,7 +267,7 @@ export default function OrderConfirmed() {
             <p className="flex justify-between text-muted"><span>Cliente</span><span className="text-brand-white">{order.customerName as string}</span></p>
             {(order.items as Array<{ quantity: number; productName: string; price: number; flavors?: string[]; notes?: string }>)?.map((item, i) => (
               <div key={i} className="space-y-0.5">
-                <p className="flex justify-between text-muted"><span>{item.quantity}x {item.productName}</span><span className="text-brand-white">{formatCurrency(item.price * item.quantity)}</span></p>
+                <p className="flex justify-between gap-2 text-muted"><span className="min-w-0 break-words">{item.quantity}x {item.productName}</span><span className="text-brand-white shrink-0">{formatCurrency(item.price * item.quantity)}</span></p>
                 {item.flavors?.length && (
                   <p className="text-[10px] text-accent font-medium ml-1">Sabores: {item.flavors.join(', ')}</p>
                 )}

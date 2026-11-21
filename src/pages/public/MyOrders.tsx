@@ -256,7 +256,7 @@ function OrderItem({ order, prefix }: { order: Order; prefix?: string }) {
       <div className="space-y-0.5 mb-2">
         {order.items.map((item, i) => (
           <div key={i} className="space-y-0.5">
-            <p className="text-sm text-muted">{item.quantity}x {item.productName}</p>
+            <p className="text-sm text-muted break-words">{item.quantity}x {item.productName}</p>
             {item.flavors?.length && (
               <p className="text-[10px] text-accent font-medium">Sabores: {item.flavors.join(', ')}</p>
             )}
@@ -266,19 +266,19 @@ function OrderItem({ order, prefix }: { order: Order; prefix?: string }) {
           </div>
         ))}
       </div>
-      <div className="flex items-center gap-3 border-t border-border pt-2 text-xs text-muted">
-        <span className="flex items-center gap-1"><PayIcon size={11} />{payLabel}</span>
-        <span className="flex items-center gap-1">#{order.id.slice(0, 8)}</span>
+      <div className="flex flex-wrap items-center gap-2 border-t border-border pt-2 text-xs text-muted">
+        <span className="flex items-center gap-1 min-w-0"><PayIcon size={11} className="shrink-0" /><span className="truncate">{payLabel}</span></span>
+        <span className="flex items-center gap-1 shrink-0">#{order.id.slice(0, 8)}</span>
+        <span className="text-sm font-semibold text-brand-white ml-auto shrink-0">{formatCurrency(order.total)}</span>
         {isCompleted && (
           <button
             onClick={reorder}
-            className="flex items-center gap-1 ml-auto rounded-md px-2 py-1 font-medium text-accent transition-colors hover:bg-accent/10"
+            className="flex items-center gap-1 rounded-md px-2 py-1 font-medium text-accent transition-colors hover:bg-accent/10 shrink-0"
           >
             <RotateCcw size={11} />
             Pedir novamente
           </button>
         )}
-        <span className="text-sm font-semibold text-brand-white ml-auto">{formatCurrency(order.total)}</span>
       </div>
     </div>
   )
