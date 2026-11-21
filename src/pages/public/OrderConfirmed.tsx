@@ -247,32 +247,6 @@ export default function OrderConfirmed() {
           </div>
         )}
 
-        <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6 text-left">
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-xs md:text-sm text-muted">Status do pedido</span>
-            <span className={`text-xs font-medium ${currentStatus === 'waitingPayment' ? 'text-yellow-400' : currentStatus === 'cancelled' ? 'text-red-400' : 'text-green-400'}`}>
-              {statusLabel}
-            </span>
-          </div>
-          <div className="space-y-4">
-            {visibleSteps.map((step) => {
-              const stepIdx = stepOrder.indexOf(step.key)
-              const done = stepIdx <= currentIdx && currentStatus !== 'waitingPayment'
-              return (
-                <div key={step.key} className="flex items-center gap-3">
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-full ${done ? 'bg-green-500/20 text-green-500' : 'bg-surface-hover text-muted'}`}>
-                    <step.icon size={16} />
-                  </div>
-                  <div className="flex-1">
-                    <p className={`text-sm ${done ? 'text-green-400 font-medium' : 'text-muted'}`}>{step.label}</p>
-                  </div>
-                  {done && <CheckCircle size={16} className="text-green-500 shrink-0" />}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
         {(order.paymentMethod as string) === 'pix' && (order.status as string) === 'waitingPayment' && pixPayload && (
           <div className="mt-6 rounded-xl border border-green-500/30 bg-green-500/5 p-4 space-y-3">
             <h3 className="flex items-center gap-2 text-sm font-semibold text-green-400"><QrCode size={16} />Pagamento PIX</h3>
@@ -316,6 +290,32 @@ export default function OrderConfirmed() {
             )}
           </div>
         )}
+
+        <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6 text-left">
+          <div className="mb-4 flex items-center justify-between">
+            <span className="text-xs md:text-sm text-muted">Status do pedido</span>
+            <span className={`text-xs font-medium ${currentStatus === 'waitingPayment' ? 'text-yellow-400' : currentStatus === 'cancelled' ? 'text-red-400' : 'text-green-400'}`}>
+              {statusLabel}
+            </span>
+          </div>
+          <div className="space-y-4">
+            {visibleSteps.map((step) => {
+              const stepIdx = stepOrder.indexOf(step.key)
+              const done = stepIdx <= currentIdx && currentStatus !== 'waitingPayment'
+              return (
+                <div key={step.key} className="flex items-center gap-3">
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-full ${done ? 'bg-green-500/20 text-green-500' : 'bg-surface-hover text-muted'}`}>
+                    <step.icon size={16} />
+                  </div>
+                  <div className="flex-1">
+                    <p className={`text-sm ${done ? 'text-green-400 font-medium' : 'text-muted'}`}>{step.label}</p>
+                  </div>
+                  {done && <CheckCircle size={16} className="text-green-500 shrink-0" />}
+                </div>
+              )
+            })}
+          </div>
+        </div>
 
         <div className="mt-6 rounded-xl border border-border bg-surface p-4">
           <h3 className="mb-3 font-semibold text-brand-white text-sm">Detalhes do Pedido</h3>
