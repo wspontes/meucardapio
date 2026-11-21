@@ -134,6 +134,11 @@ export interface Order {
   deliveryTime?: number
   motoboyId?: string
   motoboyName?: string
+  rating?: {
+    stars: number
+    comment?: string
+    ratedAt: string
+  }
   createdAt: string
   updatedAt: string
 }

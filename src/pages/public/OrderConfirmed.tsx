@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useLocation, Link, useParams } from 'react-router-dom'
 import { doc, onSnapshot, getDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { CheckCircle, Clock, Bike, ChefHat, ShoppingBag, QrCode, AlertTriangle, Copy, Bell } from 'lucide-react'
+import { CheckCircle, Clock, Bike, ChefHat, ShoppingBag, QrCode, AlertTriangle, Copy, Bell, Star } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { useSettings } from '@/hooks'
 import { useStore } from '@/contexts/StoreContext'
@@ -253,6 +253,22 @@ export default function OrderConfirmed() {
             </span></p>
           </div>
         </div>
+
+        {currentStatus === 'delivered' && !(order as Record<string, unknown>).rating && (
+          <div className="mt-6 rounded-xl border border-yellow-500/30 bg-yellow-500/5 p-4 text-center">
+            <Star size={24} className="mx-auto mb-2 text-yellow-400" />
+            <p className="mb-3 text-sm text-brand-white">Gostou do seu pedido?</p>
+            <Link to={`${prefix}/avaliar/${order.id as string}`}>
+              <Button variant="primary" className="w-full">⭐ Avaliar pedido</Button>
+            </Link>
+          </div>
+        )}
+        {currentStatus === 'delivered' && !!(order as Record<string, unknown>).rating && (
+          <div className="mt-6 rounded-xl border border-green-500/30 bg-green-500/5 p-4 text-center">
+            <Star size={24} className="mx-auto mb-2 text-yellow-400" />
+            <p className="text-sm text-green-400">Você já avaliou este pedido. Obrigado!</p>
+          </div>
+        )}
 
         <div className="mt-8 flex flex-col gap-3">
           <Link to={`${prefix}/cardapio`}><Button variant="primary" className="w-full">Fazer novo pedido</Button></Link>

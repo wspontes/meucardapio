@@ -12,12 +12,14 @@ const Menu = lazy(() => import('@/pages/public/Menu'))
 const Cart = lazy(() => import('@/pages/public/Cart'))
 const Checkout = lazy(() => import('@/pages/public/Checkout'))
 const OrderConfirmed = lazy(() => import('@/pages/public/OrderConfirmed'))
+const RateOrder = lazy(() => import('@/pages/public/RateOrder'))
 const MyOrders = lazy(() => import('@/pages/public/MyOrders'))
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'))
 const AdminProducts = lazy(() => import('@/pages/admin/Products'))
 const AdminProductForm = lazy(() => import('@/pages/admin/ProductForm'))
 const AdminCategories = lazy(() => import('@/pages/admin/Categories'))
 const AdminOrders = lazy(() => import('@/pages/admin/OrdersAdmin'))
+const AdminRatings = lazy(() => import('@/pages/admin/RatingsAdmin'))
 const AdminSettings = lazy(() => import('@/pages/admin/Settings'))
 const AdminCoupons = lazy(() => import('@/pages/admin/CouponsAdmin'))
 const AdminMotoboys = lazy(() => import('@/pages/admin/MotoboysAdmin'))
@@ -120,6 +122,7 @@ export const router = createBrowserRouter([
       { path: 'carrinho', element: <Suspense fallback={<PageLoader />}><Cart /></Suspense> },
       { path: 'checkout', element: <Suspense fallback={<PageLoader />}><Checkout /></Suspense> },
       { path: 'pedido/confirmacao', element: <Suspense fallback={<PageLoader />}><OrderConfirmed /></Suspense> },
+      { path: 'avaliar/:orderId', element: <Suspense fallback={<PageLoader />}><RateOrder /></Suspense> },
       { path: 'meus-pedidos', element: <Suspense fallback={<PageLoader />}><MyOrders /></Suspense> },
     ],
   },
@@ -130,6 +133,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense> },
       { path: 'pedidos', element: <Suspense fallback={<PageLoader />}><AdminOrders /></Suspense> },
+      { path: 'avaliacoes', element: <Suspense fallback={<PageLoader />}><AdminRatings /></Suspense> },
       { path: 'produtos', element: <Suspense fallback={<PageLoader />}><AdminProducts /></Suspense> },
       { path: 'produtos/novo', element: <Suspense fallback={<PageLoader />}><AdminProductForm /></Suspense> },
       { path: 'produtos/:id/editar', element: <Suspense fallback={<PageLoader />}><AdminProductForm /></Suspense> },

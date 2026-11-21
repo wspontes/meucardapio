@@ -1,5 +1,5 @@
 import { NavLink, useParams } from 'react-router-dom'
-import { LayoutDashboard, Package, ListTree, ClipboardList, Settings, UtensilsCrossed, X, Ticket, Bike } from 'lucide-react'
+import { LayoutDashboard, Package, ListTree, ClipboardList, Settings, UtensilsCrossed, X, Ticket, Bike, Star } from 'lucide-react'
 import { cn } from '@/utils'
 import { useStoreGuard } from '@/components/shared/StoreGuard'
 
@@ -17,6 +17,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const links = [
     { to: prefix, label: 'Dashboard', icon: LayoutDashboard, end: true },
     { to: `${prefix}/pedidos`, label: 'Pedidos', icon: ClipboardList },
+    { to: `${prefix}/avaliacoes`, label: 'Avaliações', icon: Star },
     { to: `${prefix}/produtos`, label: 'Produtos', icon: Package },
     { to: `${prefix}/categorias`, label: 'Categorias', icon: ListTree },
     { to: `${prefix}/cupons`, label: 'Cupons', icon: Ticket },

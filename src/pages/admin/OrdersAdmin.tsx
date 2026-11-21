@@ -81,6 +81,13 @@ export default function OrdersAdmin() {
           ? `Olá ${order.customerName}! Seu pedido está PRONTO para retirada! Pode buscar no estabelecimento.`
           : `Olá ${order.customerName}! Seu pedido SAIU PARA ENTREGA. Fique atento ao seu celular!`
       })
+    } else if (nextStatus === 'delivered') {
+      const ratingLink = `${window.location.origin}/${slug}/avaliar/${order.id}`
+      setWhatsappModal({
+        phone: order.customerPhone,
+        name: order.customerName,
+        message: `Olá ${order.customerName}! Seu pedido foi ENTREGUE. Obrigado por escolher! Avalie sua experiência: ${ratingLink}`
+      })
     }
   }
 
