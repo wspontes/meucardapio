@@ -25,6 +25,7 @@ const AdminSettings = lazy(() => import('@/pages/admin/Settings'))
 const AdminCoupons = lazy(() => import('@/pages/admin/CouponsAdmin'))
 const AdminMotoboys = lazy(() => import('@/pages/admin/MotoboysAdmin'))
 const KitchenDashboard = lazy(() => import('@/pages/kitchen/Dashboard'))
+const CozinhaRedirect = lazy(() => import('@/pages/public/CozinhaRedirect'))
 const MasterDashboard = lazy(() => import('@/pages/master/Dashboard'))
 const MasterStoreDetail = lazy(() => import('@/pages/master/StoreDetail'))
 const MasterStoreEdit = lazy(() => import('@/pages/master/StoreEdit'))
@@ -112,6 +113,11 @@ export const router = createBrowserRouter([
       { path: 'login', element: <Suspense fallback={<PageLoader />}><Login /></Suspense> },
       { path: 'register', element: <Suspense fallback={<PageLoader />}><Register /></Suspense> },
     ],
+  },
+  {
+    path: '/cozinha',
+    element: <Suspense fallback={<PageLoader />}><CozinhaRedirect /></Suspense>,
+    errorElement: <ChunkError />,
   },
   {
     path: '/:slug',

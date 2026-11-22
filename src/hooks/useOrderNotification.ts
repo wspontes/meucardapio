@@ -11,7 +11,9 @@ export function useOrderNotification() {
   const initialized = useRef(false)
   const { showToast } = useToast()
   const { settings } = useSettings()
-  const notifSettings = settings?.notificationSettings || { enabled: true, sound: 'bell' as const, volume: 0.5 }
+  const notifSettingsRef = useRef(settings?.notificationSettings || { enabled: true, sound: 'bell' as const, volume: 0.5 })
+  // Keep notifSettings ref updated without re-triggering the subscription
+  notifSettingsRef.current = settings?.notificationSettings || { enabled: true, sound: 'bell' as const, volume: 0.5 }
   const audioCtxRef = useRef<AudioContext | null>(null)
 
   const createAudio = () => {
@@ -32,34 +34,52 @@ export function useOrderNotification() {
   }, [createAudio])
 
   useEffect(() => {
-    const storeId = getCurrentStoreId()
-    const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
-    const unsub = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Order))
-      const scoped = storeId ? data.filter((o) => o.storeId === storeId) : data
-      const currentIds = new Set(scoped.map((o) => o.id))
-      const newIds = [...currentIds].filter((id) => !prevIds.current.has(id))
+    let unsub: (() => void) | null = null
+    let cancelled = false
 
-      // Primeira carga: apenas popula o prevIds, não toca som
-      if (!initialized.current) {
-        initialized.current = true
-        prevIds.current = currentIds
+    function subscribe() {
+      if (cancelled) return
+      const storeId = getCurrentStoreId()
+      if (!storeId) {
+        setTimeout(subscribe, 100)
         return
       }
 
-      if (newIds.length > 0 && notifSettings.enabled) {
-        // Tenta criar áudio se ainda não existe (fallback para quem não clicou)
-        if (!audioCtxRef.current) createAudio()
-        playNotificationSound(audioCtxRef.current, notifSettings.sound, notifSettings.volume)
-        const newOrders = scoped.filter((o) => newIds.includes(o.id))
-        newOrders.forEach((o) => {
-          showToast(`Novo pedido de ${o.customerName}!`, 'success')
-        })
-      }
-      prevIds.current = currentIds
-    })
-    return () => unsub()
-  }, [notifSettings.enabled, notifSettings.sound, notifSettings.volume])
+      const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
+      unsub = onSnapshot(q, (snapshot) => {
+        const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Order))
+        const scoped = data.filter((o) => o.storeId === storeId)
+        const currentIds = new Set(scoped.map((o) => o.id))
+        const newIds = [...currentIds].filter((id) => !prevIds.current.has(id))
+
+        // Primeira carga: apenas popula o prevIds, não toca som
+        if (!initialized.current) {
+          initialized.current = true
+          prevIds.current = currentIds
+          return
+        }
+
+        const ns = notifSettingsRef.current
+        if (newIds.length > 0 && ns.enabled) {
+          // Tenta criar áudio se ainda não existe (fallback para quem não clicou)
+          if (!audioCtxRef.current) createAudio()
+          playNotificationSound(audioCtxRef.current, ns.sound, ns.volume)
+          const newOrders = scoped.filter((o) => newIds.includes(o.id))
+          newOrders.forEach((o) => {
+            showToast(`Novo pedido de ${o.customerName}!`, 'success')
+          })
+        }
+        prevIds.current = currentIds
+      })
+    }
+
+    subscribe()
+
+    return () => {
+      cancelled = true
+      if (unsub) unsub()
+    }
+  }, [])
 }
 
 function playNotificationSound(ctx: AudioContext | null, sound: string, volume: number) {
