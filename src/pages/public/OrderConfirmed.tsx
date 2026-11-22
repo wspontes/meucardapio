@@ -348,12 +348,23 @@ export default function OrderConfirmed() {
         </div>
 
         {currentStatus === 'delivered' && !(order as Record<string, unknown>).rating && (
-          <div className="mt-6 rounded-xl border border-yellow-500/30 bg-yellow-500/5 p-4 text-center">
-            <Star size={24} className="mx-auto mb-2 text-yellow-400" />
-            <p className="mb-3 text-sm text-brand-white">Gostou do seu pedido?</p>
-            <Link to={`${prefix}/avaliar/${order.id as string}`}>
-              <Button variant="primary" className="w-full">⭐ Avaliar pedido</Button>
-            </Link>
+          <div className="fixed bottom-4 left-1/2 z-50 w-[92vw] max-w-md -translate-x-1/2 animate-[fadeIn_0.3s_ease-out]">
+            <div className="rounded-2xl border-2 border-yellow-500/50 bg-surface p-4 shadow-2xl shadow-yellow-500/10">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-yellow-500/20">
+                  <Star size={24} className="fill-yellow-400 text-yellow-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-brand-white">Gostou do seu pedido?</p>
+                  <p className="text-xs text-muted">Sua avaliação nos ajuda a melhorar!</p>
+                </div>
+                <Link to={`${prefix}/avaliar/${order.id as string}`} className="shrink-0">
+                  <Button variant="primary" className="text-sm px-4 py-2 bg-yellow-500 text-black hover:bg-yellow-400">
+                    ⭐ Avaliar
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         )}
         {currentStatus === 'delivered' && !!(order as Record<string, unknown>).rating && (
