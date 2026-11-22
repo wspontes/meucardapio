@@ -175,29 +175,6 @@ export default function MyOrders() {
         </button>
       </div>
 
-      {!loading && orders.some((o) => o.status === 'delivered' && !o.rating) && (
-        <div className="mb-6 rounded-2xl border-2 border-yellow-500/50 bg-yellow-500/10 p-4 shadow-lg shadow-yellow-500/10">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-yellow-500/20">
-              <Star size={20} className="fill-yellow-400 text-yellow-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-brand-white">Gostou do seu pedido?</p>
-              <p className="text-xs text-muted">Avalie e nos ajude a melhorar!</p>
-            </div>
-            <button
-              onClick={() => {
-                const unrated = orders.find((o) => o.status === 'delivered' && !o.rating)
-                if (unrated) navigate(`${prefix}/avaliar/${unrated.id}`)
-              }}
-              className="shrink-0 rounded-lg bg-yellow-500 px-4 py-2 text-sm font-bold text-black hover:bg-yellow-400 transition-colors"
-            >
-              ⭐ Avaliar
-            </button>
-          </div>
-        </div>
-      )}
-
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />

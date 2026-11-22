@@ -35,20 +35,31 @@ export default function RateOrder() {
           setSubmitted(true)
         }
       } else {
-        setError('Pedido não encontrado.')
+        setError('Pedido não encontrado. ID: ' + orderId)
       }
       setLoading(false)
-    }).catch(() => {
-      setError('Erro ao carregar pedido.')
+    }).catch((err) => {
+      console.error('Erro ao carregar pedido:', err)
+      setError('Erro ao carregar pedido: ' + (err instanceof Error ? err.message : ''))
       setLoading(false)
     })
   }, [orderId])
 
   const handleSubmit = async () => {
     if (!order || stars === 0 || submitting) return
+    if (order.rating) {
+      setError('Este pedido já foi avaliado.')
+      return
+    }
     setSubmitting(true)
+    setError('')
     try {
-      await updateDoc(doc(db, 'orders', order.id), {
+      const ref = doc(db, 'orders', order.id)
+      const snap = await getDoc(ref)
+      if (!snap.exists()) {
+        throw new Error('Pedido não encontrado no banco de dados.')
+      }
+      await updateDoc(ref, {
         rating: {
           stars,
           comment: comment.trim() || undefined,
@@ -57,8 +68,9 @@ export default function RateOrder() {
         updatedAt: new Date().toISOString(),
       })
       setSubmitted(true)
-    } catch {
-      setError('Erro ao enviar avaliação. Tente novamente.')
+    } catch (err) {
+      console.error('Erro ao enviar avaliação:', err)
+      setError('Erro ao enviar avaliação: ' + (err instanceof Error ? err.message : 'Tente novamente.'))
     } finally {
       setSubmitting(false)
     }
