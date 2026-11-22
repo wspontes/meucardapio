@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { onSnapshot, collection, query, orderBy } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { Clock, ChefHat, ShoppingBag, Bike } from 'lucide-react'
+import { useStoreGuard } from '@/components/shared/StoreGuard'
 import type { Order } from '@/types'
 
 const ACTIVE_STATUSES = ['received', 'accepted', 'preparing', 'outForDelivery'] as const
@@ -61,6 +62,7 @@ function playBeep(ctx: AudioContext) {
 }
 
 export default function KitchenDashboard() {
+  const { store } = useStoreGuard()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [now, setNow] = useState(() => new Date())
@@ -90,13 +92,17 @@ export default function KitchenDashboard() {
   }, [createAudio])
 
   useEffect(() => {
+    const storeId = store?.id
+    if (!storeId) return
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'))
     const unsub = onSnapshot(q, (snapshot) => {
-      setOrders(snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Order)))
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Order))
+      const scoped = data.filter((o) => o.storeId === storeId)
+      setOrders(scoped)
       setLoading(false)
     })
     return () => unsub()
-  }, [])
+  }, [store?.id])
 
   const active = orders
     .filter((o) => (ACTIVE_STATUSES as readonly string[]).includes(o.status))
