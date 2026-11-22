@@ -5,11 +5,13 @@ import { Button, Input } from '@/components/ui'
 import { motoboysService } from '@/services'
 import { db } from '@/firebase/config'
 import { useToast } from '@/contexts/ToastContext'
+import { useStoreGuard } from '@/components/shared/StoreGuard'
 import type { Motoboy } from '@/types'
 
 export default function MotoboysAdmin() {
   const { slug } = useParams<{ slug: string }>()
   const prefix = slug ? `/${slug}` : ''
+  const { store } = useStoreGuard()
   const [motoboys, setMotoboys] = useState<Motoboy[]>([])
   const [loading, setLoading] = useState(true)
   const [formMode, setFormMode] = useState<'list' | 'create' | 'edit'>('list')
