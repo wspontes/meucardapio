@@ -233,6 +233,25 @@ export default function OrderConfirmed() {
             : 'Em breve entraremos em contato com mais detalhes do seu pedido.'}
         </p>
 
+        {currentStatus === 'delivered' && !(order as Record<string, unknown>).rating && (
+          <div className="mt-4 rounded-2xl border-2 border-yellow-500/50 bg-yellow-500/10 p-5 shadow-lg shadow-yellow-500/10 animate-[fadeIn_0.3s_ease-out]">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-yellow-500/20">
+                <Star size={28} className="fill-yellow-400 text-yellow-400" />
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-base font-bold text-brand-white">⭐ Gostou do seu pedido?</p>
+                <p className="text-xs text-muted mt-0.5">Sua avaliação nos ajuda a melhorar!</p>
+              </div>
+              <Link to={`${prefix}/avaliar/${order.id as string}`} className="shrink-0">
+                <Button variant="primary" className="text-sm px-5 py-2.5 bg-yellow-500 text-black hover:bg-yellow-400 font-bold">
+                  Avaliar agora
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
+
         {currentStatus === 'waitingPayment' && (
           <div className="mt-4 flex items-start gap-2 rounded-lg bg-yellow-500/10 p-3 text-sm text-yellow-400 text-left">
             <AlertTriangle size={16} className="mt-0.5 shrink-0" />
@@ -347,26 +366,6 @@ export default function OrderConfirmed() {
           </div>
         </div>
 
-        {currentStatus === 'delivered' && !(order as Record<string, unknown>).rating && (
-          <div className="fixed bottom-4 left-1/2 z-50 w-[92vw] max-w-md -translate-x-1/2 animate-[fadeIn_0.3s_ease-out]">
-            <div className="rounded-2xl border-2 border-yellow-500/50 bg-surface p-4 shadow-2xl shadow-yellow-500/10">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-yellow-500/20">
-                  <Star size={24} className="fill-yellow-400 text-yellow-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-brand-white">Gostou do seu pedido?</p>
-                  <p className="text-xs text-muted">Sua avaliação nos ajuda a melhorar!</p>
-                </div>
-                <Link to={`${prefix}/avaliar/${order.id as string}`} className="shrink-0">
-                  <Button variant="primary" className="text-sm px-4 py-2 bg-yellow-500 text-black hover:bg-yellow-400">
-                    ⭐ Avaliar
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
         {currentStatus === 'delivered' && !!(order as Record<string, unknown>).rating && (
           <div className="mt-6 rounded-xl border border-green-500/30 bg-green-500/5 p-4 text-center">
             <Star size={24} className="mx-auto mb-2 text-yellow-400" />

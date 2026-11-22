@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import { ChefHat, XCircle, ArrowLeft, MessageSquare, CheckCircle, Search, User as UserIcon, Clock, Banknote, Bell, ChevronDown, ChevronUp, AlertTriangle, Bike, Monitor, Printer, Star } from 'lucide-react'
+import { ChefHat, XCircle, ArrowLeft, MessageSquare, CheckCircle, Search, User as UserIcon, Clock, Banknote, Bell, ChevronDown, ChevronUp, AlertTriangle, Bike, Monitor, Printer } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { PrintOrderModal } from '@/components/shared/PrintOrderModal'
 import { ordersService, motoboysService } from '@/services'
@@ -62,7 +62,6 @@ export default function OrdersAdmin() {
   const [confirmPaymentModal, setConfirmPaymentModal] = useState<{ orderId: string; operator: string } | null>(null)
   const [hasMotoboys, setHasMotoboys] = useState(true)
   const [printOrder, setPrintOrder] = useState<Order | null>(null)
-  const [ratingsSummary, setRatingsSummary] = useState<{ avg: number; total: number; satisfaction: number } | null>(null)
   const [waDesktop, setWaDesktop] = useState<boolean>(() => {
     try { return localStorage.getItem(WA_DESKTOP_KEY) === '1' } catch { return false }
   })
@@ -88,16 +87,6 @@ export default function OrdersAdmin() {
       const scoped = storeId ? data.filter((o) => o.storeId === storeId) : data
       setOrders(scoped)
       setLoading(false)
-
-      // Resumo de avaliações
-      const rated = scoped.filter((o) => o.rating)
-      if (rated.length > 0) {
-        const avg = rated.reduce((s, o) => s + (o.rating?.stars || 0), 0) / rated.length
-        const satisfied = rated.filter((o) => (o.rating?.stars || 0) >= 4).length
-        setRatingsSummary({ avg: Math.round(avg * 10) / 10, total: rated.length, satisfaction: Math.round((satisfied / rated.length) * 100) })
-      } else {
-        setRatingsSummary(null)
-      }
     })
     return () => unsub()
   }, [store?.id])
@@ -254,14 +243,6 @@ export default function OrdersAdmin() {
           <Monitor size={16} className="text-accent" />
           <span className="hidden sm:inline">Tela Cozinha</span>
         </a>
-        {ratingsSummary && (
-          <div className="flex shrink-0 items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-3 py-2 text-sm">
-            <Star size={14} className="text-yellow-400" />
-            <span className="font-bold text-brand-white">{ratingsSummary.avg}</span>
-            <span className="text-muted text-xs">({ratingsSummary.total})</span>
-            <span className="text-xs text-muted hidden sm:inline">· {ratingsSummary.satisfaction}% satisfação</span>
-          </div>
-        )}
       </div>
 
       <div className="mb-4">
