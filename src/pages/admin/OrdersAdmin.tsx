@@ -27,16 +27,26 @@ const sectionOrder = ['waitingPayment', 'received', 'accepted', 'preparing', 'ou
 const doneStatus = 'delivered'
 const cancelledStatus = 'cancelled'
 
-function abrirWhatsApp(phone: string, message: string) {
+const WA_DESKTOP_KEY = 'meucardapio_whatsapp_desktop'
+
+function abrirWhatsApp(phone: string, message: string, useDesktop: boolean) {
   const digits = phone.replace(/\D/g, '')
   const fullPhone = digits.length <= 11 ? `55${digits}` : digits
   const text = encodeURIComponent(message)
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-  const url = isMobile
-    ? `https://wa.me/${fullPhone}?text=${text}`
-    : `https://web.whatsapp.com/send?phone=${fullPhone}&text=${text}`
-  // nome fixo = reaproveita a mesma aba em vez de abrir uma nova a cada clique
-  window.open(url, 'whatsapp_meucardapio')
+
+  if (isMobile) {
+    window.open(`https://wa.me/${fullPhone}?text=${text}`, '_blank')
+    return
+  }
+
+  if (useDesktop) {
+    // abre o app WhatsApp Desktop direto, sem criar aba no navegador
+    window.location.href = `whatsapp://send?phone=${fullPhone}&text=${text}`
+    return
+  }
+
+  window.open(`https://web.whatsapp.com/send?phone=${fullPhone}&text=${text}`, '_blank')
 }
 
 export default function OrdersAdmin() {
@@ -51,6 +61,13 @@ export default function OrdersAdmin() {
   const [cancelConfirm, setCancelConfirm] = useState<string | null>(null)
   const [hasMotoboys, setHasMotoboys] = useState(true)
   const [printOrder, setPrintOrder] = useState<Order | null>(null)
+  const [waDesktop, setWaDesktop] = useState<boolean>(() => {
+    try { return localStorage.getItem(WA_DESKTOP_KEY) === '1' } catch { return false }
+  })
+  const toggleWaDesktop = (value: boolean) => {
+    setWaDesktop(value)
+    try { localStorage.setItem(WA_DESKTOP_KEY, value ? '1' : '0') } catch { /* ignore */ }
+  }
   const { settings } = useSettings()
   const { store } = useStoreGuard()
 
@@ -289,8 +306,12 @@ export default function OrdersAdmin() {
             </div>
             <p className="mb-4 text-sm text-muted">Enviar mensagem para <span className="text-brand-white font-medium">{whatsappModal.name}</span></p>
             <textarea className="mb-4 w-full rounded-lg border border-border bg-surface-hover px-3 py-2.5 text-sm text-brand-white" rows={4} value={whatsappModal.message} onChange={(e) => setWhatsappModal({ ...whatsappModal, message: e.target.value })} />
+            <label className="mb-4 hidden md:flex cursor-pointer items-center gap-2 text-xs text-muted">
+              <input type="checkbox" checked={waDesktop} onChange={(e) => toggleWaDesktop(e.target.checked)} />
+              Abrir no app WhatsApp Desktop (sem abrir nova aba)
+            </label>
             <div className="flex gap-2 flex-col sm:flex-row">
-              <Button className="flex-1 text-sm h-10" onClick={() => { abrirWhatsApp(whatsappModal.phone, whatsappModal.message); setWhatsappModal(null) }}>
+              <Button className="flex-1 text-sm h-10" onClick={() => { abrirWhatsApp(whatsappModal.phone, whatsappModal.message, waDesktop); setWhatsappModal(null) }}>
                 <MessageSquare size={16} />
                 Enviar via WhatsApp
               </Button>
@@ -385,6 +406,15 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
   const status = isPickup && order.status === 'outForDelivery'
     ? { label: 'Pronto, aguardando retirada', color: 'bg-purple-500/10 text-purple-400' }
     : statusConfig[order.status] || statusConfig.waitingPayment
+  const nextStatusKey = statuses[statuses.indexOf(order.status as typeof statuses[number]) + 1]
+  const nextActionLabels: Record<string, string> = {
+    received: 'Confirmar pagamento',
+    accepted: 'Aceitar pedido',
+    preparing: 'Iniciar preparo',
+    outForDelivery: isPickup ? 'Pronto p/ retirada' : 'Saiu p/ entrega',
+    delivered: isPickup ? 'Pedido retirado' : 'Pedido entregue',
+  }
+  const nextStatusLabel = nextStatusKey ? nextActionLabels[nextStatusKey] : undefined
   return (
     <div className="rounded-xl border border-border bg-surface p-3.5 md:p-4">
       <div className="flex items-start gap-3">
@@ -452,7 +482,7 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
             )}
             <Button size="sm" onClick={() => advanceStatus(order.id)} className="text-xs">
               <ChefHat size={13} />
-              Avançar
+              {nextStatusLabel || 'Avançar'}
             </Button>
             {order.status === 'outForDelivery' && !isPickup && hasMotoboys && (
               <Button size="sm" variant="outline" onClick={() => onSendMotoboy(order)} className="text-xs">
