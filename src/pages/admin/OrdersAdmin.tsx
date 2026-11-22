@@ -27,6 +27,18 @@ const sectionOrder = ['waitingPayment', 'received', 'accepted', 'preparing', 'ou
 const doneStatus = 'delivered'
 const cancelledStatus = 'cancelled'
 
+function abrirWhatsApp(phone: string, message: string) {
+  const digits = phone.replace(/\D/g, '')
+  const fullPhone = digits.length <= 11 ? `55${digits}` : digits
+  const text = encodeURIComponent(message)
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  const url = isMobile
+    ? `https://wa.me/${fullPhone}?text=${text}`
+    : `https://web.whatsapp.com/send?phone=${fullPhone}&text=${text}`
+  // nome fixo = reaproveita a mesma aba em vez de abrir uma nova a cada clique
+  window.open(url, 'whatsapp_meucardapio')
+}
+
 export default function OrdersAdmin() {
   const { slug } = useParams<{ slug: string }>()
   const [orders, setOrders] = useState<Order[]>([])
@@ -278,7 +290,7 @@ export default function OrdersAdmin() {
             <p className="mb-4 text-sm text-muted">Enviar mensagem para <span className="text-brand-white font-medium">{whatsappModal.name}</span></p>
             <textarea className="mb-4 w-full rounded-lg border border-border bg-surface-hover px-3 py-2.5 text-sm text-brand-white" rows={4} value={whatsappModal.message} onChange={(e) => setWhatsappModal({ ...whatsappModal, message: e.target.value })} />
             <div className="flex gap-2 flex-col sm:flex-row">
-              <Button className="flex-1 text-sm h-10" onClick={() => { window.open(`https://wa.me/${whatsappModal.phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappModal.message)}`, '_blank'); setWhatsappModal(null) }}>
+              <Button className="flex-1 text-sm h-10" onClick={() => { abrirWhatsApp(whatsappModal.phone, whatsappModal.message); setWhatsappModal(null) }}>
                 <MessageSquare size={16} />
                 Enviar via WhatsApp
               </Button>
