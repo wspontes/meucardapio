@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+// no router Navigate needed; using window.location.replace
 import { useAuth } from '@/contexts/AuthContext'
 import { storesService } from '@/services'
 
@@ -32,8 +32,10 @@ export default function CozinhaRedirect() {
   }
 
   if (error || !slug) {
-    return <Navigate to="/auth/login?redirect=/cozinha" replace />
+    window.location.replace('/auth/login?redirect=/cozinha')
+    return null
   }
 
-  return <Navigate to={`/${slug}/cozinha`} replace />
+  window.location.replace(`/${slug}/cozinha`)
+  return null
 }
