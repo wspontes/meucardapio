@@ -2,9 +2,10 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { doc, getDoc, updateDoc, onSnapshot, collection, query, where } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { Bike, Phone, MapPin, CheckCircle, LogOut, Navigation, Route, Loader2, AlertTriangle, Package, Clock, Banknote, Coins, XCircle } from 'lucide-react'
+import { Bike, Phone, MapPin, CheckCircle, LogOut, Navigation, Route, Loader2, AlertTriangle, Package, Clock, Banknote, Coins, XCircle, Bell } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { useStore } from '@/contexts/StoreContext'
+import { useSettings } from '@/hooks'
 import { formatCurrency } from '@/utils'
 import { calculateOptimizedRoute, buildWazeUrl, type RouteStop, type LatLng } from '@/utils/routeOptimizer'
 import type { Order, Motoboy } from '@/types'
@@ -35,6 +36,7 @@ export default function MotoboyDashboard() {
   const { slug } = useParams<{ slug: string }>()
   const prefix = slug ? `/${slug}` : ''
   const { store } = useStore()
+  const { settings } = useSettings()
   const storeName = store?.name || 'MeuCardapio'
 
   const [motoboy, setMotoboy] = useState<Motoboy | null>(null)
@@ -193,9 +195,9 @@ export default function MotoboyDashboard() {
         origin = { lat: pos.coords.latitude, lng: pos.coords.longitude }
       } catch {
         // Fallback: use store address (geocode it)
-        if (store?.address) {
+        if (settings?.address) {
           const { geocodeAddress } = await import('@/utils/routeOptimizer')
-          const geo = await geocodeAddress(store.address)
+          const geo = await geocodeAddress(settings.address)
           if (geo) origin = geo
           else throw new Error('Não foi possível obter localização')
         } else {
