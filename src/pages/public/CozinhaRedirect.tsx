@@ -10,8 +10,13 @@ export default function CozinhaRedirect() {
 
   useEffect(() => {
     if (loading) return
-    if (!user?.storeId) {
+    if (!user) {
       setError(true)
+      return
+    }
+    // Master users don't have a specific store — redirect to master dashboard
+    if (!user.storeId || user.role === 'master') {
+      window.location.replace('/master')
       return
     }
     storesService.getById(user.storeId).then((store) => {
