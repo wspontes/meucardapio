@@ -5,7 +5,6 @@ import { storesService } from '@/services'
 
 export default function CozinhaRedirect() {
   const { user, loading } = useAuth()
-  const navigate = useNavigate()
   const [slug, setSlug] = useState<string | null>(null)
   const [error, setError] = useState(false)
 
