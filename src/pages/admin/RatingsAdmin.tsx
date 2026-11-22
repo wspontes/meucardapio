@@ -2,10 +2,20 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { onSnapshot, collection, query, orderBy } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import { Star, MessageSquare, TrendingUp, Package } from 'lucide-react'
+import { Star, MessageSquare, TrendingUp, Package, XCircle } from 'lucide-react'
 import { useStoreGuard } from '@/components/shared/StoreGuard'
 import type { Order } from '@/types'
 import { formatCurrency, formatTime } from '@/utils'
+
+function getPaymentLabel(method: string): string {
+  if (method === 'pix') return 'PIX'
+  if (method === 'card') return 'Cartão'
+  if (method === 'cash') return 'Dinheiro'
+  if (method === 'credit') return 'Crédito'
+  if (method === 'debit') return 'Débito'
+  if (method === 'delivery') return 'Na entrega'
+  return method
+}
 
 export default function RatingsAdmin() {
   const { slug } = useParams<{ slug: string }>()
@@ -13,6 +23,7 @@ export default function RatingsAdmin() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [filterStars, setFilterStars] = useState<number | null>(null)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
   useEffect(() => {
     const storeId = store?.id
@@ -171,7 +182,7 @@ export default function RatingsAdmin() {
       ) : (
         <div className="space-y-3">
           {filtered.map((order) => (
-            <div key={order.id} className="rounded-xl border border-border bg-surface p-4">
+            <div key={order.id} onClick={() => setSelectedOrder(order)} className="rounded-xl border border-border bg-surface p-4 cursor-pointer hover:border-accent/50 transition-colors">
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div>
                   <p className="text-sm font-medium text-brand-white">{order.customerName}</p>
@@ -198,6 +209,86 @@ export default function RatingsAdmin() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setSelectedOrder(null)}>
+          <div className="w-full max-w-lg rounded-xl border border-border bg-surface p-5 md:p-6 shadow-2xl max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-base md:text-lg font-semibold text-brand-white">Detalhes do Pedido</h3>
+              <button onClick={() => setSelectedOrder(null)} className="text-muted hover:text-brand-white transition-colors">
+                <XCircle size={18} />
+              </button>
+            </div>
+
+            {/* Avaliação */}
+            <div className="mb-4 rounded-lg bg-yellow-500/5 border border-yellow-500/20 p-3">
+              <div className="flex gap-0.5 mb-1">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star key={s} size={16} className={s <= (selectedOrder.rating?.stars || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-muted'} />
+                ))}
+              </div>
+              {selectedOrder.rating?.comment && (
+                <p className="text-sm text-muted italic mt-1">"{selectedOrder.rating.comment}"</p>
+              )}
+              <p className="text-[10px] text-muted mt-1">
+                Avaliado em {selectedOrder.rating?.ratedAt ? new Date(selectedOrder.rating.ratedAt).toLocaleString('pt-BR') : ''}
+              </p>
+            </div>
+
+            {/* Cliente e pedido */}
+            <div className="mb-4 space-y-1 text-sm">
+              <p className="flex justify-between text-muted"><span>Cliente</span><span className="text-brand-white">{selectedOrder.customerName}</span></p>
+              <p className="flex justify-between text-muted"><span>Pedido</span><span className="text-brand-white font-mono">#{selectedOrder.id.slice(0, 8)}</span></p>
+              <p className="flex justify-between text-muted"><span>Data</span><span className="text-brand-white">{formatTime(new Date(selectedOrder.createdAt))}</span></p>
+              <p className="flex justify-between text-muted"><span>Pagamento</span><span className="text-brand-white">{getPaymentLabel(selectedOrder.paymentMethod)}</span></p>
+              {selectedOrder.paymentConfirmedBy && (
+                <p className="flex justify-between text-muted"><span>Confirmado por</span><span className="text-brand-white">{selectedOrder.paymentConfirmedBy}</span></p>
+              )}
+            </div>
+
+            {/* Itens */}
+            <div className="mb-4">
+              <h4 className="text-xs font-semibold text-muted mb-2">Itens</h4>
+              <div className="space-y-1">
+                {selectedOrder.items.map((item, i) => (
+                  <div key={i} className="flex justify-between text-sm">
+                    <span className="text-muted">{item.quantity}x {item.productName}</span>
+                    <span className="text-brand-white shrink-0">{formatCurrency(item.price * item.quantity)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Resumo */}
+            <div className="mb-4 space-y-1 text-sm border-t border-border pt-3">
+              <p className="flex justify-between text-muted"><span>Subtotal</span><span className="text-brand-white">{formatCurrency(selectedOrder.subtotal)}</span></p>
+              {(selectedOrder.deliveryFee || 0) > 0 && <p className="flex justify-between text-muted"><span>Entrega</span><span className="text-brand-white">{formatCurrency(selectedOrder.deliveryFee)}</span></p>}
+              {(selectedOrder.discount || 0) > 0 && <p className="flex justify-between text-green-400"><span>Desconto</span><span>-{formatCurrency(selectedOrder.discount)}</span></p>}
+              <p className="flex justify-between font-semibold text-brand-white pt-1 border-t border-border"><span>Total</span><span className="text-accent">{formatCurrency(selectedOrder.total)}</span></p>
+            </div>
+
+            {/* Entrega */}
+            {selectedOrder.deliveryType !== 'pickup' && selectedOrder.deliveryAddress && (
+              <div className="mb-4 text-sm">
+                <h4 className="text-xs font-semibold text-muted mb-1">Endereço de entrega</h4>
+                <p className="text-brand-white">{selectedOrder.deliveryAddress.street}, {selectedOrder.deliveryAddress.number}</p>
+                {selectedOrder.deliveryAddress.complement && <p className="text-xs text-muted">{selectedOrder.deliveryAddress.complement}</p>}
+                <p className="text-xs text-muted">{selectedOrder.deliveryAddress.neighborhood} - {selectedOrder.deliveryAddress.city}</p>
+                {selectedOrder.motoboyName && <p className="text-xs text-muted mt-1">Motoboy: {selectedOrder.motoboyName}</p>}
+              </div>
+            )}
+            {selectedOrder.deliveryType === 'pickup' && (
+              <p className="mb-4 text-xs text-muted">Retirada no local</p>
+            )}
+
+            {selectedOrder.notes && (
+              <p className="mb-4 text-sm text-yellow-400">Obs.: {selectedOrder.notes}</p>
+            )}
+
+            <Button variant="ghost" className="w-full text-sm" onClick={() => setSelectedOrder(null)}>Fechar</Button>
+          </div>
         </div>
       )}
     </div>
