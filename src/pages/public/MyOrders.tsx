@@ -50,6 +50,7 @@ function playStatusBeep() {
 export default function MyOrders() {
   const { slug } = useParams<{ slug: string }>()
   const prefix = slug ? `/${slug}` : ''
+  const navigate = useNavigate()
   const { store } = useStore()
   const { customer, isLoggedIn, logout } = useCustomer()
   const [showLogin, setShowLogin] = useState(false)
