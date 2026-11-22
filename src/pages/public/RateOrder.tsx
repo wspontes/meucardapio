@@ -59,12 +59,13 @@ export default function RateOrder() {
       if (!snap.exists()) {
         throw new Error('Pedido não encontrado no banco de dados.')
       }
+      const ratingData: { stars: number; comment?: string; ratedAt: string } = {
+        stars,
+        ratedAt: new Date().toISOString(),
+      }
+      if (comment.trim()) ratingData.comment = comment.trim()
       await updateDoc(ref, {
-        rating: {
-          stars,
-          comment: comment.trim() || undefined,
-          ratedAt: new Date().toISOString(),
-        },
+        rating: ratingData,
         updatedAt: new Date().toISOString(),
       })
       setSubmitted(true)
