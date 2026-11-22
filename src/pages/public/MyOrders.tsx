@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { collection, query, where, onSnapshot } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { getCurrentStoreId } from '@/services'
-import { ArrowLeft, ShoppingBag, CheckCircle, Bike, ChefHat, QrCode, LogIn, LogOut, RotateCcw, Banknote, CreditCard, Bell } from 'lucide-react'
+import { ArrowLeft, ShoppingBag, CheckCircle, Bike, ChefHat, QrCode, LogIn, LogOut, RotateCcw, Banknote, CreditCard, Bell, Star } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { useCustomer } from '@/contexts/CustomerContext'
 import { useStore } from '@/contexts/StoreContext'
@@ -174,6 +174,29 @@ export default function MyOrders() {
         </button>
       </div>
 
+      {!loading && orders.some((o) => o.status === 'delivered' && !o.rating) && (
+        <div className="mb-6 rounded-2xl border-2 border-yellow-500/50 bg-yellow-500/10 p-4 shadow-lg shadow-yellow-500/10">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-yellow-500/20">
+              <Star size={20} className="fill-yellow-400 text-yellow-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-brand-white">Gostou do seu pedido?</p>
+              <p className="text-xs text-muted">Avalie e nos ajude a melhorar!</p>
+            </div>
+            <button
+              onClick={() => {
+                const unrated = orders.find((o) => o.status === 'delivered' && !o.rating)
+                if (unrated) navigate(`${prefix}/avaliar/${unrated.id}`)
+              }}
+              className="shrink-0 rounded-lg bg-yellow-500 px-4 py-2 text-sm font-bold text-black hover:bg-yellow-400 transition-colors"
+            >
+              ⭐ Avaliar
+            </button>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
@@ -272,7 +295,27 @@ function OrderItem({ order, prefix }: { order: Order; prefix?: string }) {
       <div className="flex flex-wrap items-center gap-2 border-t border-border pt-2 text-xs text-muted">
         <span className="flex items-center gap-1 min-w-0"><PayIcon size={11} className="shrink-0" /><span className="truncate">{payLabel}</span></span>
         <span className="flex items-center gap-1 shrink-0">#{order.id.slice(0, 8)}</span>
+        {order.rating && (
+          <span className="flex items-center gap-0.5 shrink-0">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <Star
+                key={s}
+                size={12}
+                className={s <= (order.rating?.stars || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-muted'}
+              />
+            ))}
+          </span>
+        )}
         <span className="text-sm font-semibold text-brand-white ml-auto shrink-0">{formatCurrency(order.total)}</span>
+        {isCompleted && !order.rating && order.status === 'delivered' && (
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`${prefix || ''}/avaliar/${order.id}`) }}
+            className="flex items-center gap-1 rounded-md px-2 py-1 font-medium text-yellow-400 transition-colors hover:bg-yellow-500/10 shrink-0"
+          >
+            <Star size={11} />
+            Avaliar
+          </button>
+        )}
         {isCompleted && (
           <button
             onClick={(e) => { e.stopPropagation(); reorder() }}
