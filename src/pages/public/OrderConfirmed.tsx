@@ -33,7 +33,7 @@ function playStatusBeep() {
 
 export default function OrderConfirmed() {
   const location = useLocation()
-  const { slug } = useParams<{ slug: string }>()
+  const { slug, orderId: paramOrderId } = useParams<{ slug: string; orderId?: string }>()
   const prefix = slug ? `/${slug}` : ''
   const { store } = useStore()
   const storeName = store?.name || 'MeuCardapio'
@@ -45,7 +45,7 @@ export default function OrderConfirmed() {
   const [pixQrDataUrl, setPixQrDataUrl] = useState('')
   const [copied, setCopied] = useState(false)
   const prevStatus = useRef<string>((initialOrder?.status as string) || '')
-  const orderIdRef = useRef<string>((initialOrder?.id as string) || sessionStorage.getItem(ORDER_ID_KEY) || '')
+  const orderIdRef = useRef<string>(paramOrderId || (initialOrder?.id as string) || sessionStorage.getItem(ORDER_ID_KEY) || '')
   const storeNameRef = useRef(storeName)
 
   const showToast = useCallback((msg: string, opts?: { link?: string; type?: 'info' | 'success' | 'rating'; duration?: number }) => {
@@ -55,11 +55,14 @@ export default function OrderConfirmed() {
   }, [])
 
   useEffect(() => {
-    if (initialOrder?.id) {
+    if (paramOrderId) {
+      orderIdRef.current = paramOrderId
+      sessionStorage.setItem(ORDER_ID_KEY, paramOrderId)
+    } else if (initialOrder?.id) {
       orderIdRef.current = initialOrder.id as string
       sessionStorage.setItem(ORDER_ID_KEY, initialOrder.id as string)
     }
-  }, [initialOrder?.id])
+  }, [paramOrderId, initialOrder?.id])
 
   useEffect(() => {
     const oid = orderIdRef.current

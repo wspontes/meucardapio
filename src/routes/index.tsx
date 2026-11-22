@@ -129,6 +129,7 @@ export const router = createBrowserRouter([
       { path: 'carrinho', element: <Suspense fallback={<PageLoader />}><Cart /></Suspense> },
       { path: 'checkout', element: <Suspense fallback={<PageLoader />}><Checkout /></Suspense> },
       { path: 'pedido/confirmacao', element: <Suspense fallback={<PageLoader />}><OrderConfirmed /></Suspense> },
+      { path: 'pedido/confirmacao/:orderId', element: <Suspense fallback={<PageLoader />}><OrderConfirmed /></Suspense> },
       { path: 'avaliar/:orderId', element: <Suspense fallback={<PageLoader />}><RateOrder /></Suspense> },
       { path: 'motoboy', element: <Suspense fallback={<PageLoader />}><MotoboyDashboard /></Suspense> },
       { path: 'meus-pedidos', element: <Suspense fallback={<PageLoader />}><MyOrders /></Suspense> },

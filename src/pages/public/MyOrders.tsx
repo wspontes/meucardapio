@@ -215,6 +215,9 @@ export default function MyOrders() {
 function OrderItem({ order, prefix }: { order: Order; prefix?: string }) {
   const { addItem } = useCart()
   const navigate = useNavigate()
+  const openDetails = () => {
+    navigate(`${prefix || ''}/pedido/confirmacao/${order.id}`, { state: { order } })
+  }
   const isPickup = order.deliveryType === 'pickup'
   const st = statusMap[order.status] || statusMap.received
   const label = isPickup && order.status === 'outForDelivery' ? 'Pronto para retirada'
@@ -245,7 +248,7 @@ function OrderItem({ order, prefix }: { order: Order; prefix?: string }) {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
+    <div className="rounded-xl border border-border bg-surface p-4 cursor-pointer hover:border-accent/50 transition-colors" onClick={openDetails}>
       <div className="flex items-center justify-between mb-2">
         <span className={`flex items-center gap-1.5 text-xs font-medium ${st.color}`}>
           <Icon size={13} />
@@ -272,7 +275,7 @@ function OrderItem({ order, prefix }: { order: Order; prefix?: string }) {
         <span className="text-sm font-semibold text-brand-white ml-auto shrink-0">{formatCurrency(order.total)}</span>
         {isCompleted && (
           <button
-            onClick={reorder}
+            onClick={(e) => { e.stopPropagation(); reorder() }}
             className="flex items-center gap-1 rounded-md px-2 py-1 font-medium text-accent transition-colors hover:bg-accent/10 shrink-0"
           >
             <RotateCcw size={11} />
