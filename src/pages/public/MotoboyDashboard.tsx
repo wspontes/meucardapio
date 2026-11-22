@@ -310,6 +310,18 @@ export default function MotoboyDashboard() {
         </div>
       )}
 
+      {/* Stats */}
+      <div className="mb-6 grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-border bg-surface p-4">
+          <p className="text-xs text-muted mb-1">Entregas realizadas</p>
+          <p className="text-2xl font-bold text-green-400">{orders.filter((o) => o.status === 'delivered').length}</p>
+        </div>
+        <div className="rounded-xl border border-border bg-surface p-4">
+          <p className="text-xs text-muted mb-1">Pendentes</p>
+          <p className="text-2xl font-bold text-accent">{activeOrders.length}</p>
+        </div>
+      </div>
+
       {/* Route optimization result */}
       {showRoute && (
         <div className="mb-6 rounded-xl border border-border bg-surface p-4 md:p-6">

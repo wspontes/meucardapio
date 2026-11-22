@@ -16,6 +16,7 @@ function StoreContent() {
   // O cardápio tem tela limpa: sem cabeçalho, com ícones flutuantes sobre o banner.
   const segments = pathname.split('/').filter(Boolean)
   const isMenuPage = segments.length === 1 || (segments.length === 2 && segments[1] === 'cardapio')
+  const isMotoboyPage = segments.length >= 2 && segments[1] === 'motoboy'
 
   useEffect(() => { if (store) trackVisit() }, [store])
 
@@ -47,11 +48,11 @@ function StoreContent() {
 
   return (
     <div className="flex min-h-screen flex-col bg-brand-black">
-      {!isMenuPage && <Header />}
+      {!isMenuPage && !isMotoboyPage && <Header />}
       <main className="flex-1">
         <Outlet />
       </main>
-      <Footer />
+      {!isMotoboyPage && <Footer />}
       <UpdateToast />
     </div>
   )
