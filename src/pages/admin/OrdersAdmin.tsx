@@ -169,7 +169,9 @@ export default function OrdersAdmin() {
     setMotoboyModalOrder(null)
     const digits = motoboy.phone.replace(/\D/g, '')
     const fullPhone = digits.length <= 11 ? `55${digits}` : digits
-    setWhatsappModal({ phone: fullPhone, name: motoboy.name, message: buildMotoboyMessage(order) })
+    const motoboyLink = `${window.location.origin}/${slug}/motoboy`
+    const msg = buildMotoboyMessage(order) + `\n\nAcesse sua tela de entregas: ${motoboyLink}`
+    setWhatsappModal({ phone: fullPhone, name: motoboy.name, message: msg })
   }
 
   const backStatus = async (orderId: string) => {

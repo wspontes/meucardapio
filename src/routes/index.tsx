@@ -13,6 +13,7 @@ const Cart = lazy(() => import('@/pages/public/Cart'))
 const Checkout = lazy(() => import('@/pages/public/Checkout'))
 const OrderConfirmed = lazy(() => import('@/pages/public/OrderConfirmed'))
 const RateOrder = lazy(() => import('@/pages/public/RateOrder'))
+const MotoboyDashboard = lazy(() => import('@/pages/public/MotoboyDashboard'))
 const MyOrders = lazy(() => import('@/pages/public/MyOrders'))
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'))
 const AdminProducts = lazy(() => import('@/pages/admin/Products'))
@@ -123,6 +124,7 @@ export const router = createBrowserRouter([
       { path: 'checkout', element: <Suspense fallback={<PageLoader />}><Checkout /></Suspense> },
       { path: 'pedido/confirmacao', element: <Suspense fallback={<PageLoader />}><OrderConfirmed /></Suspense> },
       { path: 'avaliar/:orderId', element: <Suspense fallback={<PageLoader />}><RateOrder /></Suspense> },
+      { path: 'motoboy', element: <Suspense fallback={<PageLoader />}><MotoboyDashboard /></Suspense> },
       { path: 'meus-pedidos', element: <Suspense fallback={<PageLoader />}><MyOrders /></Suspense> },
     ],
   },

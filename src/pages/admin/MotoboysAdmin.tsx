@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Bike, Plus, Trash2, Phone } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { ArrowLeft, Bike, Plus, Trash2, Phone, ExternalLink } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { motoboysService } from '@/services'
 import { useToast } from '@/contexts/ToastContext'
 import type { Motoboy } from '@/types'
 
 export default function MotoboysAdmin() {
+  const { slug } = useParams<{ slug: string }>()
+  const prefix = slug ? `/${slug}` : ''
   const [motoboys, setMotoboys] = useState<Motoboy[]>([])
   const [loading, setLoading] = useState(true)
   const [formMode, setFormMode] = useState<'list' | 'create' | 'edit'>('list')
@@ -90,9 +93,16 @@ export default function MotoboysAdmin() {
           </p>
         </div>
         {formMode === 'list' && (
-          <Button onClick={() => { setFormMode('create'); setForm({ name: '', phone: '', active: true }) }}>
-            <Plus size={16} /> Novo Motoboy
-          </Button>
+          <div className="flex items-center gap-2">
+            <a href={`${prefix}/motoboy`} target="_blank" rel="noopener noreferrer">
+              <Button variant="outline">
+                <ExternalLink size={16} /> Tela do Motoboy
+              </Button>
+            </a>
+            <Button onClick={() => { setFormMode('create'); setForm({ name: '', phone: '', active: true }) }}>
+              <Plus size={16} /> Novo Motoboy
+            </Button>
+          </div>
         )}
       </div>
 
