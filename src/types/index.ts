@@ -124,6 +124,8 @@ export interface Order {
   total: number
   paymentMethod: PaymentMethod
   paymentStatus: PaymentStatus
+  paymentConfirmedBy?: string
+  paymentConfirmedAt?: string
   status: OrderStatus
   notes?: string
   couponCode?: string

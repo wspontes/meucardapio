@@ -59,6 +59,7 @@ export default function OrdersAdmin() {
   const [motoboyList, setMotoboyList] = useState<Motoboy[]>([])
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [cancelConfirm, setCancelConfirm] = useState<string | null>(null)
+  const [confirmPaymentModal, setConfirmPaymentModal] = useState<{ orderId: string; operator: string } | null>(null)
   const [hasMotoboys, setHasMotoboys] = useState(true)
   const [printOrder, setPrintOrder] = useState<Order | null>(null)
   const [waDesktop, setWaDesktop] = useState<boolean>(() => {
@@ -121,8 +122,18 @@ export default function OrdersAdmin() {
     }
   }
 
-  const confirmPayment = async (orderId: string) => {
-    await ordersService.update(orderId, { status: 'received', paymentStatus: 'paid' } as Partial<Order>)
+  const confirmPayment = async (orderId: string, operator: string) => {
+    const name = operator.trim()
+    if (!name) return
+    try {
+      localStorage.setItem('meucardapio_last_operator', name)
+    } catch { /* ignore */ }
+    await ordersService.update(orderId, {
+      status: 'received',
+      paymentStatus: 'paid',
+      paymentConfirmedBy: name,
+      paymentConfirmedAt: new Date().toISOString(),
+    } as Partial<Order>)
   }
 
   const openMotoboyModal = async (order: Order) => {
@@ -256,7 +267,7 @@ export default function OrdersAdmin() {
               </button>
               {!collapsed.has('ativos') && (
                 <div className="space-y-3">
-                  {activeOrders.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, backStatus, cancelOrder: (id: string) => setCancelConfirm(id), setWhatsappModal, onSendMotoboy: openMotoboyModal, onPrint: setPrintOrder, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
+                  {activeOrders.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, onConfirmPayment: (id) => setConfirmPaymentModal({ orderId: id, operator: (typeof window !== 'undefined' ? (localStorage.getItem('meucardapio_last_operator') || '') : '') }), backStatus, cancelOrder: (id: string) => setCancelConfirm(id), setWhatsappModal, onSendMotoboy: openMotoboyModal, onPrint: setPrintOrder, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
                 </div>
               )}
             </div>
@@ -271,7 +282,7 @@ export default function OrdersAdmin() {
               </button>
               {!collapsed.has('entregues') && (
                 <div className="space-y-3">
-                  {doneOnes.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, backStatus, cancelOrder: () => {}, setWhatsappModal, onSendMotoboy: openMotoboyModal, onPrint: setPrintOrder, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
+                  {doneOnes.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, onConfirmPayment: (id) => setConfirmPaymentModal({ orderId: id, operator: (typeof window !== 'undefined' ? (localStorage.getItem('meucardapio_last_operator') || '') : '') }), backStatus, cancelOrder: () => {}, setWhatsappModal, onSendMotoboy: openMotoboyModal, onPrint: setPrintOrder, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
                 </div>
               )}
             </div>
@@ -286,7 +297,7 @@ export default function OrdersAdmin() {
               </button>
               {!collapsed.has('cancelados') && (
                 <div className="space-y-3">
-                  {cancelledOnes.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, backStatus, cancelOrder: () => {}, setWhatsappModal, onSendMotoboy: openMotoboyModal, onPrint: setPrintOrder, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
+                  {cancelledOnes.map((order) => <OrderCard key={order.id} order={order} {...{ advanceStatus, confirmPayment, onConfirmPayment: (id) => setConfirmPaymentModal({ orderId: id, operator: (typeof window !== 'undefined' ? (localStorage.getItem('meucardapio_last_operator') || '') : '') }), backStatus, cancelOrder: () => {}, setWhatsappModal, onSendMotoboy: openMotoboyModal, onPrint: setPrintOrder, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }} />)}
                 </div>
               )}
             </div>
@@ -385,14 +396,53 @@ export default function OrdersAdmin() {
           </div>
         </div>
       )}
+
+      {confirmPaymentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setConfirmPaymentModal(null)}>
+          <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-5 md:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-500/10">
+                <CheckCircle size={28} className="text-green-400" />
+              </div>
+            </div>
+            <h3 className="mb-2 text-center text-base font-semibold text-brand-white">Confirmar pagamento</h3>
+            <p className="mb-4 text-center text-sm text-muted">Quem está confirmando o pagamento?</p>
+            <input
+              type="text"
+              value={confirmPaymentModal.operator}
+              onChange={(e) => setConfirmPaymentModal({ ...confirmPaymentModal, operator: e.target.value })}
+              placeholder="Nome da operadora"
+              autoFocus
+              className="mb-4 w-full rounded-lg border border-border bg-surface-hover px-3 py-2.5 text-sm text-brand-white placeholder:text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            />
+            <div className="flex gap-2">
+              <Button variant="ghost" className="flex-1 text-sm h-10" onClick={() => setConfirmPaymentModal(null)}>
+                Cancelar
+              </Button>
+              <Button
+                className="flex-1 text-sm h-10 bg-green-600 hover:bg-green-700"
+                disabled={!confirmPaymentModal.operator.trim()}
+                onClick={async () => {
+                  await confirmPayment(confirmPaymentModal.orderId, confirmPaymentModal.operator)
+                  setConfirmPaymentModal(null)
+                }}
+              >
+                <CheckCircle size={15} />
+                Confirmar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrder, setWhatsappModal, onSendMotoboy, onPrint, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }: {
+function OrderCard({ order, advanceStatus, confirmPayment, onConfirmPayment, backStatus, cancelOrder, setWhatsappModal, onSendMotoboy, onPrint, hasMotoboys, statusConfig, getPaymentLabel, formatCurrency, formatTime }: {
   order: Order
   advanceStatus: (id: string) => void
-  confirmPayment: (id: string) => void
+  confirmPayment: (id: string, operator: string) => void
+  onConfirmPayment: (id: string) => void
   backStatus: (id: string) => void
   cancelOrder: (id: string) => void
   setWhatsappModal: (data: { phone: string; name: string; message: string }) => void
@@ -457,6 +507,12 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
                 {order.paymentStatus === 'paid' ? 'Pago' : 'Aguardando confirmação'}
               </span>
             )}
+            {order.paymentConfirmedBy && (
+              <span className="text-[10px] text-muted">
+                Confirmado por: <span className="text-brand-white font-medium">{order.paymentConfirmedBy}</span>
+                {order.paymentConfirmedAt && <span className="ml-1">({new Date(order.paymentConfirmedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })})</span>}
+              </span>
+            )}
             {order.motoboyName && (
               <span className="flex items-center gap-1 text-accent font-medium"><Bike size={11} />{order.motoboyName}</span>
             )}
@@ -470,7 +526,7 @@ function OrderCard({ order, advanceStatus, confirmPayment, backStatus, cancelOrd
 
       <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
         {order.status === 'waitingPayment' && (
-          <Button size="sm" onClick={() => confirmPayment(order.id)} className="bg-green-600 hover:bg-green-700 text-xs">
+          <Button size="sm" onClick={() => onConfirmPayment(order.id)} className="bg-green-600 hover:bg-green-700 text-xs">
             <CheckCircle size={13} />
             Confirmar Pagamento
           </Button>
