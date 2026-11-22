@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { ArrowLeft, Bike, Plus, Trash2, Phone, ExternalLink } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { motoboysService } from '@/services'
+import { db } from '@/firebase/config'
 import { useToast } from '@/contexts/ToastContext'
 import type { Motoboy } from '@/types'
 
@@ -20,8 +21,21 @@ export default function MotoboysAdmin() {
   const loadMotoboys = async () => {
     setLoading(true)
     try {
-      const list = await motoboysService.getAll()
-      setMotoboys(list.sort((a, b) => (a.name || '').localeCompare(b.name || '')))
+      const { getDocs, collection } = await import('firebase/firestore')
+      const snap = await getDocs(collection(db, 'motoboys'))
+      const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Motoboy))
+      // migração: motoboys sem storeId são atribuídos à loja atual
+      const migrated = await Promise.all(all.map(async (m) => {
+        if (!m.storeId && store?.id) {
+          try {
+            await motoboysService.update(m.id, { storeId: store.id })
+            m.storeId = store.id
+          } catch { /* ignore */ }
+        }
+        return m
+      }))
+      const scoped = store?.id ? migrated.filter((m) => m.storeId === store.id) : migrated
+      setMotoboys(scoped.sort((a, b) => (a.name || '').localeCompare(b.name || '')))
     } catch { setMotoboys([]) } finally { setLoading(false) }
   }
 
@@ -38,6 +52,7 @@ export default function MotoboysAdmin() {
           name: form.name,
           phone: form.phone,
           active: form.active ?? true,
+          storeId: store?.id,
         })
       } else {
         await motoboysService.create({

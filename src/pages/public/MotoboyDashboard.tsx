@@ -138,7 +138,7 @@ export default function MotoboyDashboard() {
       const snap = await getDocs(col(db, 'motoboys'))
       const found = snap.docs
         .map((d) => ({ id: d.id, ...d.data() } as Motoboy))
-        .find((m) => normalizePhone(m.phone || '') === phone)
+        .find((m) => normalizePhone(m.phone || '') === phone && (!m.storeId || m.storeId === store?.id))
 
       if (!found) {
         setLoginError('Motoboy não cadastrado. Contate o administrador.')
@@ -147,6 +147,14 @@ export default function MotoboyDashboard() {
       if (!found.active) {
         setLoginError('Motoboy inativo. Contate o administrador.')
         return
+      }
+      // Migração: garante storeId para motoboys antigos
+      if (!found.storeId && store?.id) {
+        try {
+          const { doc: d, updateDoc } = await import('firebase/firestore')
+          await updateDoc(d(db, 'motoboys', found.id), { storeId: store.id })
+          found.storeId = store.id
+        } catch { /* ignore */ }
       }
       setMotoboy(found)
       localStorage.setItem(MOTOBOW_KEY, JSON.stringify(found))

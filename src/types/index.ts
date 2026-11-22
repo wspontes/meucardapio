@@ -146,6 +146,7 @@ export interface Order {
 
 export interface Motoboy {
   id: string
+  storeId?: string
   name: string
   phone: string
   active: boolean
