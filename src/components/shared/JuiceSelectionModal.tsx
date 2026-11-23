@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Droplets, Wine, CheckCircle, ArrowLeft } from 'lucide-react'
+import { X, Droplets, Milk, CheckCircle, ArrowLeft } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
 import { useBusinessStatus } from '@/hooks'
@@ -18,7 +18,7 @@ type BaseType = 'agua' | 'leite'
 
 const BASE_OPTIONS: { id: BaseType; label: string; icon: React.ReactNode }[] = [
   { id: 'agua', label: 'Água', icon: <Droplets size={20} className="text-accent" /> },
-  { id: 'leite', label: 'Leite', icon: <Wine size={20} className="text-muted" /> },
+  { id: 'leite', label: 'Leite', icon: <Milk size={20} className="text-muted" /> },
 ]
 
 export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalProps) {
@@ -33,7 +33,8 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
   const price = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price
   const ingredients = product.ingredients ?? []
 
-  const totalPrice = price
+  const LEITE_SURCHARGE = 2
+  const totalPrice = price + (selectedBase === 'leite' ? LEITE_SURCHARGE : 0)
   const hasFlavors = ingredients.length > 0
   // Produto sem sabores cadastrados ainda pode ser adicionado diretamente.
   const canAdd = hasFlavors ? selectedFlavors.length > 0 : true
@@ -97,7 +98,7 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
           />
         ) : (
           <div className="flex h-64 w-full items-center justify-center bg-surface-hover">
-            <Wine size={48} className="text-muted" />
+            <Milk size={48} className="text-muted" />
           </div>
         )}
 
@@ -190,6 +191,9 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
                     >
                       {base.icon}
                       <span className="text-sm font-medium">{base.label}</span>
+                      {base.id === 'leite' && (
+                        <span className="ml-auto text-xs text-accent">+{formatCurrency(LEITE_SURCHARGE)}</span>
+                      )}
                     </button>
                   )
                 })}
@@ -218,6 +222,9 @@ export function JuiceSelectionModal({ product, onClose }: JuiceSelectionModalPro
                   <span className="text-muted">Base</span>
                   <span className="text-brand-white font-medium">
                     {selectedBase === 'agua' ? 'Água' : 'Leite'}
+                    {selectedBase === 'leite' && (
+                      <span className="ml-1 text-xs text-accent">(+{formatCurrency(LEITE_SURCHARGE)})</span>
+                    )}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
