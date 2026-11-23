@@ -10,6 +10,8 @@ import {
   buildChurrasqueiraText,
   printAllViaRawBt,
   PRINT_COLS,
+  PRINT_COLS_80,
+  getCols,
 } from '@/utils/receipt'
 
 interface Props {
@@ -51,10 +53,13 @@ export function PrintOrderModal({ order, storeName = 'MeuCardapio', initialMotob
 
   const [tab, setTab] = useState<string>(enabledTargets[0])
 
+  // Colunas conforme largura do papel configurada (58 ou 80mm)
+  const cols = settings?.paperWidth === '80' ? PRINT_COLS_80 : PRINT_COLS
+
   const buildText = (target: Target): string => {
-    if (target === 'kitchen') return buildKitchenText(order, storeName, PRINT_COLS)
-    if (target === 'churrasqueira') return buildChurrasqueiraText(order, storeName, PRINT_COLS)
-    return buildDeliveryText(order, storeName, motoboy, PRINT_COLS)
+    if (target === 'kitchen') return buildKitchenText(order, storeName, cols)
+    if (target === 'churrasqueira') return buildChurrasqueiraText(order, storeName, cols)
+    return buildDeliveryText(order, storeName, motoboy, cols)
   }
 
   const allTickets = enabledTargets.map((t) => buildText(t))
@@ -139,7 +144,7 @@ export function PrintOrderModal({ order, storeName = 'MeuCardapio', initialMotob
         <div className="flex flex-col gap-2">
           {isAndroid ? (
             <>
-              <Button onClick={() => printAllViaRawBt(order, storeName, motoboy, enabledTargets)} className="w-full text-sm">
+              <Button onClick={() => printAllViaRawBt(order, storeName, motoboy, enabledTargets, cols)} className="w-full text-sm">
                 <Printer size={16} />
                 Imprimir via RawBT
               </Button>

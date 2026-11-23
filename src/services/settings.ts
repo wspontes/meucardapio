@@ -69,6 +69,7 @@ export interface BusinessSettings {
     churrasqueira?: boolean
     delivery?: boolean
   }
+  paperWidth?: '58' | '80'
   homeBoard?: {
     title: string
     productIds: string[]

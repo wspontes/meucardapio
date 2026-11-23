@@ -74,6 +74,7 @@ export default function Settings() {
   const [printKitchen, setPrintKitchen] = useState(true)
   const [printChurrasqueira, setPrintChurrasqueira] = useState(false)
   const [printDelivery, setPrintDelivery] = useState(true)
+  const [paperWidth, setPaperWidth] = useState<'58' | '80'>('58')
   const audioCtxRef = useRef<AudioContext | null>(null)
 
   const createAudio = () => {
@@ -232,6 +233,7 @@ export default function Settings() {
           if (pt.churrasqueira !== undefined) setPrintChurrasqueira(pt.churrasqueira)
           if (pt.delivery !== undefined) setPrintDelivery(pt.delivery)
         }
+        if (data.paperWidth) setPaperWidth(data.paperWidth)
         if (data.productViewMode) setViewMode(data.productViewMode)
         if (data.homeBoard) {
           if (data.homeBoard.title) setHomeBoardTitle(data.homeBoard.title)
@@ -306,6 +308,7 @@ export default function Settings() {
           churrasqueira: printChurrasqueira,
           delivery: printDelivery,
         },
+        paperWidth,
       }
       await settingsService.save(JSON.parse(JSON.stringify(data)))
       await loadBackups()
@@ -907,6 +910,37 @@ export default function Settings() {
                 <p className="text-xs text-muted">Imprime cupom com endereço, pagamento e total</p>
               </div>
             </label>
+          </div>
+
+          <div className="mt-4">
+            <label className="mb-1.5 block text-sm font-medium text-brand-white">Largura do papel da impressora</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setPaperWidth('58')}
+                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                  paperWidth === '58'
+                    ? 'border-accent bg-accent/10 text-accent'
+                    : 'border-border bg-surface-hover text-muted hover:text-brand-white'
+                }`}
+              >
+                58 mm (padrão)
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaperWidth('80')}
+                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                  paperWidth === '80'
+                    ? 'border-accent bg-accent/10 text-accent'
+                    : 'border-border bg-surface-hover text-muted hover:text-brand-white'
+                }`}
+              >
+                80 mm
+              </button>
+            </div>
+            <p className="mt-1.5 text-[10px] text-muted">
+              Escolha conforme a impressora térmica da loja. Afeta o número de colunas do cupom.
+            </p>
           </div>
         </div>
 

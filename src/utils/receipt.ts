@@ -1,6 +1,7 @@
 import type { Order } from '@/types'
 
 export const RECEIPT_COLS = 32
+export const RECEIPT_COLS_80 = 48
 
 /**
  * Colunas da impressão via navegador.
@@ -8,6 +9,13 @@ export const RECEIPT_COLS = 32
  * menos colunas deixam cada caractere ~25% maior (mais "forte" no papel).
  */
 export const PRINT_COLS = 26
+export const PRINT_COLS_80 = 40
+
+/** Retorna as colunas corretas para a largura de papel configurada. */
+export function getCols(paperWidth?: '58' | '80'): { receipt: number; print: number } {
+  if (paperWidth === '80') return { receipt: RECEIPT_COLS_80, print: PRINT_COLS_80 }
+  return { receipt: RECEIPT_COLS, print: PRINT_COLS }
+}
 
 function stripAccents(s: string): string {
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -223,11 +231,12 @@ export function printBothViaRawBt(order: Order, storeName = 'MeuCardapio', motob
 }
 
 /** Imprime todos os targets habilitados via RawBT. */
-export function printAllViaRawBt(order: Order, storeName = 'MeuCardapio', motoboy = '', targets: ('kitchen' | 'churrasqueira' | 'delivery')[] = ['kitchen', 'delivery']): string {
+export function printAllViaRawBt(order: Order, storeName = 'MeuCardapio', motoboy = '', targets: ('kitchen' | 'churrasqueira' | 'delivery')[] = ['kitchen', 'delivery'], cols?: number): string {
+  const c = cols ?? RECEIPT_COLS
   const texts = targets.map((t) => {
-    if (t === 'kitchen') return buildKitchenText(order, storeName)
-    if (t === 'churrasqueira') return buildChurrasqueiraText(order, storeName)
-    return buildDeliveryText(order, storeName, motoboy)
+    if (t === 'kitchen') return buildKitchenText(order, storeName, c)
+    if (t === 'churrasqueira') return buildChurrasqueiraText(order, storeName, c)
+    return buildDeliveryText(order, storeName, motoboy, c)
   })
   const text = texts.join('')
   const ascii = stripAccents(text).replace(/[^ -~\n]/g, '')
