@@ -105,8 +105,16 @@ Copie o arquivo completo (ver abaixo). Principais exports:
 import type { Order } from '@/types'
 
 export const RECEIPT_COLS = 32
+export const RECEIPT_COLS_80 = 48
 
 export const PRINT_COLS = 26
+export const PRINT_COLS_80 = 40
+
+/** Retorna as colunas corretas para a largura de papel configurada. */
+export function getCols(paperWidth?: '58' | '80'): { receipt: number; print: number } {
+  if (paperWidth === '80') return { receipt: RECEIPT_COLS_80, print: PRINT_COLS_80 }
+  return { receipt: RECEIPT_COLS, print: PRINT_COLS }
+}
 
 function stripAccents(s: string): string {
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -322,11 +330,12 @@ export function printBothViaRawBt(order: Order, storeName = 'MeuCardapio', motob
 }
 
 /** Imprime todos os targets habilitados via RawBT. */
-export function printAllViaRawBt(order: Order, storeName = 'MeuCardapio', motoboy = '', targets: ('kitchen' | 'churrasqueira' | 'delivery')[] = ['kitchen', 'delivery']): string {
+export function printAllViaRawBt(order: Order, storeName = 'MeuCardapio', motoboy = '', targets: ('kitchen' | 'churrasqueira' | 'delivery')[] = ['kitchen', 'delivery'], cols?: number): string {
+  const c = cols ?? RECEIPT_COLS
   const texts = targets.map((t) => {
-    if (t === 'kitchen') return buildKitchenText(order, storeName)
-    if (t === 'churrasqueira') return buildChurrasqueiraText(order, storeName)
-    return buildDeliveryText(order, storeName, motoboy)
+    if (t === 'kitchen') return buildKitchenText(order, storeName, c)
+    if (t === 'churrasqueira') return buildChurrasqueiraText(order, storeName, c)
+    return buildDeliveryText(order, storeName, motoboy, c)
   })
   const text = texts.join('')
   const ascii = stripAccents(text).replace(/[^ -~\n]/g, '')
@@ -467,6 +476,7 @@ import {
   buildChurrasqueiraText,
   printAllViaRawBt,
   PRINT_COLS,
+  PRINT_COLS_80,
 } from '@/utils/receipt'
 
 interface Props {
@@ -505,10 +515,13 @@ export function PrintOrderModal({ order, storeName = 'MeuCardapio', initialMotob
 
   const [tab, setTab] = useState<string>(enabledTargets[0])
 
+  // Colunas conforme largura do papel configurada (58 ou 80mm)
+  const cols = settings?.paperWidth === '80' ? PRINT_COLS_80 : PRINT_COLS
+
   const buildText = (target: Target): string => {
-    if (target === 'kitchen') return buildKitchenText(order, storeName, PRINT_COLS)
-    if (target === 'churrasqueira') return buildChurrasqueiraText(order, storeName, PRINT_COLS)
-    return buildDeliveryText(order, storeName, motoboy, PRINT_COLS)
+    if (target === 'kitchen') return buildKitchenText(order, storeName, cols)
+    if (target === 'churrasqueira') return buildChurrasqueiraText(order, storeName, cols)
+    return buildDeliveryText(order, storeName, motoboy, cols)
   }
 
   const allTickets = enabledTargets.map((t) => buildText(t))
@@ -593,7 +606,7 @@ export function PrintOrderModal({ order, storeName = 'MeuCardapio', initialMotob
         <div className="flex flex-col gap-2">
           {isAndroid ? (
             <>
-              <Button onClick={() => printAllViaRawBt(order, storeName, motoboy, enabledTargets)} className="w-full text-sm">
+              <Button onClick={() => printAllViaRawBt(order, storeName, motoboy, enabledTargets, cols)} className="w-full text-sm">
                 <Printer size={16} />
                 Imprimir via RawBT
               </Button>
@@ -707,6 +720,7 @@ printTargets?: {
   churrasqueira?: boolean
   delivery?: boolean
 }
+paperWidth?: '58' | '80'  // default: '58'
 ```
 
 ### UI (Settings.tsx) — seção "Impressão de Comandas":
@@ -742,6 +756,37 @@ printTargets?: {
       </div>
     </label>
   </div>
+
+  <div className="mt-4">
+    <label className="mb-1.5 block text-sm font-medium text-brand-white">Largura do papel da impressora</label>
+    <div className="grid grid-cols-2 gap-2">
+      <button
+        type="button"
+        onClick={() => setPaperWidth('58')}
+        className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+          paperWidth === '58'
+            ? 'border-accent bg-accent/10 text-accent'
+            : 'border-border bg-surface-hover text-muted hover:text-brand-white'
+        }`}
+      >
+        58 mm (padrão)
+      </button>
+      <button
+        type="button"
+        onClick={() => setPaperWidth('80')}
+        className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+          paperWidth === '80'
+            ? 'border-accent bg-accent/10 text-accent'
+            : 'border-border bg-surface-hover text-muted hover:text-brand-white'
+        }`}
+      >
+        80 mm
+      </button>
+    </div>
+    <p className="mt-1.5 text-[10px] text-muted">
+      Escolha conforme a impressora térmica da loja. Afeta o número de colunas do cupom.
+    </p>
+  </div>
 </div>
 ```
 
@@ -750,6 +795,7 @@ printTargets?: {
 const [printKitchen, setPrintKitchen] = useState(true)
 const [printChurrasqueira, setPrintChurrasqueira] = useState(false)
 const [printDelivery, setPrintDelivery] = useState(true)
+const [paperWidth, setPaperWidth] = useState<'58' | '80'>('58')
 
 // No load:
 if (data.printTargets) {
@@ -758,6 +804,7 @@ if (data.printTargets) {
   if (pt.churrasqueira !== undefined) setPrintChurrasqueira(pt.churrasqueira)
   if (pt.delivery !== undefined) setPrintDelivery(pt.delivery)
 }
+if (data.paperWidth) setPaperWidth(data.paperWidth)
 
 // No save:
 printTargets: {
@@ -765,6 +812,7 @@ printTargets: {
   churrasqueira: printChurrasqueira,
   delivery: printDelivery,
 },
+paperWidth,
 ```
 
 ## Arquivos mínimos para copiar
@@ -781,10 +829,11 @@ printTargets: {
 ## Adaptações necessárias
 
 - **Tipo `Order`**: deve ter `items` (com productName, quantity, size, flavors, extras, removedIngredients, notes), `deliveryAddress`, `paymentMethod`, `total`, `subtotal`, `deliveryFee`, `discount`, `customerName`, `customerPhone`, `deliveryType`, `couponCode`, `notes`, `changeNeeded`, `changeFor`, `createdAt`
-- **`useSettings` hook**: para ler `settings.printTargets`
+- **`useSettings` hook**: para ler `settings.printTargets` e `settings.paperWidth`
 - **`StoreGuard` / `useStoreGuard`**: para obter `store.name`
 - **`paymentLabel` / `getPaymentLabel`**: adaptar para os métodos de pagamento do outro projeto
 - **RawBT**: requer app RawBT instalado no Android
+- **Largura do papel**: `paperWidth` ('58' | '80') controla as colunas (RECEIPT_COLS/PRINT_COLS). Default '58'. Colunas: 58mm → 32/26, 80mm → 48/40.
 
 ## Roteiro de teste
 1. Configurar targets em Settings (ativar/desativar setores)
